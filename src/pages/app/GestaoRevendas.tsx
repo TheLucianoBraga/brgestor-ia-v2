@@ -1330,20 +1330,67 @@ const GestaoRevendas: React.FC = () => {
         open={deleteDialog.open}
         onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
         title="Apagar conta"
-        description={`Tem certeza que deseja apagar permanentemente "${deleteDialog.tenant?.name}"? Esta ação não pode ser desfeita.`}
-        confirmLabel="Apagar"
+        description={`Tem certeza que deseja apagar permanentemente "${deleteDialog.tenant?.name}"? Esta ação não pode ser desfeita. Todos os dados, clientes, cobranças e configurações serão perdidos.`}
+        confirmLabel="Apagar Permanentemente"
         variant="destructive"
         onConfirm={async () => {
           if (!deleteDialog.tenant) return;
           try {
-            await supabase
+            const tenantId = deleteDialog.tenant.id;
+            
+            // 1. Deletar customers e seus dados relacionados
+            const { data: customersList } = await supabase
+              .from('customers')
+              .select('id')
+              .eq('tenant_id', tenantId);
+            
+            const customerIds = customersList?.map(c => c.id) || [];
+            
+            if (customerIds.length > 0) {
+              // Deletar customer_items
+              await supabase.from('customer_items').delete().in('customer_id', customerIds);
+              // Deletar customer_charges
+              await supabase.from('customer_charges').delete().in('customer_id', customerIds);
+              // Deletar customer_plan_subscriptions
+              await supabase.from('customer_plan_subscriptions').delete().in('customer_id', customerIds);
+              // Deletar customers
+              await supabase.from('customers').delete().in('id', customerIds);
+            }
+            
+            // 2. Deletar subscriptions (planos da revenda)
+            await supabase.from('subscriptions').delete().eq('buyer_tenant_id', tenantId);
+            
+            // 3. Deletar ref_codes
+            await supabase.from('ref_codes').delete().eq('owner_tenant_id', tenantId);
+            
+            // 4. Deletar tenant_members
+            await supabase.from('tenant_members').delete().eq('tenant_id', tenantId);
+            
+            // 5. Deletar activity_logs
+            await supabase.from('activity_logs').delete().eq('tenant_id', tenantId);
+            
+            // 6. Deletar scheduled_messages
+            await supabase.from('scheduled_messages').delete().eq('tenant_id', tenantId);
+            
+            // 7. Deletar whatsapp_templates
+            await supabase.from('whatsapp_templates').delete().eq('tenant_id', tenantId);
+            
+            // 8. Deletar content_posts
+            await supabase.from('content_posts').delete().eq('tenant_id', tenantId);
+            
+            // 9. Por fim, deletar o tenant
+            const { error } = await supabase
               .from('tenants')
               .delete()
-              .eq('id', deleteDialog.tenant.id);
-            toast.success('Conta apagada com sucesso!');
+              .eq('id', tenantId);
+            
+            if (error) throw error;
+            
+            toast.success('Conta e todos os dados apagados com sucesso!');
             refetchChildren();
           } catch (error: any) {
-            toast.error(error.message || 'Erro ao apagar conta');
+            console.error('Erro ao apagar conta:', error);
+            toast.error(error.message || 'Erro ao apagar conta. Verifique as dependências.');
           }
         }}
       />

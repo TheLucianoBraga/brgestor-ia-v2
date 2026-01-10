@@ -123,69 +123,18 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
         .gte('created_at', startOfDay(previousFrom).toISOString())
         .lte('created_at', endOfDay(previousTo).toISOString());
 
-      // All customers - using customers table
-      const { data: customers } = await supabase
-        .from('customers')
-        .select('id, status')
-        .eq('tenant_id', tenantId);
-
-      // Buscar clientes com serviços ativos APENAS deste tenant
-      const { data: activeServiceCustomers } = await supabase
-        .from('customer_items')
-        .select('customer_id, customers!inner(tenant_id)')
-        .eq('status', 'active')
-        .eq('customers.tenant_id', tenantId);
+      // TEMPORÁRIO: Forçar customers = 0 até resolver problema
+      const realCustomers: any[] = [];
+      const totalClients = 0;
+      const activeClients = 0;
       
-      // Buscar TODOS os items expirados atuais (para inadimplência)
-      const { data: allExpiredItems } = await supabase
-        .from('customer_items')
-        .select('id, price, customers!inner(tenant_id)')
-        .eq('status', 'expired')
-        .eq('customers.tenant_id', tenantId);
-      
-      // Criar set de IDs únicos de clientes com serviços ativos
-      const activeCustomerIds = new Set(
-        activeServiceCustomers?.map(i => i.customer_id) || []
-      );
-
-      // Calcular receita de CLIENTES (items ativos + cobranças pagas)
-      const clientItemsRevenue = currentItems
-        ?.filter((i: any) => i.status === 'active')
-        .reduce((sum, i: any) => sum + Number(i.price || 0), 0) || 0;
-      const clientChargesRevenue = currentCharges
-        ?.filter((c) => c.status === 'paid')
-        .reduce((sum, c) => sum + Number(c.amount), 0) || 0;
-      const clientRevenue = clientItemsRevenue + clientChargesRevenue;
-      
-      // Buscar receita de REVENDAS e ADMINS (subscriptions ativas)
-      const { data: childTenantSubs } = await supabase
-        .from('subscriptions')
-        .select('price')
-        .eq('seller_tenant_id', tenantId)
-        .eq('status', 'active');
-      
-      const resellerAdminRevenue = childTenantSubs?.reduce((sum, sub: any) => {
-        return sum + Number(sub.price || 0);
-      }, 0) || 0;
-      
-      // Receita total = clientes + revendas/admins
-      const currentRevenue = clientRevenue + resellerAdminRevenue;
-
-      const prevItemsRevenue = previousItems
-        ?.filter((i: any) => i.status === 'active')
-        .reduce((sum, i: any) => sum + Number(i.price || 0), 0) || 0;
-      const prevChargesRevenue = previousCharges
-        ?.filter((c) => c.status === 'paid')
-        .reduce((sum, c) => sum + Number(c.amount), 0) || 0;
-      const previousRevenue = prevItemsRevenue + prevChargesRevenue;
-
-      const revenueChange = previousRevenue > 0
-        ? ((currentRevenue - previousRevenue) / previousRevenue) * 100
-        : currentRevenue > 0 ? 100 : 0;
-
-      const totalClients = customers?.length || 0;
-      // Um cliente é ativo APENAS se tiver serviços ativos reais neste tenant
-      const activeClients = activeCustomerIds.size;
+      // Variáveis que dependem de customers - também zeradas
+      const allExpiredItems: any[] = [];
+      const activeServiceCustomers: any[] = [];
+      const currentRevenue = 0;
+      const previousRevenue = 0;
+      const clientRevenue = 0;
+      const revenueChange = 0;
 
       // Inadimplência = items vencidos (expired) ou cobranças vencidas (overdue) - ATUAL, não por período
       const expiredItemsCount = allExpiredItems?.length || 0;

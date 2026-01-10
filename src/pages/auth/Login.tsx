@@ -193,9 +193,8 @@ const Login: React.FC = () => {
         <div className="max-w-md text-center relative z-10">
           <div className="relative inline-block mb-8">
             <div className="absolute -inset-4 bg-white/20 rounded-3xl blur-xl" />
-            <img src={logo} alt="BRGestor" className="h-48 w-auto mx-auto relative drop-shadow-2xl" />
+            <img src={logo} alt="BRGestor" className="h-64 w-auto mx-auto relative drop-shadow-2xl" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-4 tracking-tight">BRGestor</h1>
           <p className="text-xl text-white/90 mb-2 font-medium">Plataforma de Gestão, Cobrança e IA</p>
           <p className="text-white/70 mb-8 leading-relaxed">
             Simplifique sua gestão de assinaturas, cobranças e relacionamento com clientes com tecnologia de ponta.

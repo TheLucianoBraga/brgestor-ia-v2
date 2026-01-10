@@ -1,6 +1,6 @@
 # Caddyfile
-# Substitua BRGESTOR_DOMAIN pelo seu domínio real (ex: brgestor.seudominio.com)
-BRGESTOR_DOMAIN {
+# HTTP apenas, sem SSL
+:80 {
   reverse_proxy brgestor:80
   encode gzip
 }

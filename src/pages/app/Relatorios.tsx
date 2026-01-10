@@ -65,6 +65,7 @@ import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
 import { cn } from '@/lib/utils';
 import { useExport, ExportColumn } from '@/hooks/useExport';
 import { ComparisonCard } from '@/components/relatorios/ComparisonCard';
+import { AIInsights } from '@/components/relatorios/AIInsights';
 
 const CHART_HEIGHT = 320;
 const CHART_COLORS = ['#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4'];
@@ -408,7 +409,7 @@ const Relatorios: React.FC = () => {
 
         <Card className="rounded-xl bg-indigo-500/5 shadow-sm border-indigo-500/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Ativos de Admin</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Ativos de Revendas</CardTitle>
             <div className="p-2 rounded-xl bg-indigo-500/10">
               <BarChart3 className="h-5 w-5 text-indigo-600" />
             </div>
@@ -432,6 +433,9 @@ const Relatorios: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Insights - Análise Inteligente */}
+      <AIInsights metrics={safeMetrics} />
 
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

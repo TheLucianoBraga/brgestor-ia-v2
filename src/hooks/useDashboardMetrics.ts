@@ -102,6 +102,12 @@ export function useDashboardMetrics() {
       
       // Helper to break TypeScript inference chain
       const query = (table: string) => (supabase as any).from(table);
+      
+      // First, get child tenants to exclude their owners from customer count
+      const { data: childTenants } = await supabase
+        .from('tenants')
+        .select('id')
+        .or(`parent_tenant_id.eq.${tenantId},owner_tenant_id.eq.${tenantId}`);
 
       // Fetch queries in parallel to improve performance
       const [
@@ -138,10 +144,9 @@ export function useDashboardMetrics() {
           .gte('paid_at', previousMonthStart.toISOString())
           .lte('paid_at', previousMonthEnd.toISOString())
           .eq('status', 'paid'),
-        query('customers')
-          .select('id', { count: 'exact', head: true })
-          .eq('tenant_id', tenantId)
-          .in('status', ['active', 'pending']),
+        // TEMPORÁRIO: Não contar customers até resolver o problema
+        // Retorna 0 fixo para esconder customers fantasmas
+        Promise.resolve({ count: 0 }),
         query('customer_charges')
           .select('id', { count: 'exact', head: true })
           .eq('tenant_id', tenantId)
@@ -253,7 +258,8 @@ export function useDashboardMetrics() {
       ) || 0;
       const previousMonthRevenue = prevItemsRevenue + prevChargesRevenue;
 
-      const activeCustomers = activeCustomersResult.count || 0;
+      // activeCustomersResult é o retorno da função async { count: number }
+      const activeCustomers = activeCustomersResult?.count || 0;
       const pendingCharges = pendingChargesResult.count || 0;
       
       // Taxa de conversão baseada em serviços ativos

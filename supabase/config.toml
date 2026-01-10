@@ -1,0 +1,76 @@
+project_id = "your-project-ref"
+
+[functions.process-scheduled-charges]
+verify_jwt = false
+
+[functions.mp-create-pix]
+verify_jwt = false
+
+[functions.mp-create-preference]
+verify_jwt = false
+
+[functions.mp-check-status]
+verify_jwt = false
+
+[functions.mp-webhook]
+verify_jwt = false
+
+[functions.mp-process-card]
+verify_jwt = false
+
+[functions.ai-generate]
+verify_jwt = false
+
+[functions.chatbot-response]
+verify_jwt = true
+
+[functions.chat-ai]
+verify_jwt = false
+
+[functions.chat-contextual]
+verify_jwt = false
+
+[functions.waha-api]
+verify_jwt = false
+
+[functions.waha-webhook]
+verify_jwt = false
+
+[functions.create-tenant-with-owner]
+verify_jwt = true
+
+[functions.process-trial-notifications]
+verify_jwt = false
+
+[functions.asaas-webhook]
+verify_jwt = false
+
+[functions.asaas-create-charge]
+verify_jwt = false
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.stripe-create-charge]
+verify_jwt = false
+
+[functions.stripe-create-payment-intent]
+verify_jwt = false
+
+[functions.pagseguro-webhook]
+verify_jwt = false
+
+[functions.pagseguro-create-charge]
+verify_jwt = false
+
+[functions.asaas-process-card]
+verify_jwt = false
+
+[functions.pagseguro-process-card]
+verify_jwt = false
+
+[functions.stripe-create-pix]
+verify_jwt = false
+
+[functions.expense-ai]
+verify_jwt = false

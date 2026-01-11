@@ -3,7 +3,12 @@ version: "3.8"
 
 services:
   brgestor:
-    build: .
+    build:
+      context: .
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_PUBLISHABLE_KEY: ${VITE_SUPABASE_PUBLISHABLE_KEY}
+        VITE_APP_URL: ${VITE_APP_URL}
     image: brgestor:latest
     restart: unless-stopped
     networks:

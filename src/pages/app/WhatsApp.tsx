@@ -123,20 +123,44 @@ export default function WhatsApp() {
       if (wahaConfigured && currentTenant?.id && mounted) {
         setIsRefreshing(true);
         try {
-          const result = await callWahaApi('get-status');
+          const sessionName = `tenant_${currentTenant.id.substring(0, 8)}`;
+          const wahaUrl = getSetting('waha_api_url')!;
+          const wahaKey = getSetting('waha_api_key')!;
           
-          if (result.success && result.data && mounted) {
-            const status = result.data.status as WAHAStatus['status'];
+          const res = await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
+            method: 'GET',
+            headers: { 'X-Api-Key': wahaKey },
+          });
+          
+          if (res.ok && mounted) {
+            const data = await res.json();
+            const status = data.status as WAHAStatus['status'];
             
             if (status === 'WORKING') {
               setConnectionStatus('connected');
               setQrCode('');
               
-              if (result.data.me) {
-                const phoneId = result.data.me.id?.split('@')[0] || '';
+              if (data.me) {
+                const phoneId = data.me.id?.split('@')[0] || '';
                 setConnectedPhone(phoneId);
-                setConnectedName(result.data.me.pushName || '');
+                setConnectedName(data.me.pushName || '');
               }
+              
+              // SEMPRE garantir que webhook está configurado
+              const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
+              fetch(`${wahaUrl}/api/${sessionName}/settings`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Api-Key': wahaKey,
+                },
+                body: JSON.stringify({
+                  webhooks: [{
+                    url: webhookUrl,
+                    events: ['message']
+                  }]
+                }),
+              }).catch(() => {/* Ignorar erro - webhook pode já estar configurado */});
             } else if (status === 'SCAN_QR_CODE') {
               setConnectionStatus('waiting_qr');
             } else {
@@ -173,22 +197,6 @@ export default function WhatsApp() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wahaConfigured, currentTenant?.id]);
 
-  const callWahaApi = async (action: string, data?: any) => {
-    if (!currentTenant?.id) {
-      throw new Error('Tenant não selecionado');
-    }
-
-    const response = await supabase.functions.invoke('waha-api', {
-      body: { action, tenantId: currentTenant.id, data },
-    });
-
-    if (response.error) {
-      throw new Error(response.error.message);
-    }
-
-    return response.data;
-  };
-
   const formatQrCodeValue = (value?: string) => {
     if (!value) {
       return null;
@@ -217,43 +225,120 @@ export default function WhatsApp() {
     setQrCode('');
 
     try {
-      console.log('🔵 Gerando QR Code via Edge Function...');
+      console.log('🔵 Gerando QR Code...');
       
-      // Usar Edge Function waha-api em vez de chamada direta ao WAHA
-      // Isso resolve o problema de Mixed Content (HTTPS -> HTTP)
-      const result = await callWahaApi('get-qr');
-
-      if (result.success && result.data?.value) {
-        const qrValue = result.data.value;
+      const sessionName = `tenant_${currentTenant?.id?.substring(0, 8) || 'default'}`;
+      const wahaUrl = getSetting('waha_api_url')!;
+      const wahaKey = getSetting('waha_api_key')!;
+      
+      // Step 1: Criar/iniciar sessão
+      console.log('1. Criando sessão:', sessionName);
+      
+      try {
+        const createRes = await fetch(`${wahaUrl}/api/sessions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Api-Key': wahaKey,
+          },
+          body: JSON.stringify({
+            name: sessionName,
+            start: true
+          }),
+        });
         
-        // Formatar QR Code
-        let formattedQR = qrValue;
-        
-        // Se vier como base64 puro (sem prefixo), adicionar
-        if (!qrValue.startsWith('data:') && !qrValue.startsWith('raw:')) {
-          formattedQR = `data:image/png;base64,${qrValue}`;
+        if (!createRes.ok) {
+          const errorText = await createRes.text();
+          console.log('Erro ao criar sessão:', createRes.status, errorText);
+          
+          // Se erro 422 = sessão já existe, tentar iniciar
+          if (createRes.status === 422) {
+            console.log('Sessão existe, iniciando...');
+            await fetch(`${wahaUrl}/api/sessions/${sessionName}/start`, {
+              method: 'POST',
+              headers: { 'X-Api-Key': wahaKey },
+            });
+          }
         }
-        // Se vier como raw, converter para URL
-        else if (qrValue.startsWith('raw:')) {
-          const rawValue = qrValue.substring(4);
-          formattedQR = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(rawValue)}`;
-        }
-        
-        setQrCode(formattedQR);
-        setConnectionStatus('waiting_qr');
-        toast.success('QR Code gerado! Escaneie com seu WhatsApp');
-        startStatusPolling();
-        return;
+      } catch (e) {
+        console.log('Erro na criação:', e);
       }
 
-      if (result.error === 'already_connected') {
-        setConnectionStatus('connected');
-        setQrCode('');
-        toast.info('WhatsApp já está conectado');
-        return;
+      // Step 2: Aguardar e buscar QR Code
+      console.log('2. Buscando QR Code...');
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Aguardar 2s
+      
+      for (let attempt = 0; attempt < 10; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log(`Tentativa ${attempt + 1}/10`);
+
+        // Verificar status
+        const statusRes = await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
+          method: 'GET',
+          headers: { 'X-Api-Key': wahaKey },
+        });
+
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          console.log('Status:', statusData.status);
+
+          if (statusData.status === 'WORKING') {
+            setConnectionStatus('connected');
+            setQrCode('');
+            
+            // Configurar webhook após conectar
+            console.log('3. Configurando webhook...');
+            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
+            try {
+              await fetch(`${wahaUrl}/api/${sessionName}/settings`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Api-Key': wahaKey,
+                },
+                body: JSON.stringify({
+                  webhooks: [{
+                    url: webhookUrl,
+                    events: ['message']
+                  }]
+                }),
+              });
+              console.log('✅ Webhook configurado!');
+            } catch (e) {
+              console.log('⚠️ Erro ao configurar webhook:', e);
+            }
+            
+            toast.info('WhatsApp já está conectado');
+            return;
+          }
+
+          if (statusData.status === 'SCAN_QR_CODE') {
+            // Buscar QR como imagem
+            const qrRes = await fetch(`${wahaUrl}/api/${sessionName}/auth/qr`, {
+              method: 'GET',
+              headers: {
+                'X-Api-Key': wahaKey,
+                'Accept': 'image/png',
+              },
+            });
+
+            if (qrRes.ok && qrRes.headers.get('content-type')?.includes('image')) {
+              const buffer = await qrRes.arrayBuffer();
+              const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+              setQrCode(`data:image/png;base64,${base64}`);
+              toast.success('QR Code gerado! Escaneie com seu WhatsApp');
+              
+              // Configurar webhook para quando conectar
+              console.log('3. Webhook será configurado após escanear...');
+              
+              startStatusPolling();
+              return;
+            }
+          }
+        }
       }
 
-      toast.error(result.error || 'Não foi possível gerar o QR Code');
+      toast.error('Não foi possível gerar o QR Code');
       setConnectionStatus('disconnected');
     } catch (error) {
       console.error('QR error:', error);
@@ -280,20 +365,50 @@ export default function WhatsApp() {
       }
 
       try {
-        const result = await callWahaApi('get-status');
+        const sessionName = `tenant_${currentTenant?.id?.substring(0, 8) || 'default'}`;
+        const wahaUrl = getSetting('waha_api_url')!;
+        const wahaKey = getSetting('waha_api_key')!;
         
-        if (result.success && result.data) {
-          const status = result.data.status as WAHAStatus['status'];
+        const res = await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
+          method: 'GET',
+          headers: { 'X-Api-Key': wahaKey },
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          const status = data.status as WAHAStatus['status'];
           
           if (status === 'WORKING') {
             clearInterval(poll);
             setConnectionStatus('connected');
             setQrCode('');
             
-            if (result.data.me) {
-              const phoneId = result.data.me.id?.split('@')[0] || '';
+            if (data.me) {
+              const phoneId = data.me.id?.split('@')[0] || '';
               setConnectedPhone(phoneId);
-              setConnectedName(result.data.me.pushName || '');
+              setConnectedName(data.me.pushName || '');
+            }
+            
+            // Configurar webhook após conectar via QR
+            console.log('✅ Conectado! Configurando webhook...');
+            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
+            try {
+              await fetch(`${wahaUrl}/api/${sessionName}/settings`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Api-Key': wahaKey,
+                },
+                body: JSON.stringify({
+                  webhooks: [{
+                    url: webhookUrl,
+                    events: ['message']
+                  }]
+                }),
+              });
+              console.log('✅ Webhook configurado - IA ativa!');
+            } catch (e) {
+              console.log('⚠️ Erro ao configurar webhook:', e);
             }
             
             toast.success('WhatsApp conectado com sucesso!');
@@ -318,20 +433,44 @@ export default function WhatsApp() {
 
     setIsRefreshing(true);
     try {
-      const result = await callWahaApi('get-status');
+      const sessionName = `tenant_${currentTenant?.id?.substring(0, 8) || 'default'}`;
+      const wahaUrl = getSetting('waha_api_url')!;
+      const wahaKey = getSetting('waha_api_key')!;
       
-      if (result.success && result.data) {
-        const status = result.data.status as WAHAStatus['status'];
+      const res = await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
+        method: 'GET',
+        headers: { 'X-Api-Key': wahaKey },
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        const status = data.status as WAHAStatus['status'];
         
         if (status === 'WORKING') {
           setConnectionStatus('connected');
           setQrCode('');
           
-          if (result.data.me) {
-            const phoneId = result.data.me.id?.split('@')[0] || '';
+          if (data.me) {
+            const phoneId = data.me.id?.split('@')[0] || '';
             setConnectedPhone(phoneId);
-            setConnectedName(result.data.me.pushName || '');
+            setConnectedName(data.me.pushName || '');
           }
+          
+          // SEMPRE garantir que webhook está configurado
+          const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
+          fetch(`${wahaUrl}/api/${sessionName}/settings`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Api-Key': wahaKey,
+            },
+            body: JSON.stringify({
+              webhooks: [{
+                url: webhookUrl,
+                events: ['message']
+              }]
+            }),
+          }).catch(() => {/* Ignorar erro */});
         } else if (status === 'SCAN_QR_CODE') {
           setConnectionStatus('waiting_qr');
           try {
@@ -367,16 +506,23 @@ export default function WhatsApp() {
   const handleDisconnect = async () => {
     setIsRefreshing(true);
     try {
-      const result = await callWahaApi('logout');
+      const sessionName = `tenant_${currentTenant?.id?.substring(0, 8) || 'default'}`;
+      const wahaUrl = getSetting('waha_api_url')!;
+      const wahaKey = getSetting('waha_api_key')!;
       
-      if (result.success) {
+      const res = await fetch(`${wahaUrl}/api/${sessionName}/auth/logout`, {
+        method: 'POST',
+        headers: { 'X-Api-Key': wahaKey },
+      });
+      
+      if (res.ok) {
         setConnectionStatus('disconnected');
         setConnectedPhone('');
         setConnectedName('');
         setQrCode('');
         toast.success('Sessão desconectada');
       } else {
-        toast.error(result.error || 'Erro ao desconectar');
+        toast.error('Erro ao desconectar');
       }
     } catch (error) {
       console.error('Error disconnecting:', error);
@@ -389,8 +535,19 @@ export default function WhatsApp() {
   const handleClearSession = async () => {
     setIsRefreshing(true);
     try {
-      await callWahaApi('logout');
-      await callWahaApi('stop-session');
+      const sessionName = `tenant_${currentTenant?.id?.substring(0, 8) || 'default'}`;
+      const wahaUrl = getSetting('waha_api_url')!;
+      const wahaKey = getSetting('waha_api_key')!;
+      
+      await fetch(`${wahaUrl}/api/${sessionName}/auth/logout`, {
+        method: 'POST',
+        headers: { 'X-Api-Key': wahaKey },
+      });
+      
+      await fetch(`${wahaUrl}/api/sessions/${sessionName}/stop`, {
+        method: 'POST',
+        headers: { 'X-Api-Key': wahaKey },
+      });
       
       setConnectionStatus('disconnected');
       setConnectedPhone('');
@@ -419,15 +576,27 @@ export default function WhatsApp() {
 
     setIsSendingTest(true);
     try {
-      const result = await callWahaApi('send-message', {
-        phone: testPhone,
-        message: testMessage,
+      const sessionName = `tenant_${currentTenant?.id?.substring(0, 8) || 'default'}`;
+      const wahaUrl = getSetting('waha_api_url')!;
+      const wahaKey = getSetting('waha_api_key')!;
+      
+      const res = await fetch(`${wahaUrl}/api/sendText`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Api-Key': wahaKey,
+        },
+        body: JSON.stringify({
+          session: sessionName,
+          chatId: `${testPhone}@c.us`,
+          text: testMessage,
+        }),
       });
 
-      if (result.success) {
+      if (res.ok) {
         toast.success('Mensagem de teste enviada com sucesso!');
       } else {
-        toast.error(result.error || 'Erro ao enviar mensagem');
+        toast.error('Erro ao enviar mensagem');
       }
     } catch (error) {
       console.error('Error sending test message:', error);

@@ -146,19 +146,12 @@ export function useDashboardMetrics() {
           .gte('paid_at', previousMonthStart.toISOString())
           .lte('paid_at', previousMonthEnd.toISOString())
           .eq('status', 'paid'),
-        // Buscar clientes ativos excluindo donos de revendas
-        (async () => {
-          let activeQuery = query('customers')
-            .select('id', { count: 'exact', head: true })
-            .eq('tenant_id', tenantId)
-            .eq('status', 'active');
-          
-          if (excludeCustomerIds.length > 0) {
-            activeQuery = activeQuery.not('id', 'in', `(${excludeCustomerIds.join(',')})`);
-          }
-          
-          return await activeQuery;
-        })(),
+        // Contar APENAS clientes com serviços/itens ativos (clientes reais)
+        query('customers')
+          .select('id, customer_items!inner(id)', { count: 'exact', head: true })
+          .eq('tenant_id', tenantId)
+          .eq('status', 'active')
+          .eq('customer_items.status', 'active'),
         query('customer_charges')
           .select('id', { count: 'exact', head: true })
           .eq('tenant_id', tenantId)

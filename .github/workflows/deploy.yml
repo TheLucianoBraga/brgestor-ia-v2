@@ -19,6 +19,9 @@ jobs:
 
       - name: Run remote deploy script on VPS
         env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
           REPO_DIR: /home/brgestor/brgestor-ia-v2
           BRANCH: master
           DOCKER_COMPOSE_CMD: docker compose

@@ -217,120 +217,43 @@ export default function WhatsApp() {
     setQrCode('');
 
     try {
-      console.log('🔵 Gerando QR Code...');
+      console.log('🔵 Gerando QR Code via Edge Function...');
       
-      // CHAMADA DIRETA À API WAHA COMO NO CÓDIGO ORIGINAL QUE FUNCIONA
-      const sessionName = `tenant_${currentTenant?.id?.substring(0, 8) || 'default'}`;
-      
-      // Step 1: Criar/iniciar sessão
-      console.log('1. Criando sessão:', sessionName);
-      const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
-      const createResponse = await fetch(`${getSetting('waha_api_url')}/api/sessions`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Api-Key': getSetting('waha_api_key')!,
-        },
-        body: JSON.stringify({
-          name: sessionName,
-          start: true,
-          config: { 
-            proxy: null, 
-            webhooks: [{
-              url: webhookUrl,
-              events: ['message']
-            }]
-          }
-        }),
-      });
+      // Usar Edge Function waha-api em vez de chamada direta ao WAHA
+      // Isso resolve o problema de Mixed Content (HTTPS -> HTTP)
+      const result = await callWahaApi('get-qr');
 
-      console.log('Create status:', createResponse.status);
-
-      // Se sessão já existe, tentar iniciar
-      if (createResponse.status === 422 || createResponse.status === 409) {
-        console.log('Sessão já existe, iniciando...');
-        await fetch(`${getSetting('waha_api_url')}/api/sessions/${sessionName}/start`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Api-Key': getSetting('waha_api_key')!,
-          },
-        });
-      }
-
-      // Step 2: Polling por QR Code (10 tentativas, 1 segundo cada)
-      console.log('2. Polling por QR Code...');
-      let qrCodeFound = '';
-      let isConnected = false;
-
-      for (let attempt = 0; attempt < 10; attempt++) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log(`Tentativa ${attempt + 1}/10`);
-
-        // Verificar status da sessão
-        const statusResponse = await fetch(`${getSetting('waha_api_url')}/api/sessions/${sessionName}`, {
-          method: 'GET',
-          headers: { 'X-Api-Key': getSetting('waha_api_key')! },
-        });
-
-        if (statusResponse.ok) {
-          const statusData = await statusResponse.json();
-          console.log('Status:', statusData.status);
-
-          if (statusData.status === 'WORKING' || statusData.status === 'CONNECTED') {
-            isConnected = true;
-            console.log('✅ Já conectado!');
-            break;
-          }
-
-          if (statusData.status === 'SCAN_QR_CODE') {
-            // Buscar QR Code como imagem
-            const qrResponse = await fetch(`${getSetting('waha_api_url')}/api/${sessionName}/auth/qr`, {
-              method: 'GET',
-              headers: {
-                'X-Api-Key': getSetting('waha_api_key')!,
-                'Accept': 'image/png',
-              },
-            });
-
-            if (qrResponse.ok) {
-              const contentType = qrResponse.headers.get('content-type') || '';
-              
-              if (contentType.includes('image')) {
-                // Converter imagem para base64
-                const imageBuffer = await qrResponse.arrayBuffer();
-                const uint8Array = new Uint8Array(imageBuffer);
-                let binary = '';
-                const chunkSize = 8192;
-                for (let i = 0; i < uint8Array.length; i += chunkSize) {
-                  const chunk = uint8Array.subarray(i, Math.min(i + chunkSize, uint8Array.length));
-                  binary += String.fromCharCode.apply(null, Array.from(chunk));
-                }
-                const base64 = btoa(binary);
-                qrCodeFound = `data:image/png;base64,${base64}`;
-                console.log('✅ QR Code obtido!');
-                break;
-              }
-            }
-          }
+      if (result.success && result.data?.value) {
+        const qrValue = result.data.value;
+        
+        // Formatar QR Code
+        let formattedQR = qrValue;
+        
+        // Se vier como base64 puro (sem prefixo), adicionar
+        if (!qrValue.startsWith('data:') && !qrValue.startsWith('raw:')) {
+          formattedQR = `data:image/png;base64,${qrValue}`;
         }
+        // Se vier como raw, converter para URL
+        else if (qrValue.startsWith('raw:')) {
+          const rawValue = qrValue.substring(4);
+          formattedQR = `https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(rawValue)}`;
+        }
+        
+        setQrCode(formattedQR);
+        setConnectionStatus('waiting_qr');
+        toast.success('QR Code gerado! Escaneie com seu WhatsApp');
+        startStatusPolling();
+        return;
       }
 
-      if (isConnected) {
+      if (result.error === 'already_connected') {
         setConnectionStatus('connected');
         setQrCode('');
         toast.info('WhatsApp já está conectado');
         return;
       }
 
-      if (qrCodeFound) {
-        setQrCode(qrCodeFound);
-        toast.success('QR Code gerado! Escaneie com seu WhatsApp');
-        startStatusPolling();
-        return;
-      }
-
-      toast.error('Não foi possível gerar o QR Code');
+      toast.error(result.error || 'Não foi possível gerar o QR Code');
       setConnectionStatus('disconnected');
     } catch (error) {
       console.error('QR error:', error);

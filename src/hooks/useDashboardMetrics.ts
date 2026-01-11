@@ -106,8 +106,10 @@ export function useDashboardMetrics() {
       // First, get child tenants to exclude their owners from customer count
       const { data: childTenants } = await supabase
         .from('tenants')
-        .select('id')
+        .select('customer_id')
         .or(`parent_tenant_id.eq.${tenantId},owner_tenant_id.eq.${tenantId}`);
+
+      const excludeCustomerIds = childTenants?.map(t => t.customer_id).filter(Boolean) || [];
 
       // Fetch queries in parallel to improve performance
       const [
@@ -144,10 +146,19 @@ export function useDashboardMetrics() {
           .gte('paid_at', previousMonthStart.toISOString())
           .lte('paid_at', previousMonthEnd.toISOString())
           .eq('status', 'paid'),
-        query('customers')
-          .select('id', { count: 'exact', head: true })
-          .eq('tenant_id', tenantId)
-          .eq('status', 'active'),
+        // Buscar clientes ativos excluindo donos de revendas
+        (async () => {
+          let activeQuery = query('customers')
+            .select('id', { count: 'exact', head: true })
+            .eq('tenant_id', tenantId)
+            .eq('status', 'active');
+          
+          if (excludeCustomerIds.length > 0) {
+            activeQuery = activeQuery.not('id', 'in', `(${excludeCustomerIds.join(',')})`);
+          }
+          
+          return await activeQuery;
+        })(),
         query('customer_charges')
           .select('id', { count: 'exact', head: true })
           .eq('tenant_id', tenantId)

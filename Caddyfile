@@ -32,3 +32,22 @@ brgestor.com, www.brgestor.com {
         format json
     }
 }
+
+# Proxy HTTPS para WAHA API
+waha.brgestor.com {
+    reverse_proxy 72.60.14.172:3000
+    
+    # Headers CORS
+    header {
+        Access-Control-Allow-Origin "*"
+        Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+        Access-Control-Allow-Headers "*"
+    }
+    
+    # Logs
+    log {
+        output file /var/log/caddy/waha-access.log
+        format json
+    }
+}
+

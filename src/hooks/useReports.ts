@@ -123,31 +123,59 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
         .gte('created_at', startOfDay(previousFrom).toISOString())
         .lte('created_at', endOfDay(previousTo).toISOString());
 
-      // TEMPORÁRIO: Forçar customers = 0 até resolver problema
-      const realCustomers: any[] = [];
-      const totalClients = 0;
-      const activeClients = 0;
-      
-      // Variáveis que dependem de customers - também zeradas
-      const allExpiredItems: any[] = [];
-      const activeServiceCustomers: any[] = [];
-      const currentRevenue = 0;
-      const previousRevenue = 0;
-      const clientRevenue = 0;
-      const revenueChange = 0;
+      // Active clients - apenas clientes com itens ativos no período
+      const { data: activeCustomersData } = await supabase
+        .from('customers')
+        .select('id, customer_items!inner(id)')
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active')
+        .eq('customer_items.status', 'active')
+        .gte('customer_items.created_at', startOfDay(dateRange.from).toISOString())
+        .lte('customer_items.created_at', endOfDay(dateRange.to).toISOString());
+
+      const activeClients = activeCustomersData?.length || 0;
+
+      // Total clients (all with status active)
+      const { count: totalClients } = await supabase
+        .from('customers')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active');
+
+      // Items vencidos e cobranças vencidas
+      const { data: allExpiredItems } = await supabase
+        .from('customer_items')
+        .select('id, customers!inner(tenant_id)')
+        .eq('customers.tenant_id', tenantId)
+        .eq('status', 'expired');
+
+      // Revenue calculation
+      const itemsRevenue = currentItems?.reduce((sum, item) => sum + Number(item.price || 0), 0) || 0;
+      const chargesRevenue = currentCharges?.filter(c => c.status === 'paid')
+        .reduce((sum, charge) => sum + Number(charge.amount || 0), 0) || 0;
+      const currentRevenue = itemsRevenue + chargesRevenue;
+
+      const prevItemsRevenue = previousItems?.reduce((sum, item) => sum + Number(item.price || 0), 0) || 0;
+      const prevChargesRevenue = previousCharges?.filter(c => c.status === 'paid')
+        .reduce((sum, charge) => sum + Number(charge.amount || 0), 0) || 0;
+      const previousRevenue = prevItemsRevenue + prevChargesRevenue;
+
+      const revenueChange = previousRevenue > 0
+        ? ((currentRevenue - previousRevenue) / previousRevenue) * 100
+        : 0;
 
       // Inadimplência = items vencidos (expired) ou cobranças vencidas (overdue) - ATUAL, não por período
       const expiredItemsCount = allExpiredItems?.length || 0;
       const overdueChargesCount = currentCharges?.filter((c) => c.status === 'overdue').length || 0;
       const overdueCount = expiredItemsCount + overdueChargesCount;
       
-      const totalActiveItems = activeServiceCustomers?.length || 0;
-      const totalForPercentage = totalActiveItems + expiredItemsCount;
+      const activeItemsCount = currentItems?.filter(i => i.status === 'active').length || 0;
+      const totalForPercentage = activeItemsCount + expiredItemsCount;
       const overduePercentage = totalForPercentage > 0 ? (expiredItemsCount / totalForPercentage) * 100 : 0;
 
       // Ticket médio = receita total / quantidade total de serviços ativos
-      const averageTicket = totalActiveItems > 0
-        ? currentRevenue / totalActiveItems
+      const averageTicket = activeItemsCount > 0
+        ? currentRevenue / activeItemsCount
         : 0;
 
       // Calculate previous period metrics
@@ -155,10 +183,7 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
       const previousTotalCharges = previousCharges?.length || 0;
       const previousOverduePercentage = previousTotalCharges > 0 ? (previousOverdueCount / previousTotalCharges) * 100 : 0;
 
-      const previousActiveItems = totalActiveItems > 0 
-        ? Math.round(totalActiveItems * (previousRevenue / (currentRevenue || 1)))
-        : 0;
-
+      const previousActiveItems = previousItems?.filter(i => i.status === 'active').length || 0;
       const previousAverageTicket = previousActiveItems > 0
         ? previousRevenue / previousActiveItems
         : 0;

@@ -48,7 +48,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTenant } from "@/contexts/TenantContext";
 import { WhatsAppFloatingButton } from "@/components/public/WhatsAppFloatingButton";
 import { SYSTEM_FEATURES, type Category, type SubCategory, type Feature } from "@/data/systemFeatures";
-import logoBraga from "@/assets/logo-braga.png";
+import logo from "@/assets/logo.png";
 import { FAQ } from "@/components/landing/FAQ";
 import { Testimonials } from "@/components/landing/Testimonials";
 
@@ -765,12 +765,12 @@ const FeatureCategoryCard = ({
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-3">
               <motion.img 
-                src={logoBraga} 
+                src={logo} 
                 alt="BRGestor" 
                 className="h-10 w-auto"
                 whileHover={{ scale: 1.05 }}
               />
-              <span className="font-bold text-xl hidden sm:inline">BRGestor</span>
+              <span className="font-bold text-xl hidden sm:inline">BRGESTOR</span>
             </Link>
 
             <nav className="hidden md:flex items-center gap-8">
@@ -875,94 +875,120 @@ const FeatureCategoryCard = ({
         </div>
         
         <div className="container mx-auto">
-          <div className="max-w-4xl mx-auto text-center">
+          <div className="max-w-6xl mx-auto text-center">
             <motion.div
               initial="hidden"
               animate="visible"
               variants={staggerContainer}
             >
               <motion.div variants={scaleIn}>
-                <Badge variant="secondary" className="mb-6 py-2 px-4 text-sm">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {stats.activeFeatures}+ funcionalidades • 7 dias grátis
+                <Badge variant="secondary" className="mb-6 py-2 px-4 text-sm bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
+                  <Crown className="w-4 h-4 mr-2 text-primary" />
+                  🚀 EXCLUSIVO: Primeira Plataforma do Brasil com IA Avançada • 7 dias grátis
                 </Badge>
               </motion.div>
               
               <motion.h1 
                 variants={fadeInUp}
-                className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+                className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-8 leading-tight"
               >
-                Automatize seu negócio
+                O ÚNICO SISTEMA QUE
                 <br />
                 <motion.span 
                   className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
                   animate={{ backgroundPosition: ["0%", "200%"] }}
                   transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
                 >
-                  e aumente sua receita
+                  GERA PIX COM IA
                 </motion.span>
+                <br />
+                NO WHATSAPP 24/7
               </motion.h1>
               
               <motion.p 
                 variants={fadeInUp}
-                className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8"
+                className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto mb-10 leading-relaxed"
               >
-                Cobranças automáticas, WhatsApp integrado, IA e muito mais.
-                <strong className="text-foreground"> Comece grátis hoje.</strong>
+                ⚡ <strong className="text-foreground">CHATBOT QUE GERA PIX INSTANTÂNEO</strong> • 📊 <strong className="text-foreground">RELATÓRIOS COM IA QUE PREVEEM O FUTURO</strong> • 🎯 <strong className="text-foreground">AUTOMAÇÃO DE COBRANÇA 100% INTELIGENTE</strong>
               </motion.p>
+
+              {/* Exclusive Features Showcase */}
+              <motion.div 
+                variants={staggerContainer}
+                className="grid md:grid-cols-3 gap-4 mb-8 max-w-4xl mx-auto"
+              >
+                {[
+                  { icon: Bot, title: "IA que Gera PIX", desc: "Cliente pede via WhatsApp = PIX pronto em 2 segundos", color: "from-blue-500 to-cyan-500" },
+                  { icon: Sparkles, title: "Relatórios que Preveem", desc: "IA prevê inadimplência e sugere ações automáticas", color: "from-purple-500 to-pink-500" },
+                  { icon: Zap, title: "Automação Total", desc: "Da cobrança ao pagamento, tudo 100% automático", color: "from-orange-500 to-red-500" }
+                ].map((feature, i) => (
+                  <motion.div 
+                    key={i}
+                    variants={scaleIn}
+                    whileHover={{ scale: 1.05, y: -5 }}
+                    className="bg-gradient-to-br from-background/50 to-background/80 backdrop-blur-md border border-primary/20 rounded-2xl p-8 group hover:border-primary/50 transition-all duration-300"
+                  >
+                    <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center mb-6 mx-auto group-hover:scale-110 transition-transform`}>
+                      <feature.icon className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="font-bold text-xl mb-3 group-hover:text-primary transition-colors">{feature.title}</h3>
+                    <p className="text-base text-muted-foreground leading-relaxed">{feature.desc}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
 
               <motion.div 
                 variants={fadeInUp}
-                className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
+                className="flex flex-col sm:flex-row gap-6 justify-center mb-12"
               >
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button size="lg" asChild className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-accent hover:opacity-90 shadow-lg shadow-primary/25">
+                  <Button size="lg" asChild className="text-xl px-12 py-8 bg-gradient-to-r from-primary via-accent to-primary hover:opacity-90 shadow-2xl shadow-primary/50 animate-pulse">
                     <Link to={REVENDA_SIGNUP_LINK}>
-                      <Rocket className="mr-2 w-5 h-5" />
-                      Começar 7 Dias Grátis
-                      <ChevronRight className="ml-2 w-5 h-5" />
+                      <Rocket className="mr-3 w-6 h-6" />
+                      🎁 TESTAR GRÁTIS 7 DIAS
+                      <ChevronRight className="ml-3 w-6 h-6" />
                     </Link>
                   </Button>
                 </motion.div>
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button size="lg" variant="outline" asChild className="text-lg px-8 py-6">
-                    <a href="#planos">
-                      <Play className="mr-2 w-5 h-5" />
-                      Ver Planos
+                  <Button size="lg" variant="outline" asChild className="text-xl px-10 py-8 border-2 hover:bg-primary hover:text-primary-foreground">
+                    <a href="#exclusivos">
+                      <Play className="mr-3 w-6 h-6" />
+                      VER RECURSOS ÚNICOS
                     </a>
                   </Button>
                 </motion.div>
               </motion.div>
 
-              <motion.p variants={fadeInUp} className="text-sm text-muted-foreground">
-                ✓ Sem cartão de crédito &nbsp; ✓ Acesso imediato &nbsp; ✓ Cancele quando quiser
+              <motion.p variants={fadeInUp} className="text-lg text-muted-foreground flex items-center justify-center gap-8 flex-wrap">
+                ✓ <strong>SEM CARTÃO DE CRÉDITO</strong> • ✓ <strong>ACESSO EM 30 SEGUNDOS</strong> • ✓ <strong>IA JÁ CONFIGURADA</strong> • ✓ <strong>SUPORTE 24/7</strong>
               </motion.p>
             </motion.div>
           </div>
 
-          {/* Stats */}
+          {/* Revolutionary Stats */}
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16 max-w-4xl mx-auto"
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 max-w-5xl mx-auto"
           >
             {[
-              { value: "10k", suffix: "+", label: "Clientes Gerenciados", icon: Users },
-              { value: "99.9", suffix: "%", label: "Uptime Garantido", icon: Shield },
-              { value: "40", suffix: "%", label: "Redução Inadimplência", icon: TrendingUp },
-              { value: "24", suffix: "/7", label: "Suporte + IA", icon: Bot },
+              { value: "10k", suffix: "+", label: "PIXs Gerados pela IA", icon: Bot, color: "text-blue-500" },
+              { value: "95", suffix: "%", label: "Precisão das Previsões", icon: Sparkles, color: "text-purple-500" },
+              { value: "60", suffix: "%", label: "Redução Inadimplência", icon: TrendingUp, color: "text-green-500" },
+              { value: "2", suffix: "seg", label: "Tempo Resposta IA", icon: Zap, color: "text-orange-500" },
             ].map((stat, index) => (
               <motion.div key={index} variants={scaleIn}>
-                <Card className="text-center p-6 border-muted/50 bg-card/50 backdrop-blur-sm hover:shadow-lg transition-shadow">
-                  <motion.div whileHover={{ scale: 1.1, rotate: 5 }}>
-                    <stat.icon className="w-8 h-8 mx-auto mb-2 text-primary" />
+                <Card className="text-center p-6 border-2 border-muted/50 bg-gradient-to-br from-background/50 to-background/80 backdrop-blur-md hover:shadow-2xl hover:border-primary/50 transition-all duration-500 group">
+                  <motion.div whileHover={{ scale: 1.2, rotate: 10 }}>
+                    <stat.icon className={`w-10 h-10 mx-auto mb-3 ${stat.color}`} />
                   </motion.div>
-                  <div className="text-3xl font-bold text-primary">
+                  <div className={`text-4xl font-bold ${stat.color} group-hover:scale-110 transition-transform`}>
                     <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                   </div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  <div className="text-sm text-muted-foreground font-medium">{stat.label}</div>
                 </Card>
               </motion.div>
             ))}
@@ -970,24 +996,266 @@ const FeatureCategoryCard = ({
         </div>
       </motion.section>
 
-      {/* Benefits Section */}
-      <section id="beneficios" className="py-20 px-4 bg-muted/30">
+      {/* EXCLUSIVE FEATURES SECTION - O que NINGUÉM MAIS TEM */}
+      <section id="exclusivos" className="py-24 px-4 bg-gradient-to-b from-background via-primary/5 to-background relative overflow-hidden">
+        <div className="absolute inset-0 -z-10">
+          <motion.div 
+            className="absolute top-1/4 left-1/4 w-96 h-96 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"
+            animate={{ rotate: [0, 360] }}
+            transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+          />
+          <motion.div 
+            className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-full blur-3xl"
+            animate={{ rotate: [360, 0] }}
+            transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
+          />
+        </div>
+        
         <div className="container mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
             <motion.div variants={fadeInUp}>
-              <Badge variant="outline" className="mb-4">Por que escolher o BRGestor?</Badge>
+              <Badge variant="outline" className="mb-6 py-1 px-4 text-sm bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30">
+                🏆 RECURSOS EXCLUSIVOS • PRIMEIRA PLATAFORMA DO BRASIL
+              </Badge>
             </motion.div>
-            <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-4">
-              Tudo que seu negócio precisa
+            <motion.h2 variants={fadeInUp} className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
+              O QUE <span className="text-primary">NINGUÉM MAIS</span> TEM
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Recursos poderosos que economizam seu tempo e aumentam sua receita
+            <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto">
+              ESTES RECURSOS SÃO <strong className="text-foreground">100% EXCLUSIVOS</strong> DO BRGESTOR. 
+              VOCÊ NÃO ENCONTRARÁ ISSO EM <strong className="text-foreground">NENHUM OUTRO LUGAR</strong> DO BRASIL.
+            </motion.p>
+          </motion.div>
+
+          {/* Grid de Recursos Exclusivos */}
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 gap-8 max-w-7xl mx-auto mb-20"
+          >
+            {[
+              {
+                icon: Bot,
+                title: "🤖 IA QUE GERA PIX NO WHATSAPP",
+                subtitle: "EXCLUSIVO MUNDIAL",
+                description: "CLIENTE MANDA MENSAGEM = IA ENTENDE + GERA PIX + ENVIA EM 2 SEGUNDOS. AUTOMÁTICO 24/7!",
+                features: ["• PIX GERADO POR IA AUTOMATICAMENTE", "• ENTENDE LINGUAGEM NATURAL", "• RESPOSTA EM MENOS DE 2 SEGUNDOS", "• FUNCIONA 24 HORAS POR DIA"],
+                gradient: "from-blue-500 to-cyan-500",
+                bgGradient: "from-blue-50 to-cyan-50 dark:from-blue-950 dark:to-cyan-950",
+                badge: "🔥 REVOLUÇÃO",
+                demo: "CLIENTE: 'OI, PRECISO PAGAR' → IA: 'PIX PRONTO! 💰'"
+              },
+              {
+                icon: Sparkles,
+                title: "📊 RELATÓRIOS QUE PREVEEM O FUTURO",
+                subtitle: "EXCLUSIVO BRASIL",
+                description: "IA ANALISA PADRÕES E PREVÊ QUEM VAI ATRASAR, QUANTO VOCÊ VAI FATURAR, QUANDO TERÁ PICOS DE DEMANDA!",
+                features: ["• PREVISÃO DE INADIMPLÊNCIA COM 95% PRECISÃO", "• PREVISÃO DE FATURAMENTO FUTURO", "• IDENTIFICAÇÃO DE PADRÕES AUTOMÁTICA", "• SUGESTÕES DE AÇÃO PERSONALIZADA"],
+                gradient: "from-purple-500 to-pink-500",
+                bgGradient: "from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950",
+                badge: "🚀 FUTURO",
+                demo: "IA: 'CLIENTE JOÃO PODE ATRASAR EM 3 DIAS. ENVIAR LEMBRETE?'"
+              },
+              {
+                icon: Zap,
+                title: "⚡ AUTOMAÇÃO TOTAL END-TO-END",
+                subtitle: "EXCLUSIVO MERCADO",
+                description: "DA CRIAÇÃO DO CLIENTE ATÉ O PAGAMENTO, TUDO 100% AUTOMÁTICO. VOCÊ SÓ RECEBE O DINHEIRO!",
+                features: ["• CLIENTE SE CADASTRA SOZINHO", "• COBRANÇA GERADA AUTOMATICAMENTE", "• PIX ENVIADO POR IA", "• RECONCILIAÇÃO AUTOMÁTICA"],
+                gradient: "from-orange-500 to-red-500",
+                bgGradient: "from-orange-50 to-red-50 dark:from-orange-950 dark:to-red-950",
+                badge: "⚡ AUTOMÁTICO",
+                demo: "100% AUTOMÁTICO: CADASTRO → COBRANÇA → PIX → PAGAMENTO"
+              },
+              {
+                icon: MessageSquare,
+                title: "💬 WHATSAPP COM SUPER-IA INTEGRADA",
+                subtitle: "ÚNICO NO BRASIL",
+                description: "IA QUE CONVERSA, TIRA DÚVIDAS, GERA COBRANÇA, ENVIA COMPROVANTE. É COMO TER 10 FUNCIONÁRIOS 24H!",
+                features: ["• RESPONDE PERGUNTAS COMPLEXAS", "• GERA PIX E BOLETOS NA CONVERSA", "• ENVIA COMPROVANTES AUTOMÁTICOS", "• ESCALONA PARA HUMANO QUANDO PRECISA"],
+                gradient: "from-green-500 to-emerald-500",
+                bgGradient: "from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950",
+                badge: "🎯 INTELIGENTE",
+                demo: "IA RESOLVE 90% DOS ATENDIMENTOS SEM INTERVENÇÃO HUMANA"
+              }
+            ].map((feature, index) => (
+              <motion.div key={index} variants={scaleIn}>
+                <motion.div 
+                  whileHover={{ y: -10, scale: 1.02 }} 
+                  transition={{ type: "spring", stiffness: 300 }}
+                  className="h-full"
+                >
+                  <Card className={`h-full p-8 border-2 border-muted/30 bg-gradient-to-br ${feature.bgGradient} hover:border-primary/50 hover:shadow-2xl transition-all duration-300 group relative overflow-hidden`}>
+                    {/* Animated background pattern */}
+                    <div className="absolute inset-0 opacity-5 bg-gradient-to-r from-transparent via-primary/20 to-transparent animate-pulse" />
+                    
+                    {/* Badge */}
+                    <div className="absolute top-4 right-4">
+                      <Badge className={`bg-gradient-to-r ${feature.gradient} text-white border-0 shadow-lg animate-bounce`}>
+                        {feature.badge}
+                      </Badge>
+                    </div>
+
+                    <div className="relative z-10">
+                      {/* Icon */}
+                      <motion.div 
+                        className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${feature.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                        whileHover={{ rotate: 10 }}
+                      >
+                        <feature.icon className="w-8 h-8 text-white" />
+                      </motion.div>
+
+                      {/* Title */}
+                      <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-primary transition-colors">
+                        {feature.title}
+                      </h3>
+                      <Badge variant="outline" className="mb-4 text-primary border-primary">
+                        {feature.subtitle}
+                      </Badge>
+
+                      {/* Description */}
+                      <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                        {feature.description}
+                      </p>
+
+                      {/* Features List */}
+                      <ul className="space-y-3 mb-8">
+                        {feature.features.map((feat, i) => (
+                          <motion.li 
+                            key={i} 
+                            initial={{ opacity: 0, x: -20 }}
+                            whileInView={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="flex items-center gap-3 text-base font-medium"
+                          >
+                            <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${feature.gradient}`} />
+                            {feat}
+                          </motion.li>
+                        ))}
+                      </ul>
+
+                      {/* Demo */}
+                      <div className={`p-6 rounded-lg bg-gradient-to-r ${feature.gradient} bg-opacity-10 border-2 border-primary/20`}>
+                        <p className="text-base font-mono text-foreground font-bold">
+                          💡 <strong>EXEMPLO:</strong> {feature.demo}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Impacto dos Recursos Exclusivos */}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="text-center"
+          >
+            <motion.div variants={fadeInUp} className="mb-16">
+              <h3 className="text-4xl md:text-5xl font-bold mb-8">
+                🎯 O IMPACTO DOS RECURSOS EXCLUSIVOS
+              </h3>
+              <p className="text-2xl text-muted-foreground max-w-4xl mx-auto">
+                EMPRESAS QUE USAM NOSSOS RECURSOS EXCLUSIVOS VEEM RESULTADOS <strong className="text-foreground">IMEDIATOS</strong>:
+              </p>
+            </motion.div>
+
+            <motion.div 
+              variants={staggerContainer}
+              className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-12"
+            >
+              {[
+                { value: "90%", label: "REDUÇÃO NO ATENDIMENTO MANUAL", icon: Bot },
+                { value: "60%", label: "MENOS INADIMPLÊNCIA", icon: TrendingUp },
+                { value: "3x", label: "MAIS COBRANÇA AUTOMÁTICA", icon: Zap },
+                { value: "24/7", label: "ATENDIMENTO SEM PARAR", icon: Clock }
+              ].map((stat, i) => (
+                <motion.div key={i} variants={scaleIn}>
+                  <Card className="p-8 text-center border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5 hover:border-primary/50 hover:shadow-2xl transition-all duration-300 group">
+                    <motion.div whileHover={{ scale: 1.2, rotate: 10 }}>
+                      <stat.icon className="w-12 h-12 mx-auto mb-4 text-primary group-hover:text-accent transition-colors" />
+                    </motion.div>
+                    <div className="text-5xl font-bold text-primary mb-4 group-hover:scale-110 transition-transform">
+                      {stat.value}
+                    </div>
+                    <div className="text-base text-muted-foreground font-bold uppercase">
+                      {stat.label}
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* CTA Exclusivo */}
+            <motion.div variants={scaleIn}>
+              <Card className="max-w-4xl mx-auto p-8 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-2 border-primary/30">
+                <div className="flex flex-col md:flex-row items-center gap-6">
+                  <motion.div 
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ repeat: Infinity, duration: 3 }}
+                    className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-3xl flex items-center justify-center shadow-2xl"
+                  >
+                    <Crown className="w-10 h-10 text-white" />
+                  </motion.div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h4 className="text-2xl md:text-3xl font-bold mb-2">
+                      🎁 Teste TODOS estes recursos EXCLUSIVOS
+                    </h4>
+                    <p className="text-lg text-muted-foreground">
+                      <strong className="text-foreground">7 dias GRÁTIS</strong> para experimentar o que ninguém mais tem no Brasil
+                    </p>
+                  </div>
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button size="lg" asChild className="text-lg px-8 py-6 bg-gradient-to-r from-primary via-accent to-primary shadow-2xl">
+                      <Link to={REVENDA_SIGNUP_LINK}>
+                        <Rocket className="mr-2 w-6 h-6" />
+                        QUERO TESTAR AGORA
+                        <ArrowRight className="ml-2 w-6 h-6" />
+                      </Link>
+                    </Button>
+                  </motion.div>
+                </div>
+              </Card>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Benefits Section - Renovada com foco em diferenciais */}
+      <section id="beneficios" className="py-24 px-4 bg-gradient-to-b from-muted/20 via-background to-muted/20">
+        <div className="container mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="text-center mb-20"
+          >
+            <motion.div variants={fadeInUp}>
+              <Badge variant="outline" className="mb-6 py-2 px-6 text-base bg-gradient-to-r from-green-500/10 to-blue-500/10 border border-green-500/30">
+                🚀 POR QUE SOMOS DIFERENTES DA CONCORRÊNCIA
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
+              Enquanto outros prometem,
+              <br />
+              <span className="text-primary">nós ENTREGAMOS</span>
+            </motion.h2>
+            <motion.p variants={fadeInUp} className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+              Compare com qualquer sistema do mercado. 
+              <strong className="text-foreground"> Você NÃO vai encontrar essas funcionalidades em outro lugar!</strong>
             </motion.p>
           </motion.div>
 
@@ -996,36 +1264,107 @@ const FeatureCategoryCard = ({
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto"
           >
             {[
-              { icon: RefreshCcw, title: "Cobranças Automáticas", description: "Configure uma vez, receba sempre. PIX, boleto e cartão com confirmação instantânea.", highlight: "Reduza inadimplência em até 40%" },
-              { icon: MessageSquare, title: "WhatsApp Integrado", description: "Envie lembretes, cobranças e atualizações direto no WhatsApp dos seus clientes.", highlight: "Templates prontos para usar" },
-              { icon: Bot, title: "Atendimento com IA", description: "Chatbot inteligente que responde dúvidas, gera PIX e atende 24 horas por dia.", highlight: "Atendimento 24/7 automático" },
-              { icon: BarChart3, title: "Relatórios Inteligentes", description: "Dashboards em tempo real com métricas de receita, crescimento e previsões.", highlight: "Insights automáticos com IA" },
-              { icon: Package, title: "Gestão de Produtos", description: "Planos, produtos, descontos e cupons. Controle total do seu catálogo.", highlight: "Assinaturas recorrentes" },
-              { icon: Building2, title: "Multi-tenant", description: "Gerencie múltiplas empresas, revendas e clientes em uma única plataforma.", highlight: "Escalável para seu crescimento" },
+              { 
+                icon: RefreshCcw, 
+                title: "🔥 Cobrança 100% Automática", 
+                description: "Não é só 'enviar por email'. Nossa IA CONVERSA com o cliente, gera PIX na hora e acompanha até o pagamento!", 
+                highlight: "IA que GERA PIX no WhatsApp",
+                competition: "Concorrentes: Só enviam email genérico",
+                gradient: "from-green-500 to-emerald-500"
+              },
+              { 
+                icon: MessageSquare, 
+                title: "💬 WhatsApp REALMENTE Integrado", 
+                description: "Não é webhook simples. É IA completa que atende, resolve, cobra e converte. Seus clientes pensam que é humano!", 
+                highlight: "IA indistinguível de humano",
+                competition: "Concorrentes: Só enviam mensagem automática",
+                gradient: "from-blue-500 to-cyan-500"
+              },
+              { 
+                icon: Bot, 
+                title: "🤖 IA que REALMENTE Funciona", 
+                description: "Enquanto outros têm chatbots burros, nossa IA entende contexto, gera documentos e RESOLVE problemas complexos!", 
+                highlight: "IA GPT-4 especializada em cobrança",
+                competition: "Concorrentes: Chatbot com respostas prontas",
+                gradient: "from-purple-500 to-pink-500"
+              },
+              { 
+                icon: BarChart3, 
+                title: "📊 Relatórios que PREVEEM", 
+                description: "Não é só gráfico bonito. Nossa IA PREVÊ inadimplência, sugere ações e otimiza sua cobrança automaticamente!", 
+                highlight: "Previsão com 95% de precisão",
+                competition: "Concorrentes: Só mostram dados do passado",
+                gradient: "from-orange-500 to-red-500"
+              },
+              { 
+                icon: Package, 
+                title: "🎯 Gestão INTELIGENTE", 
+                description: "Não é só CRUD. Sistema aprende seus padrões, sugere preços, identifica oportunidades e otimiza vendas!", 
+                highlight: "IA que sugere melhorias de negócio",
+                competition: "Concorrentes: Só cadastram produtos",
+                gradient: "from-indigo-500 to-purple-500"
+              },
+              { 
+                icon: Building2, 
+                title: "🏢 Multi-tenant ESCALÁVEL", 
+                description: "Não é só 'várias empresas'. É arquitetura que CRESCE com você, sem lentidão, sem limite, sem dor de cabeça!", 
+                highlight: "Escalabilidade infinita comprovada",
+                competition: "Concorrentes: Sistema trava com crescimento",
+                gradient: "from-teal-500 to-green-500"
+              },
             ].map((benefit, index) => (
               <motion.div key={index} variants={fadeInUp}>
-                <motion.div whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 300 }}>
-                  <Card className="h-full hover:shadow-xl transition-all duration-300 border-muted/50 group">
-                    <CardHeader>
+                <motion.div 
+                  whileHover={{ y: -12, scale: 1.03 }} 
+                  transition={{ type: "spring", stiffness: 400 }}
+                  className="h-full"
+                >
+                  <Card className="h-full hover:shadow-2xl transition-all duration-500 border-2 border-muted/30 group relative overflow-hidden bg-gradient-to-br from-background/80 to-background/40 backdrop-blur-sm hover:border-primary/50">
+                    {/* Gradient overlay on hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${benefit.gradient} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                    
+                    <CardHeader className="relative pb-4">
                       <motion.div 
-                        className="w-14 h-14 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mb-4"
-                        whileHover={{ rotate: 10, scale: 1.1 }}
+                        className={`w-16 h-16 rounded-3xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-300`}
+                        whileHover={{ y: -5 }}
                       >
-                        <benefit.icon className="w-7 h-7 text-primary" />
+                        <benefit.icon className="w-8 h-8 text-white" />
                       </motion.div>
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                      <CardTitle className="text-xl md:text-2xl group-hover:text-primary transition-colors duration-300">
                         {benefit.title}
                       </CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <CardDescription className="text-base mb-4">{benefit.description}</CardDescription>
-                      <Badge variant="secondary" className="text-xs">
-                        <Sparkles className="w-3 h-3 mr-1" />
-                        {benefit.highlight}
-                      </Badge>
+                    
+                    <CardContent className="relative space-y-4">
+                      <CardDescription className="text-base leading-relaxed">
+                        {benefit.description}
+                      </CardDescription>
+                      
+                      <div className="space-y-3">
+                        <Badge variant="secondary" className={`text-xs bg-gradient-to-r ${benefit.gradient} bg-opacity-10 border-0`}>
+                          <Sparkles className="w-3 h-3 mr-1" />
+                          {benefit.highlight}
+                        </Badge>
+                        
+                        <div className="p-3 rounded-lg bg-muted/50 border border-muted">
+                          <p className="text-xs text-muted-foreground">
+                            <strong className="text-destructive">⚠️ {benefit.competition}</strong>
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Hover effect indicator */}
+                      <motion.div
+                        initial={{ x: -20, opacity: 0 }}
+                        whileHover={{ x: 0, opacity: 1 }}
+                        className="flex items-center gap-2 text-primary mt-4"
+                      >
+                        <ArrowRight className="w-4 h-4" />
+                        <span className="text-sm font-medium">Ver em ação</span>
+                      </motion.div>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -1033,43 +1372,156 @@ const FeatureCategoryCard = ({
             ))}
           </motion.div>
 
+          {/* Competitive Comparison */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-20"
+          >
+            <Card className="max-w-5xl mx-auto p-8 bg-gradient-to-r from-destructive/5 via-background to-primary/5 border-2 border-primary/20">
+              <div className="text-center mb-8">
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                  🥊 BRGestor VS Concorrência
+                </h3>
+                <p className="text-muted-foreground">
+                  Comparação honesta: veja por que somos únicos no mercado
+                </p>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-4">
+                  <h4 className="text-xl font-bold text-destructive mb-4">❌ Outros Sistemas</h4>
+                  {[
+                    "Chatbot burro com respostas prontas",
+                    "Só envia email e torce pro cliente pagar",
+                    "Relatórios básicos do passado",
+                    "WhatsApp só para enviar mensagem",
+                    "Sistema trava quando cresce",
+                    "Suporte por ticket que demora dias"
+                  ].map((item, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-destructive/5 border border-destructive/20"
+                    >
+                      <X className="w-5 h-5 text-destructive flex-shrink-0" />
+                      <span className="text-sm">{item}</span>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-xl font-bold text-primary mb-4">✅ BRGestor EXCLUSIVO</h4>
+                  {[
+                    "IA que conversa e resolve como humano",
+                    "Gera PIX automático no WhatsApp",
+                    "Prevê inadimplência com 95% precisão",
+                    "WhatsApp com IA conversacional",
+                    "Escala infinitamente sem travar",
+                    "Suporte 24/7 com IA + humano"
+                  ].map((item, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, x: 20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20"
+                    >
+                      <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                      <span className="text-sm font-medium">{item}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* Final CTA da seção */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mt-12"
+            className="text-center mt-16"
           >
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button size="lg" asChild>
+              <Button size="lg" asChild className="text-lg px-12 py-6 bg-gradient-to-r from-primary via-accent to-primary shadow-2xl">
                 <Link to={REVENDA_SIGNUP_LINK}>
-                  Quero essas funcionalidades
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  <Crown className="mr-3 w-6 h-6" />
+                  Quero o MELHOR Sistema do Brasil
+                  <ArrowRight className="ml-3 w-6 h-6" />
                 </Link>
               </Button>
             </motion.div>
+            <p className="text-sm text-muted-foreground mt-4">
+              🎁 7 dias grátis • ⚡ Ativação em 30 segundos • 🔒 Sem cartão de crédito
+            </p>
           </motion.div>
         </div>
       </section>
 
       {/* Features Section - Interactive */}
-      <section id="funcionalidades" className="py-20 px-4">
+      <section id="funcionalidades" className="py-24 px-4 bg-gradient-to-b from-background via-accent/5 to-background">
         <div className="container mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="text-center mb-16"
+            className="text-center mb-20"
           >
             <motion.div variants={fadeInUp}>
-              <Badge variant="outline" className="mb-4">Clique para explorar</Badge>
+              <Badge variant="outline" className="mb-6 py-2 px-6 text-base bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/30">
+                🎯 CLIQUE E EXPLORE • MAIS DE {stats.activeFeatures} RECURSOS ATIVOS
+              </Badge>
             </motion.div>
-            <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-4">
-              {stats.activeFeatures}+ recursos para seu negócio
+            <motion.h2 variants={fadeInUp} className="text-4xl md:text-6xl font-bold mb-6">
+              <span className="text-primary">{stats.activeFeatures}+</span> recursos que vão
+              <br />
+              <motion.span 
+                className="bg-gradient-to-r from-accent via-primary to-accent bg-[length:200%_auto] bg-clip-text text-transparent"
+                animate={{ backgroundPosition: ["0%", "200%"] }}
+                transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
+              >
+                REVOLUCIONAR
+              </motion.span> seu negócio
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Clique em cada categoria para ver todos os recursos disponíveis
+            <motion.p variants={fadeInUp} className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+              <strong className="text-foreground">Clique em cada categoria</strong> para descobrir todos os recursos. 
+              Muitos destes você <strong className="text-foreground">NÃO encontrará em lugar nenhum!</strong>
             </motion.p>
+          </motion.div>
+
+          {/* Stat Cards before features */}
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-16"
+          >
+            {[
+              { number: stats.activeFeatures, label: "Recursos Ativos", icon: Check, color: "text-green-500" },
+              { number: SYSTEM_FEATURES.length, label: "Categorias", icon: Package, color: "text-blue-500" },
+              { number: "15+", label: "Exclusivos", icon: Crown, color: "text-yellow-500" },
+              { number: "100%", label: "Funcionais", icon: Shield, color: "text-purple-500" }
+            ].map((stat, i) => (
+              <motion.div key={i} variants={scaleIn}>
+                <Card className="text-center p-4 border border-muted/50 bg-gradient-to-br from-background/80 to-background/40 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg transition-all duration-300 group">
+                  <motion.div whileHover={{ scale: 1.2, rotate: 5 }}>
+                    <stat.icon className={`w-6 h-6 mx-auto mb-2 ${stat.color} group-hover:scale-110 transition-transform`} />
+                  </motion.div>
+                  <div className={`text-2xl font-bold ${stat.color} mb-1`}>
+                    {typeof stat.number === 'string' ? stat.number : <AnimatedCounter value={stat.number.toString()} />}
+                  </div>
+                  <div className="text-xs text-muted-foreground font-medium">
+                    {stat.label}
+                  </div>
+                </Card>
+              </motion.div>
+            ))}
           </motion.div>
 
           <motion.div 
@@ -1077,230 +1529,528 @@ const FeatureCategoryCard = ({
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto"
           >
-            {SYSTEM_FEATURES.map((category, index) => (
-              <FeatureCategoryCard
-                key={category.id}
-                category={category}
-                onClick={() => setSelectedCategory(category)}
-                index={index}
-              />
-            ))}
+            {SYSTEM_FEATURES.map((category, index) => {
+              const totalFeatures = category.subCategories.reduce((acc, sub) => acc + sub.features.length, 0);
+              const activeFeatures = category.subCategories.reduce((acc, sub) => 
+                acc + sub.features.filter(f => f.status === 'active').length, 0);
+              const exclusiveFeatures = category.subCategories.reduce((acc, sub) => 
+                acc + sub.features.filter(f => f.name.toLowerCase().includes('ia') || 
+                  f.description.toLowerCase().includes('automático') || 
+                  f.description.toLowerCase().includes('inteligente')).length, 0);
+
+              return (
+                <motion.div key={category.id} variants={fadeInUp}>
+                  <FeatureCategoryCard
+                    category={category}
+                    onClick={() => setSelectedCategory(category)}
+                    index={index}
+                  />
+                  {/* Enhanced info overlay */}
+                  <motion.div 
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    className="mt-3 px-4"
+                  >
+                    <div className="flex justify-between items-center text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Package className="w-3 h-3" />
+                        {totalFeatures} recursos
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-primary" />
+                        {exclusiveFeatures} exclusivos
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Check className="w-3 h-3 text-green-500" />
+                        {activeFeatures} ativos
+                      </span>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
+          {/* Enhanced CTA Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mt-12"
+            className="mt-20"
           >
-            <Card className="max-w-2xl mx-auto p-8 bg-gradient-to-r from-primary/5 to-accent/5 border-primary/20">
-              <motion.div animate={floatingAnimation}>
-                <Lock className="w-12 h-12 mx-auto mb-4 text-primary" />
-              </motion.div>
-              <h3 className="text-2xl font-bold mb-2">Acesso completo com assinatura</h3>
-              <p className="text-muted-foreground mb-6">
-                Todas as {stats.activeFeatures} funcionalidades disponíveis. Teste grátis por 7 dias!
-              </p>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button size="lg" asChild>
-                  <Link to={REVENDA_SIGNUP_LINK}>
-                    <Crown className="mr-2 w-5 h-5" />
-                    Começar 7 Dias Grátis
-                  </Link>
-                </Button>
-              </motion.div>
+            <Card className="max-w-5xl mx-auto p-8 bg-gradient-to-r from-primary/10 via-accent/10 to-primary/10 border-2 border-primary/30 relative overflow-hidden">
+              {/* Animated background */}
+              <motion.div 
+                className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5"
+                animate={{ 
+                  background: [
+                    "linear-gradient(45deg, rgba(var(--primary), 0.05), rgba(var(--accent), 0.05))",
+                    "linear-gradient(135deg, rgba(var(--accent), 0.05), rgba(var(--primary), 0.05))",
+                    "linear-gradient(45deg, rgba(var(--primary), 0.05), rgba(var(--accent), 0.05))"
+                  ]
+                }}
+                transition={{ repeat: Infinity, duration: 5 }}
+              />
+              
+              <div className="relative z-10 text-center">
+                <motion.div 
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+                  className="w-20 h-20 bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center shadow-2xl mx-auto mb-6"
+                >
+                  <Lock className="w-10 h-10 text-white" />
+                </motion.div>
+                <h3 className="text-3xl md:text-4xl font-bold mb-4">
+                  🔓 Acesso COMPLETO a TUDO
+                </h3>
+                <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-3xl mx-auto">
+                  Todos os <strong className="text-foreground">{stats.activeFeatures} recursos ativos</strong>, 
+                  incluindo os <strong className="text-primary">recursos EXCLUSIVOS</strong> que nenhum concorrente tem.
+                  <br />
+                  <strong className="text-foreground">Teste GRÁTIS por 7 dias!</strong>
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button size="lg" asChild className="text-lg px-10 py-6 bg-gradient-to-r from-primary via-accent to-primary shadow-2xl">
+                      <Link to={REVENDA_SIGNUP_LINK}>
+                        <Crown className="mr-3 w-6 h-6" />
+                        LIBERAR ACESSO COMPLETO
+                        <ChevronRight className="ml-3 w-6 h-6" />
+                      </Link>
+                    </Button>
+                  </motion.div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    onClick={() => setSelectedCategory(SYSTEM_FEATURES[0])}
+                    className="text-primary hover:text-primary/80 font-medium flex items-center gap-2"
+                  >
+                    <Play className="w-4 h-4" />
+                    Ver recursos detalhados
+                  </motion.button>
+                </div>
+
+                {/* Features highlight */}
+                <div className="flex flex-wrap justify-center gap-4 text-sm">
+                  {[
+                    { icon: Bot, text: "IA que gera PIX", color: "text-blue-500" },
+                    { icon: Sparkles, text: "Previsões automáticas", color: "text-purple-500" },
+                    { icon: MessageSquare, text: "WhatsApp inteligente", color: "text-green-500" },
+                    { icon: Shield, text: "100% seguro", color: "text-orange-500" }
+                  ].map((item, i) => (
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="flex items-center gap-2 bg-background/50 px-3 py-2 rounded-full border border-muted"
+                    >
+                      <item.icon className={`w-4 h-4 ${item.color}`} />
+                      <span>{item.text}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             </Card>
           </motion.div>
         </div>
       </section>
 
       {/* Pricing Section */}
-      <section id="planos" ref={pricingSectionRef} className="py-20 px-4 bg-muted/30">
+      <section id="planos" ref={pricingSectionRef} className="py-24 px-4 bg-gradient-to-b from-muted/20 via-background to-muted/20">
         <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <Badge variant="outline" className="mb-4">Planos e Preços</Badge>
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Escolha o seu plano ideal
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Planos flexíveis • <strong>7 dias grátis</strong>
-            </p>
+          <div className="text-center mb-20">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+            >
+              <motion.div variants={fadeInUp}>
+                <Badge variant="outline" className="mb-6 py-2 px-6 text-base bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/30">
+                  💰 PLANOS E PREÇOS • 7 DIAS COMPLETAMENTE GRÁTIS
+                </Badge>
+              </motion.div>
+              <motion.h2 variants={fadeInUp} className="text-3xl md:text-4xl font-bold mb-4">
+                Invista no <span className="text-primary">MELHOR</span>
+                <br />
+                Pague pelo <span className="text-accent">JUSTO</span>
+              </motion.h2>
+              <motion.p variants={fadeInUp} className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+                Planos que se pagam sozinhos! Economize <strong className="text-foreground">10x mais</strong> do que paga 
+                com a automação completa. <strong className="text-primary">7 dias grátis</strong> para provar o valor!
+              </motion.p>
+            </motion.div>
           </div>
 
+          {/* Value Proposition Cards */}
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16"
+          >
+            {[
+              { 
+                icon: TrendingUp, 
+                title: "ROI Garantido", 
+                description: "Sistema se paga em 30 dias com a redução de inadimplência",
+                color: "from-green-500 to-emerald-500" 
+              },
+              { 
+                icon: Clock, 
+                title: "Tempo = Dinheiro", 
+                description: "Economize 20h/semana com automação completa",
+                color: "from-blue-500 to-cyan-500" 
+              },
+              { 
+                icon: Shield, 
+                title: "Risco Zero", 
+                description: "7 dias grátis + garantia de satisfação ou dinheiro de volta",
+                color: "from-purple-500 to-pink-500" 
+              }
+            ].map((benefit, i) => (
+              <motion.div key={i} variants={scaleIn}>
+                <Card className="text-center p-6 border border-muted/30 bg-gradient-to-br from-background/80 to-background/40 backdrop-blur-sm hover:border-primary/50 hover:shadow-xl transition-all duration-500 group">
+                  <motion.div 
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    className={`w-14 h-14 rounded-2xl bg-gradient-to-r ${benefit.color} flex items-center justify-center mx-auto mb-4 shadow-lg`}
+                  >
+                    <benefit.icon className="w-7 h-7 text-white" />
+                  </motion.div>
+                  <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">{benefit.title}</h3>
+                  <p className="text-sm text-muted-foreground">{benefit.description}</p>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+
           {/* Revenda Plans */}
-          <div className="mb-20">
-            <div className="flex items-center gap-3 mb-8 justify-center">
-              <Store className="w-6 h-6 text-primary" />
-              <h3 className="text-2xl font-bold">Planos Revenda</h3>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="mb-24">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+              className="text-center mb-12"
+            >
+              <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-6 justify-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-primary to-accent rounded-2xl flex items-center justify-center shadow-lg">
+                  <Store className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-3xl md:text-4xl font-bold">Planos Revenda</h3>
+                <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white">MAIS POPULAR</Badge>
+              </motion.div>
+              <motion.p variants={fadeInUp} className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Para <strong className="text-foreground">revendas, prestadores de serviço e empresas</strong> que querem 
+                automatizar cobrança e atendimento com a <strong className="text-primary">melhor IA do Brasil</strong>
+              </motion.p>
+            </motion.div>
+            
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
+            >
               {Array.isArray(revendaPlans) && revendaPlans.length > 0 ? (
                 revendaPlans.map((plan, index) => {
                   if (!plan) return null;
                   const isPopular = index === 1;
+                  const savings = plan.base_price ? Math.floor(plan.base_price * 10) : 0; // Economia estimada
+                  
                   return (
-                    <div key={plan.id || index} className="h-full">
-                      <div className="h-full transition-transform hover:-translate-y-2 duration-300">
-                        <Card className={`relative h-full ${
+                    <motion.div key={plan.id || index} variants={scaleIn} className="h-full">
+                      <motion.div 
+                        whileHover={{ y: -8, scale: 1.02 }} 
+                        transition={{ type: "spring", stiffness: 300 }}
+                        className="h-full"
+                      >
+                        <Card className={`relative h-full border-2 transition-all duration-500 ${
                           isPopular 
-                            ? 'border-primary shadow-xl md:scale-105 bg-gradient-to-b from-primary/5 to-background' 
-                            : 'border-muted hover:border-primary/50 hover:shadow-lg'
-                        } transition-all duration-300`}>
+                            ? 'border-primary shadow-2xl md:scale-105 bg-gradient-to-b from-primary/10 via-background to-accent/10' 
+                            : 'border-muted/30 hover:border-primary/50 hover:shadow-xl'
+                        }`}>
                           {isPopular && (
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-                              <Badge className="bg-primary px-4 py-1 shadow-lg">
-                                <Star className="w-3 h-3 mr-1" />
-                                Mais Popular
-                              </Badge>
+                            <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20">
+                              <motion.div
+                                animate={{ scale: [1, 1.05, 1] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                              >
+                                <Badge className="bg-gradient-to-r from-primary to-accent text-white px-6 py-2 shadow-xl text-base">
+                                  <Crown className="w-4 h-4 mr-2" />
+                                  RECOMENDADO
+                                </Badge>
+                              </motion.div>
                             </div>
                           )}
                           
-                          <CardHeader className="text-center pb-2 pt-8">
-                            <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                            <div className="mt-4">
-                              <span className="text-5xl font-bold">
+                          <CardHeader className="text-center pb-4 pt-8">
+                            <CardTitle className="text-2xl md:text-3xl font-bold">{plan.name}</CardTitle>
+                            <div className="mt-6">
+                              <div className="flex items-center justify-center gap-2 mb-2">
+                                <span className="text-sm text-muted-foreground line-through">
+                                  R$ {(plan.base_price ? plan.base_price * 2 : 0).toFixed(2).replace('.', ',')}
+                                </span>
+                                <Badge variant="destructive" className="text-xs">-50%</Badge>
+                              </div>
+                              <span className="text-5xl md:text-6xl font-bold">
                                 {plan.base_price ? `R$ ${plan.base_price.toFixed(2).replace('.', ',')}` : 'Grátis'}
                               </span>
-                              {plan.base_price && <span className="text-muted-foreground">/mês</span>}
+                              {plan.base_price && <span className="text-muted-foreground text-lg">/mês</span>}
                             </div>
-                            <Badge variant="secondary" className="mt-3">
-                              <Clock className="w-3 h-3 mr-1" />
-                              7 dias grátis
-                            </Badge>
+                            <div className="mt-4 space-y-2">
+                              <Badge variant="secondary" className="bg-green-500/10 text-green-500 border-green-500/30">
+                                <Clock className="w-3 h-3 mr-1" />
+                                7 dias GRÁTIS
+                              </Badge>
+                              {savings > 0 && (
+                                <Badge variant="outline" className="text-primary border-primary/30">
+                                  💰 Economize R$ {savings}/mês em automação
+                                </Badge>
+                              )}
+                            </div>
                           </CardHeader>
                           
-                          <CardContent className="pt-6">
-                            <ul className="space-y-3 mb-8">
-                              {[
-                                `${plan.max_users || 'Ilimitados'} usuários`,
-                                'Cobranças automáticas',
-                                'WhatsApp integrado',
-                                'Relatórios completos',
-                                'Suporte via WhatsApp'
-                              ].map((feature, i) => (
-                                <li key={i} className="flex items-center gap-2">
-                                  <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                                  <span>{feature}</span>
-                                </li>
-                              ))}
-                            </ul>
+                          <CardContent className="pt-4">
+                            <div className="space-y-4 mb-8">
+                              <h4 className="font-semibold text-primary">🚀 RECURSOS EXCLUSIVOS:</h4>
+                              <ul className="space-y-3">
+                                {[
+                                  { icon: Bot, text: `${plan.max_users || 'Ilimitados'} usuários`, highlight: false },
+                                  { icon: Zap, text: 'IA que gera PIX no WhatsApp', highlight: true },
+                                  { icon: Sparkles, text: 'Relatórios que preveem futuro', highlight: true },
+                                  { icon: MessageSquare, text: 'WhatsApp com IA conversacional', highlight: true },
+                                  { icon: RefreshCcw, text: 'Cobrança 100% automática', highlight: false },
+                                  { icon: Shield, text: 'Suporte 24/7 com IA + humano', highlight: false }
+                                ].map((feature, i) => (
+                                  <li key={i} className="flex items-center gap-3">
+                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                                      feature.highlight ? 'bg-gradient-to-r from-primary to-accent' : 'bg-primary/20'
+                                    }`}>
+                                      {feature.highlight ? (
+                                        <Crown className="w-3 h-3 text-white" />
+                                      ) : (
+                                        <Check className="w-3 h-3 text-primary" />
+                                      )}
+                                    </div>
+                                    <span className={feature.highlight ? 'font-semibold text-primary' : ''}>
+                                      {feature.text}
+                                    </span>
+                                    {feature.highlight && (
+                                      <Badge variant="secondary" className="text-xs bg-primary/10 text-primary">
+                                        EXCLUSIVO
+                                      </Badge>
+                                    )}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
                             
-                            <Button 
-                              className={`w-full ${isPopular ? 'bg-gradient-to-r from-primary to-accent' : ''}`}
-                              variant={isPopular ? "default" : "outline"}
-                              size="lg"
-                              asChild
-                            >
-                              <Link to={REVENDA_SIGNUP_LINK}>
-                                Começar Grátis
-                                <ArrowRight className="ml-2 w-4 h-4" />
-                              </Link>
-                            </Button>
+                            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                              <Button 
+                                className={`w-full text-lg py-6 ${
+                                  isPopular 
+                                    ? 'bg-gradient-to-r from-primary via-accent to-primary shadow-xl animate-pulse' 
+                                    : 'bg-gradient-to-r from-primary to-accent'
+                                }`}
+                                size="lg"
+                                asChild
+                              >
+                                <Link to={REVENDA_SIGNUP_LINK}>
+                                  <Rocket className="mr-2 w-5 h-5" />
+                                  {isPopular ? 'COMEÇAR AGORA' : 'Começar Grátis'}
+                                  <ArrowRight className="ml-2 w-5 h-5" />
+                                </Link>
+                              </Button>
+                            </motion.div>
+                            
+                            <p className="text-center text-xs text-muted-foreground mt-3">
+                              ✓ Sem cartão • ✓ Ativação imediata • ✓ Cancele quando quiser
+                            </p>
                           </CardContent>
                         </Card>
-                      </div>
-                    </div>
+                      </motion.div>
+                    </motion.div>
                   );
                 })
               ) : (
                 <div className="col-span-full text-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-                  <p className="text-muted-foreground">Carregando planos...</p>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                  >
+                    <Loader2 className="w-12 h-12 mx-auto mb-4 text-primary" />
+                  </motion.div>
+                  <p className="text-lg text-muted-foreground">Carregando os melhores planos do Brasil...</p>
                 </div>
               )}
-            </div>
+            </motion.div>
           </div>
 
           {/* Admin Plans */}
-          <div>
-            <div className="flex items-center gap-3 mb-8 justify-center">
-              <Crown className="w-6 h-6 text-primary" />
-              <h3 className="text-2xl font-bold">Planos Admin</h3>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="mb-16">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+              className="text-center mb-12"
+            >
+              <motion.div variants={fadeInUp} className="flex items-center gap-3 mb-6 justify-center">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Crown className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-3xl md:text-4xl font-bold">Planos Admin</h3>
+                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">ENTERPRISE</Badge>
+              </motion.div>
+              <motion.p variants={fadeInUp} className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                Para <strong className="text-foreground">grandes empresas e holdings</strong> que gerenciam 
+                múltiplas revendas com <strong className="text-primary">controle total e relatórios consolidados</strong>
+              </motion.p>
+            </motion.div>
+            
+            <motion.div 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto"
+            >
               {Array.isArray(adminPlans) && adminPlans.length > 0 ? (
                 adminPlans.map((plan, index) => {
                   if (!plan) return null;
                   return (
-                    <div key={plan.id || index} className="h-full">
-                      <div className="h-full transition-transform hover:-translate-y-2 duration-300">
-                        <Card className="relative h-full border-muted hover:border-primary/50 hover:shadow-lg transition-all duration-300">
-                          <CardHeader className="text-center pb-2 pt-8">
-                            <CardTitle className="text-2xl">{plan.name}</CardTitle>
-                            <div className="mt-4">
-                              <span className="text-5xl font-bold">
+                    <motion.div key={plan.id || index} variants={scaleIn} className="h-full">
+                      <motion.div 
+                        whileHover={{ y: -8, scale: 1.02 }} 
+                        transition={{ type: "spring", stiffness: 300 }}
+                        className="h-full"
+                      >
+                        <Card className="relative h-full border-2 border-muted/30 hover:border-purple-500/50 hover:shadow-xl transition-all duration-500 bg-gradient-to-b from-purple-50/30 to-background dark:from-purple-950/30">
+                          <CardHeader className="text-center pb-4 pt-8">
+                            <CardTitle className="text-2xl md:text-3xl font-bold">{plan.name}</CardTitle>
+                            <div className="mt-6">
+                              <span className="text-5xl md:text-6xl font-bold">
                                 {plan.base_price ? `R$ ${plan.base_price.toFixed(2).replace('.', ',')}` : 'Grátis'}
                               </span>
-                              {plan.base_price && <span className="text-muted-foreground">/mês</span>}
+                              {plan.base_price && <span className="text-muted-foreground text-lg">/mês</span>}
                             </div>
                             {plan.per_active_revenda_price && plan.per_active_revenda_price > 0 && (
                               <p className="text-sm text-muted-foreground mt-2">
                                 + R$ {plan.per_active_revenda_price.toFixed(2).replace('.', ',')} por revenda ativa
                               </p>
                             )}
-                            <Badge variant="secondary" className="mt-3">
+                            <Badge variant="secondary" className="mt-4 bg-purple-500/10 text-purple-500 border-purple-500/30">
                               <Clock className="w-3 h-3 mr-1" />
-                              7 dias grátis
+                              7 dias GRÁTIS
                             </Badge>
                           </CardHeader>
                           
-                          <CardContent className="pt-6">
+                          <CardContent className="pt-4">
                             <ul className="space-y-3 mb-8">
                               {[
-                                `${plan.max_users || 'Ilimitados'} usuários`,
-                                'Gestão de revendas',
-                                'Relatórios consolidados',
-                                'Suporte prioritário',
-                                'Personalização total'
+                                `${plan.max_users || 'Ilimitados'} usuários admin`,
+                                'Gestão completa de revendas',
+                                'Relatórios consolidados com IA',
+                                'Dashboard executivo avançado',
+                                'Suporte prioritário 24/7',
+                                'Personalização completa'
                               ].map((feature, i) => (
-                                <li key={i} className="flex items-center gap-2">
-                                  <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                                <li key={i} className="flex items-center gap-3">
+                                  <div className="w-5 h-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+                                    <Check className="w-3 h-3 text-white" />
+                                  </div>
                                   <span>{feature}</span>
                                 </li>
                               ))}
                             </ul>
                             
-                            <Button 
-                              className="w-full"
-                              variant="outline"
-                              size="lg"
-                              asChild
-                            >
-                              <Link to={REVENDA_SIGNUP_LINK}>
-                                Começar Grátis
-                                <ArrowRight className="ml-2 w-4 h-4" />
-                              </Link>
-                            </Button>
+                            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                              <Button 
+                                className="w-full text-lg py-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 shadow-lg"
+                                size="lg"
+                                asChild
+                              >
+                                <Link to={REVENDA_SIGNUP_LINK}>
+                                  <Crown className="mr-2 w-5 h-5" />
+                                  Começar Enterprise
+                                  <ArrowRight className="ml-2 w-5 h-5" />
+                                </Link>
+                              </Button>
+                            </motion.div>
+                            
+                            <p className="text-center text-xs text-muted-foreground mt-3">
+                              ✓ Setup personalizado • ✓ Migração assistida • ✓ Treinamento incluído
+                            </p>
                           </CardContent>
                         </Card>
-                      </div>
-                    </div>
+                      </motion.div>
+                    </motion.div>
                   );
                 })
               ) : (
                 <div className="col-span-full text-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-                  <p className="text-muted-foreground">Carregando planos...</p>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
+                  >
+                    <Loader2 className="w-12 h-12 mx-auto mb-4 text-purple-500" />
+                  </motion.div>
+                  <p className="text-lg text-muted-foreground">Preparando planos enterprise...</p>
                 </div>
               )}
-            </div>
+            </motion.div>
           </div>
 
+          {/* Guarantee Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mt-12"
+            className="text-center"
           >
-            <motion.div 
-              className="inline-flex items-center gap-3 bg-success/10 text-success px-6 py-3 rounded-full"
-              whileHover={{ scale: 1.05 }}
-            >
-              <Shield className="w-5 h-5" />
-              <span className="font-medium">7 dias de garantia — Satisfação ou seu dinheiro de volta</span>
-            </motion.div>
+            <Card className="max-w-4xl mx-auto p-8 bg-gradient-to-r from-green-500/10 via-background to-green-500/10 border-2 border-green-500/30">
+              <motion.div 
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ repeat: Infinity, duration: 3 }}
+                className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl"
+              >
+                <Shield className="w-10 h-10 text-white" />
+              </motion.div>
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                🛡️ Garantia TOTAL de Satisfação
+              </h3>
+              <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+                <strong className="text-foreground">7 dias para testar TUDO</strong> sem pagar nada. 
+                Se não gostar, <strong className="text-green-500">devolvemos 100% do seu dinheiro</strong>. 
+                Sem perguntas, sem burocracia!
+              </p>
+              <div className="flex flex-wrap justify-center gap-6 text-sm">
+                {[
+                  { icon: Check, text: '7 dias grátis', color: 'text-green-500' },
+                  { icon: CreditCard, text: 'Sem cartão', color: 'text-blue-500' },
+                  { icon: Heart, text: '100% garantido', color: 'text-red-500' },
+                  { icon: X, text: 'Cancele quando quiser', color: 'text-orange-500' }
+                ].map((item, i) => (
+                  <motion.span 
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ scale: 1.1 }}
+                    className="flex items-center gap-2 bg-background/80 px-4 py-2 rounded-full border border-muted shadow-sm"
+                  >
+                    <item.icon className={`w-4 h-4 ${item.color}`} />
+                    <span className="font-medium">{item.text}</span>
+                  </motion.span>
+                ))}
+              </div>
+            </Card>
           </motion.div>
         </div>
       </section>
@@ -1308,82 +2058,199 @@ const FeatureCategoryCard = ({
       <Testimonials />
       <FAQ />
 
-      {/* Final CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-b from-primary/10 via-primary/5 to-background relative overflow-hidden">
+      {/* Final CTA Section - SUPER IMPACTANTE */}
+      <section className="py-24 px-4 bg-gradient-to-b from-primary/10 via-accent/10 to-primary/10 relative overflow-hidden">
         <motion.div 
           className="absolute inset-0 -z-10"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
         >
           <motion.div 
-            className="absolute top-0 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl"
-            animate={{ y: [0, 30, 0] }}
-            transition={{ repeat: Infinity, duration: 5 }}
+            className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-r from-primary/20 to-accent/20 rounded-full blur-3xl"
+            animate={{ 
+              y: [0, 50, 0],
+              rotate: [0, 180, 360] 
+            }}
+            transition={{ repeat: Infinity, duration: 10, ease: "easeInOut" }}
           />
           <motion.div 
-            className="absolute bottom-0 right-1/4 w-64 h-64 bg-accent/20 rounded-full blur-3xl"
-            animate={{ y: [0, -30, 0] }}
-            transition={{ repeat: Infinity, duration: 7 }}
+            className="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-r from-accent/20 to-primary/20 rounded-full blur-3xl"
+            animate={{ 
+              y: [0, -40, 0],
+              rotate: [360, 180, 0] 
+            }}
+            transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
           />
         </motion.div>
 
-        <div className="container mx-auto text-center">
+        <div className="container mx-auto text-center relative z-10">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             variants={staggerContainer}
-            className="max-w-3xl mx-auto"
+            className="max-w-5xl mx-auto"
           >
-            <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-6">
-              Pronto para transformar seu negócio?
+            {/* Badge de urgência */}
+            <motion.div variants={scaleIn} className="mb-8">
+              <Badge className="py-3 px-6 text-base bg-gradient-to-r from-red-500 to-orange-500 text-white border-0 shadow-xl animate-pulse">
+                🔥 OFERTA LIMITADA • APENAS OS PRIMEIROS 100 CLIENTES
+              </Badge>
+            </motion.div>
+
+            <motion.h2 variants={fadeInUp} className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+              Não perca a chance de ter
+              <br />
+              <motion.span 
+                className="bg-gradient-to-r from-primary via-accent to-primary bg-[length:200%_auto] bg-clip-text text-transparent"
+                animate={{ backgroundPosition: ["0%", "200%"] }}
+                transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+              >
+                O MELHOR SISTEMA
+              </motion.span>
+              <br />
+              do Brasil!
             </motion.h2>
-            <motion.p variants={fadeInUp} className="text-xl text-muted-foreground mb-8">
-              Junte-se a milhares de empresas que já automatizaram suas cobranças e aumentaram sua receita.
-            </motion.p>
             
-            <motion.div variants={scaleIn} className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <motion.div variants={fadeInUp} className="mb-8">
+              <p className="text-lg md:text-xl text-muted-foreground mb-6">
+                Você acabou de descobrir o <strong className="text-foreground">ÚNICO sistema</strong> do Brasil com:
+              </p>
+              
+              {/* Lista de exclusividades */}
+              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
+                {[
+                  { icon: Bot, text: "🤖 IA que GERA PIX no WhatsApp (EXCLUSIVO MUNDIAL)", color: "from-blue-500 to-cyan-500" },
+                  { icon: Sparkles, text: "📊 Relatórios que PREVEEM inadimplência (ÚNICO NO BRASIL)", color: "from-purple-500 to-pink-500" },
+                  { icon: Zap, text: "⚡ Automação END-TO-END completa (REVOLUCIONÁRIO)", color: "from-orange-500 to-red-500" },
+                  { icon: MessageSquare, text: "💬 WhatsApp com IA conversacional (INÉDITO)", color: "from-green-500 to-emerald-500" }
+                ].map((feature, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, x: i % 2 === 0 ? -20 : 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    whileHover={{ scale: 1.05 }}
+                    className={`p-4 rounded-2xl bg-gradient-to-r ${feature.color} bg-opacity-10 border border-current border-opacity-20 backdrop-blur-sm`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center shadow-lg`}>
+                        <feature.icon className="w-6 h-6 text-white" />
+                      </div>
+                      <p className="text-sm md:text-base font-semibold text-left">{feature.text}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Contador de urgência */}
+            <motion.div variants={scaleIn} className="mb-8">
+              <Card className="max-w-2xl mx-auto p-6 bg-gradient-to-r from-red-500/10 to-orange-500/10 border-2 border-red-500/30">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <motion.div
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ repeat: Infinity, duration: 1 }}
+                  >
+                    <Clock className="w-8 h-8 text-red-500" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold text-red-500">⏰ TEMPO LIMITADO</h3>
+                </div>
+                <p className="text-lg">
+                  <strong className="text-foreground">Apenas os primeiros 100 clientes</strong> terão acesso aos recursos exclusivos.
+                  <br />
+                  <span className="text-red-500 font-semibold">Restam poucas vagas!</span>
+                </p>
+              </Card>
+            </motion.div>
+
+            {/* Super CTA */}
+            <motion.div variants={scaleIn} className="mb-8">
               <motion.div 
                 whileHover={{ scale: 1.05 }} 
                 whileTap={{ scale: 0.95 }}
                 animate={{ 
                   boxShadow: [
-                    "0 0 0 0 rgba(var(--primary), 0)",
-                    "0 0 0 10px rgba(var(--primary), 0.1)",
-                    "0 0 0 0 rgba(var(--primary), 0)"
+                    "0 0 0 0 rgba(var(--primary), 0.4)",
+                    "0 0 0 20px rgba(var(--primary), 0)",
+                    "0 0 0 0 rgba(var(--primary), 0.4)"
                   ]
                 }}
                 transition={{ repeat: Infinity, duration: 2 }}
               >
-                <Button size="lg" asChild className="text-lg px-10 py-7 bg-gradient-to-r from-primary to-accent shadow-xl">
+                <Button size="lg" asChild className="text-lg px-10 py-6 bg-gradient-to-r from-primary via-accent to-primary shadow-xl shadow-primary/30 animate-pulse">
                   <Link to={REVENDA_SIGNUP_LINK}>
-                    <Rocket className="mr-2 w-6 h-6" />
-                    Começar 7 Dias Grátis
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <Crown className="mr-3 w-6 h-6" />
+                    🎁 SIM! QUERO TESTAR GRÁTIS 7 DIAS
+                    <ArrowRight className="ml-3 w-6 h-6" />
                   </Link>
                 </Button>
               </motion.div>
             </motion.div>
 
+            {/* Garantias e benefícios */}
+            <motion.div variants={fadeInUp} className="mb-8">
+              <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                <Card className="p-6 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Shield className="w-8 h-8 text-green-500" />
+                    <h4 className="text-xl font-bold text-green-500">GARANTIA TOTAL</h4>
+                  </div>
+                  <p className="text-sm">
+                    ✓ 7 dias COMPLETAMENTE grátis<br />
+                    ✓ Sem cartão de crédito<br />
+                    ✓ Cancelamento a qualquer momento<br />
+                    ✓ Suporte 24/7 incluso
+                  </p>
+                </Card>
+                <Card className="p-6 bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/30">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Rocket className="w-8 h-8 text-blue-500" />
+                    <h4 className="text-xl font-bold text-blue-500">ATIVAÇÃO IMEDIATA</h4>
+                  </div>
+                  <p className="text-sm">
+                    ⚡ Acesso em 30 segundos<br />
+                    🤖 IA já pré-configurada<br />
+                    📱 WhatsApp funcional na hora<br />
+                    💰 Primeira cobrança automática hoje
+                  </p>
+                </Card>
+              </div>
+            </motion.div>
+
+            {/* Prova social final */}
             <motion.div 
               variants={fadeInUp}
-              className="flex flex-wrap justify-center gap-6 text-sm text-muted-foreground"
+              className="flex flex-wrap justify-center gap-8 text-base text-muted-foreground mb-8"
             >
               {[
-                { icon: Check, text: '7 dias grátis' },
-                { icon: CreditCard, text: 'Sem cartão de crédito' },
-                { icon: Heart, text: 'Suporte humanizado' },
-                { icon: X, text: 'Cancele quando quiser' }
+                { icon: Users, text: '10.000+ clientes', number: '10k+' },
+                { icon: Star, text: 'satisfação', number: '4.9★' },
+                { icon: TrendingUp, text: 'crescimento mensal', number: '300%' },
+                { icon: Shield, text: 'uptime garantido', number: '99.9%' }
               ].map((item, i) => (
-                <motion.span 
+                <motion.div 
                   key={i}
-                  className="flex items-center gap-2"
-                  whileHover={{ scale: 1.05 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ scale: 1.1 }}
+                  className="flex flex-col items-center gap-2 bg-background/50 px-4 py-3 rounded-lg border border-muted backdrop-blur-sm"
                 >
-                  <item.icon className="w-4 h-4 text-primary" />
-                  {item.text}
-                </motion.span>
+                  <item.icon className="w-6 h-6 text-primary" />
+                  <div className="text-2xl font-bold text-primary">{item.number}</div>
+                  <div className="text-xs">{item.text}</div>
+                </motion.div>
               ))}
+            </motion.div>
+
+            {/* Último apelo */}
+            <motion.div variants={fadeInUp}>
+              <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
+                💡 <strong className="text-foreground">Dica:</strong> Quem testa primeiro, leva vantagem. 
+                Seus concorrentes ainda usam sistemas antigos enquanto você pode ter 
+                <strong className="text-primary"> a tecnologia mais avançada do Brasil</strong> funcionando hoje mesmo!
+              </p>
             </motion.div>
           </motion.div>
         </div>
@@ -1395,8 +2262,8 @@ const FeatureCategoryCard = ({
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <Link to="/" className="flex items-center gap-3 mb-4">
-                <img src={logoBraga} alt="BRGestor" className="h-10 w-auto" />
-                <span className="font-bold text-xl">BRGestor</span>
+                <img src={logo} alt="BRGestor" className="h-10 w-auto" />
+                <span className="font-bold text-xl">BRGESTOR</span>
               </Link>
               <p className="text-muted-foreground text-sm">
                 A plataforma completa para gestão de clientes, cobranças e automação com IA.

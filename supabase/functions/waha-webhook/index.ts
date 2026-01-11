@@ -1311,7 +1311,68 @@ Deno.serve(async (req) => {
       });
       
       if (hasMediaContent) {
-        console.log('📦 Processing media:', mediaType, 'hasMediaContent:', hasMediaContent, 'mediaUrl:', mediaUrl, 'isAudioMessage:', isAudioMessage, 'isImageMessage:', isImageMessage, 'isLocalhostUrl:', isLocalhostUrl);
+        console.log('📦 Media recebida - enviando resposta automática sobre limitação de mídia');
+        
+        // RESPOSTA AUTOMÁTICA: Informar que não processa áudio/imagem
+        const mediaNotSupportedMessage = isAudioMessage 
+          ? `🎤 Oi! Recebi seu áudio, mas ainda não consigo ouvir mensagens de voz.\n\n📝 Por favor, digite sua mensagem em texto para que eu possa te ajudar melhor!`
+          : `📸 Oi! Recebi sua imagem, mas ainda não consigo visualizar fotos.\n\n📝 Por favor, digite sua mensagem em texto para que eu possa te ajudar melhor!`;
+
+        try {
+          // Enviar resposta automática via WAHA
+          const { data: wahaSettings } = await supabase
+            .from('tenant_settings')
+            .select('key, value')
+            .eq('tenant_id', tenantId)
+            .in('key', ['waha_api_url', 'waha_api_key']);
+          
+          const wahaSettingsMap: Record<string, string> = {};
+          wahaSettings?.forEach((s: any) => { wahaSettingsMap[s.key] = s.value; });
+          const wahaUrl = (wahaSettingsMap['waha_api_url'] || '').trim().replace(/\/+$/, '');
+          const wahaApiKey = wahaSettingsMap['waha_api_key'];
+          
+          if (wahaUrl && wahaApiKey) {
+            await fetch(`${wahaUrl}/api/${sessionName}/sendText`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-Api-Key': wahaApiKey,
+              },
+              body: JSON.stringify({
+                chatId: fromNumber,
+                text: mediaNotSupportedMessage,
+              }),
+            });
+            
+            console.log('✅ Resposta automática enviada sobre limitação de mídia');
+          }
+        } catch (error) {
+          console.error('❌ Erro ao enviar resposta automática:', error);
+        }
+
+        // Registrar mensagem como mídia não processada
+        await supabase
+          .from('whatsapp_messages')
+          .insert({
+            tenant_id: tenantId,
+            from_number: fromNumber,
+            message_body: isAudioMessage ? '[Áudio recebido - não processado]' : '[Imagem recebida - não processada]',
+            message_type: 'received',
+            is_processed: false,
+            created_at: new Date().toISOString(),
+          });
+
+        console.log('📝 Mensagem de mídia registrada como não processada');
+        
+        // Retornar sem processar a mídia
+        return new Response(JSON.stringify({ 
+          success: true, 
+          message: 'Mídia recebida - resposta automática enviada' 
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
         
         // NOVA LÓGICA: Sempre usar a função bridge para baixar do WAHA e subir para Supabase
         const needsWahaDownload = !mediaUrl || isLocalhostUrl || hasMediaContent;

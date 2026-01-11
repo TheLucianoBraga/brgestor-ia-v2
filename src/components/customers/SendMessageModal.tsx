@@ -113,14 +113,6 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({
     [templates, selectedTemplateId]
   );
 
-  // Update image and audio when template changes
-  useEffect(() => {
-    if (selectedTemplate) {
-      if (selectedTemplate.image_url) setCustomImage(selectedTemplate.image_url);
-      if (selectedTemplate.audio_url) setCustomAudio(selectedTemplate.audio_url);
-    }
-  }, [selectedTemplate]);
-
   // Get main item from customer
   const mainItem = useMemo(() => {
     const activeItems = customer.customer_items?.filter(i => i.status === 'active') || [];
@@ -224,6 +216,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({
       setSelectedTemplateId('');
       setCustomContent('');
       setCustomImage(null);
+      setCustomAudio(null);
       setScheduleDate('');
       setScheduleTime('09:00');
       setRecurrence('none');
@@ -485,7 +478,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({
                     </ScrollArea>
                   </div>
 
-                  {/* Media upload */}
+                  {/* Media upload - PARA ENVIO */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground">Imagem (opcional):</Label>

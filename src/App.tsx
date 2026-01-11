@@ -60,7 +60,7 @@ const MeuPlano = lazy(() => import("@/pages/app/MeuPlano"));
 const GestaoRevendas = lazy(() => import("@/pages/app/GestaoRevendas"));
 const CobrancaAtivos = lazy(() => import("@/pages/app/CobrancaAtivos"));
 const ChatPage = lazy(() => import("@/pages/app/ChatPage"));
-const Despesas = lazy(() => import("@/pages/app/Despesas"));
+const Despesas = lazy(() => import("@/pages/app/DespesasNew"));
 const Notes = lazy(() => import("@/pages/app/Notes"));
 const NotificacoesCenter = lazy(() => import("@/pages/app/NotificacoesCenter"));
 

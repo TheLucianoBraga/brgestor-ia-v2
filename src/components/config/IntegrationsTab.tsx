@@ -100,6 +100,8 @@ export const IntegrationsTab: React.FC = () => {
   const [geminiApiKey, setGeminiApiKey] = useState('');
   const [showOpenaiKey, setShowOpenaiKey] = useState(false);
   const [showGeminiKey, setShowGeminiKey] = useState(false);
+  const [isSavingOpenAI, setIsSavingOpenAI] = useState(false);
+  const [isSavingGemini, setIsSavingGemini] = useState(false);
   const [isSavingAi, setIsSavingAi] = useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
   const [selectedAiProvider, setSelectedAiProvider] = useState<'openai' | 'gemini'>('gemini');
@@ -257,6 +259,34 @@ export const IntegrationsTab: React.FC = () => {
       });
     } finally {
       setIsSavingStripe(false);
+    }
+  };
+
+  const handleSaveOpenAI = async () => {
+    setIsSavingOpenAI(true);
+    try {
+      await updateMultipleSettings.mutateAsync({
+        openai_api_key: openaiApiKey,
+      });
+      toast.success('Chave OpenAI salva com sucesso');
+    } catch (error) {
+      toast.error('Erro ao salvar chave OpenAI');
+    } finally {
+      setIsSavingOpenAI(false);
+    }
+  };
+
+  const handleSaveGemini = async () => {
+    setIsSavingGemini(true);
+    try {
+      await updateMultipleSettings.mutateAsync({
+        gemini_api_key: geminiApiKey,
+      });
+      toast.success('Chave Gemini salva com sucesso');
+    } catch (error) {
+      toast.error('Erro ao salvar chave Gemini');
+    } finally {
+      setIsSavingGemini(false);
     }
   };
 
@@ -1309,6 +1339,20 @@ export const IntegrationsTab: React.FC = () => {
                   </div>
                 </div>
 
+                <Button onClick={handleSaveOpenAI} disabled={isSavingOpenAI} className="w-full">
+                  {isSavingOpenAI ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Salvar Configurações OpenAI
+                    </>
+                  )}
+                </Button>
+
                 <Separator />
 
                 <div className="pt-2">
@@ -1319,6 +1363,22 @@ export const IntegrationsTab: React.FC = () => {
                     <li>Vá em "API Keys" → "Create new secret key"</li>
                     <li>Copie a chave e cole acima</li>
                   </ol>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button onClick={handleSaveOpenAI} disabled={isSavingOpenAI}>
+                    {isSavingOpenAI ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4 mr-2" />
+                        Salvar OpenAI
+                      </>
+                    )}
+                  </Button>
                 </div>
               </CardContent>
             </CollapsibleContent>
@@ -1371,6 +1431,20 @@ export const IntegrationsTab: React.FC = () => {
                     </Button>
                   </div>
                 </div>
+
+                <Button onClick={handleSaveGemini} disabled={isSavingGemini} className="w-full">
+                  {isSavingGemini ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Salvar Configurações Gemini
+                    </>
+                  )}
+                </Button>
 
                 <Separator />
 

@@ -138,6 +138,26 @@ export const AIInsights: React.FC<AIInsightsProps> = ({ metrics }) => {
       });
     }
 
+    // Insight padrão se nenhum foi gerado
+    if (insights.length === 0) {
+      if (metrics.currentRevenue > 0) {
+        insights.push({
+          type: 'info',
+          icon: <Sparkles className="w-5 h-5" />,
+          title: 'Análise de Período',
+          description: `Receita de R$ ${metrics.currentRevenue.toFixed(2)} neste período com ${metrics.activeClients} clientes ativos. Continue monitorando suas métricas para identificar oportunidades de crescimento.`,
+        });
+      } else {
+        insights.push({
+          type: 'info',
+          icon: <Target className="w-5 h-5" />,
+          title: 'Comece a Crescer',
+          description: 'Configure seus serviços e comece a adicionar clientes para visualizar análises detalhadas e insights personalizados.',
+          action: 'Cadastrar primeiro cliente',
+        });
+      }
+    }
+
     return insights;
   };
 
@@ -182,10 +202,7 @@ export const AIInsights: React.FC<AIInsightsProps> = ({ metrics }) => {
     }
   };
 
-  if (insights.length === 0) {
-    return null;
-  }
-
+  // Sempre renderizar o card, agora sempre terá pelo menos 1 insight
   return (
     <Card className="rounded-xl bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-950 dark:to-blue-950 border-purple-200 dark:border-purple-800">
       <CardHeader>

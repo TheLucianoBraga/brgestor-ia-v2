@@ -61,7 +61,7 @@ export const DesktopHeader: React.FC = () => {
       .slice(0, 2);
   };
 
-  const displayName = profile?.full_name || user?.email || 'Usuário';
+  const displayName = profile?.full_name || 'Luciano Braga';
   const displayEmail = user?.email || '';
 
   return (

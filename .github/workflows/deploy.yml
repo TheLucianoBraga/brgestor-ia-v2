@@ -1,0 +1,29 @@
+# .github/workflows/deploy.yml
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Run remote deploy script on VPS
+        env:
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          REPO_DIR: /home/brgestor/brgestor-ia-v2
+          BRANCH: master
+          DOCKER_COMPOSE_CMD: docker compose
+        run: |
+          ssh -o StrictHostKeyChecking=no -p ${SSH_PORT:-22} ${SSH_USER}@${SSH_HOST} "export REPO_DIR='${REPO_DIR}' BRANCH='${BRANCH}' DOCKER_COMPOSE_CMD='${DOCKER_COMPOSE_CMD}'; bash -s" < ./scripts/remote_deploy.sh

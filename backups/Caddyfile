@@ -1,0 +1,6 @@
+# Caddyfile
+# HTTP apenas, sem SSL
+:80 {
+  reverse_proxy brgestor:80
+  encode gzip
+}

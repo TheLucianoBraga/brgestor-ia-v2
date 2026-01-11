@@ -932,10 +932,10 @@ Deno.serve(async (req) => {
     }
 
     // ========================================
-    // HANDLE MESSAGE - Auto-Responder Inteligente
+    // HANDLE MESSAGE - Auto-Responder Inteligente v2.0
     // ========================================
     if (event === 'message') {
-      console.log('=== PROCESSING MESSAGE ===');
+      console.log('=== PROCESSING MESSAGE V2 ===');
       
       const messagePayload = payload.payload;
       
@@ -957,6 +957,7 @@ Deno.serve(async (req) => {
       }
 
       let messageBody = messagePayload?.body || '';
+      console.log('✅ messageBody declarado:', messageBody?.substring(0, 50));
       const from = messagePayload?.from || '';
       const chatId = messagePayload?.chatId || from;
       const senderName = messagePayload?.notifyName || messagePayload?._data?.notifyName || null;
@@ -1317,14 +1318,15 @@ Deno.serve(async (req) => {
           const wahaApiKey = wahaSettingsMap['waha_api_key'];
           
           if (wahaUrl && wahaApiKey) {
-            await fetch(`${wahaUrl}/api/${sessionName}/sendText`, {
+            await fetch(`${wahaUrl}/api/sendText`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'X-Api-Key': wahaApiKey,
               },
               body: JSON.stringify({
-                chatId: fromNumber,
+                session: sessionName,
+                chatId: chatId || from,
                 text: mediaNotSupportedMessage,
               }),
             });
@@ -1340,7 +1342,7 @@ Deno.serve(async (req) => {
           .from('whatsapp_messages')
           .insert({
             tenant_id: tenantId,
-            from_number: fromNumber,
+            from_number: from,
             message_body: isAudioMessage ? '[Áudio recebido - não processado]' : '[Imagem recebida - não processada]',
             message_type: 'received',
             is_processed: false,

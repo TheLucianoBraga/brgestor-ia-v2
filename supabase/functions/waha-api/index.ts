@@ -48,7 +48,28 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { action, tenantId, data } = body;
+    // Ler body JSON (Supabase Functions invoke envia JSON no body)
+    let body: any = null;
+    if (req.method === 'GET') {
+      // Para GET, permita parâmetros básicos via querystring (útil para debug manual)
+      const url = new URL(req.url);
+      body = {
+        action: url.searchParams.get('action'),
+        tenantId: url.searchParams.get('tenantId'),
+        data: undefined,
+      };
+    } else {
+      try {
+        body = await req.json();
+      } catch (_e) {
+        return json({ success: false, error: 'Body JSON inválido' }, 400);
+      }
+    }
+
+    const { action, tenantId, data } = body || {};
+    if (!action || !tenantId) {
+      return json({ success: false, error: 'Parâmetros obrigatórios: action e tenantId' }, 400);
+    }
     
     console.log(`🔵 WAHA-API: ${action} para tenant ${tenantId}`);
 

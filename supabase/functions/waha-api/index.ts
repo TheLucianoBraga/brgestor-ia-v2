@@ -130,7 +130,7 @@ async function getQRCode(baseUrl: string, apiKey: string, session: string): Prom
     // 4. Create or restart session
     await createOrRestartSession(baseUrl, apiKey, session);
 
-    // 5. Wait for SCAN_QR_CODE status and get QR
+    // 5. Wait for SCAN_QR_CODE status and get QR - with shorter intervals
     const qr = await waitForQRAndFetch(baseUrl, apiKey, session);
     
     if (qr) {
@@ -191,9 +191,18 @@ async function createOrRestartSession(baseUrl: string, apiKey: string, session: 
 async function waitForQRAndFetch(baseUrl: string, apiKey: string, session: string): Promise<string | null> {
   const headers = { 'Accept': 'application/json', 'X-Api-Key': apiKey };
   
-  // Poll for SCAN_QR_CODE status - max 10 seconds
-  for (let i = 0; i < 20; i++) {
-    await sleep(500);
+  // Poll for SCAN_QR_CODE status - max 10 seconds, but with faster initial polls
+  for (let i = 0; i < 30; i++) {
+    // Faster polling at the beginning (first 2 seconds), then slow down
+    const delay = i < 10 ? 200 : 500;
+    await sleep(delay);
+    
+    // Try to fetch QR directly even if status is not SCAN_QR_CODE yet
+    // Some WAHA versions/PLUS might have the QR available while STARTING
+    if (i % 2 === 0) {
+      const qr = await fetchQR(baseUrl, apiKey, session);
+      if (qr) return qr;
+    }
     
     const res = await fetch(`${baseUrl}/api/sessions/${session}`, { headers });
     if (!res.ok) continue;
@@ -206,7 +215,6 @@ async function waitForQRAndFetch(baseUrl: string, apiKey: string, session: strin
     }
     
     if (data.status === 'SCAN_QR_CODE') {
-      // Get QR immediately
       const qr = await fetchQR(baseUrl, apiKey, session);
       if (qr) return qr;
     }
@@ -273,6 +281,25 @@ async function fetchQR(baseUrl: string, apiKey: string, session: string): Promis
     }
   } catch (e) {
     console.log('Raw fetch failed:', e);
+  }
+
+  // Method 4: WAHA PLUS Screenshot fallback
+  try {
+    const res = await fetch(`${baseUrl}/api/${session}/screenshot`, {
+      method: 'GET',
+      headers: { 'Accept': 'image/png', 'X-Api-Key': apiKey }
+    });
+    
+    if (res.ok && res.headers.get('content-type')?.includes('image')) {
+      const buffer = await res.arrayBuffer();
+      if (buffer.byteLength > 100) {
+        const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        console.log('QR fetched as screenshot (WAHA PLUS)');
+        return base64;
+      }
+    }
+  } catch (e) {
+    console.log('Screenshot fetch failed:', e);
   }
 
   return null;

@@ -285,7 +285,7 @@ export default function WhatsApp() {
       } catch (error) {
         console.error('Polling error:', error);
       }
-    }, 2000);
+    }, 1000);
   };
 
   const handleRefreshStatus = async () => {

@@ -144,9 +144,10 @@ export function useDashboardMetrics() {
           .gte('paid_at', previousMonthStart.toISOString())
           .lte('paid_at', previousMonthEnd.toISOString())
           .eq('status', 'paid'),
-        // TEMPORÁRIO: Não contar customers até resolver o problema
-        // Retorna 0 fixo para esconder customers fantasmas
-        Promise.resolve({ count: 0 }),
+        query('customers')
+          .select('id', { count: 'exact', head: true })
+          .eq('tenant_id', tenantId)
+          .eq('status', 'active'),
         query('customer_charges')
           .select('id', { count: 'exact', head: true })
           .eq('tenant_id', tenantId)

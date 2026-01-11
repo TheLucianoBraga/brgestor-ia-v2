@@ -146,21 +146,7 @@ export default function WhatsApp() {
                 setConnectedName(data.me.pushName || '');
               }
               
-              // SEMPRE garantir que webhook está configurado
-              const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
-              fetch(`${wahaUrl}/api/${sessionName}/settings`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-Api-Key': wahaKey,
-                },
-                body: JSON.stringify({
-                  webhooks: [{
-                    url: webhookUrl,
-                    events: ['message']
-                  }]
-                }),
-              }).catch(() => {/* Ignorar erro - webhook pode já estar configurado */});
+              // Webhook já configurado na criação da sessão
             } else if (status === 'SCAN_QR_CODE') {
               setConnectionStatus('waiting_qr');
             } else {
@@ -231,8 +217,9 @@ export default function WhatsApp() {
       const wahaUrl = getSetting('waha_api_url')!;
       const wahaKey = getSetting('waha_api_key')!;
       
-      // Step 1: Criar/iniciar sessão
+      // Step 1: Criar/iniciar sessão COM WEBHOOK
       console.log('1. Criando sessão:', sessionName);
+      const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v2`;
       
       try {
         const createRes = await fetch(`${wahaUrl}/api/sessions`, {
@@ -243,7 +230,13 @@ export default function WhatsApp() {
           },
           body: JSON.stringify({
             name: sessionName,
-            start: true
+            start: true,
+            config: {
+              webhooks: [{
+                url: webhookUrl,
+                events: ['message']
+              }]
+            }
           }),
         });
         
@@ -288,19 +281,22 @@ export default function WhatsApp() {
             
             // Configurar webhook após conectar
             console.log('3. Configurando webhook...');
-            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
+            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v2`;
             try {
-              await fetch(`${wahaUrl}/api/${sessionName}/settings`, {
-                method: 'POST',
+              await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
+                method: 'PUT',
                 headers: {
                   'Content-Type': 'application/json',
                   'X-Api-Key': wahaKey,
                 },
                 body: JSON.stringify({
-                  webhooks: [{
-                    url: webhookUrl,
-                    events: ['message']
-                  }]
+                  name: sessionName,
+                  config: {
+                    webhooks: [{
+                      url: webhookUrl,
+                      events: ['message']
+                    }]
+                  }
                 }),
               });
               console.log('✅ Webhook configurado!');
@@ -391,19 +387,22 @@ export default function WhatsApp() {
             
             // Configurar webhook após conectar via QR
             console.log('✅ Conectado! Configurando webhook...');
-            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
+            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v2`;
             try {
-              await fetch(`${wahaUrl}/api/${sessionName}/settings`, {
-                method: 'POST',
+              await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
+                method: 'PUT',
                 headers: {
                   'Content-Type': 'application/json',
                   'X-Api-Key': wahaKey,
                 },
                 body: JSON.stringify({
-                  webhooks: [{
-                    url: webhookUrl,
-                    events: ['message']
-                  }]
+                  name: sessionName,
+                  config: {
+                    webhooks: [{
+                      url: webhookUrl,
+                      events: ['message']
+                    }]
+                  }
                 }),
               });
               console.log('✅ Webhook configurado - IA ativa!');
@@ -456,21 +455,7 @@ export default function WhatsApp() {
             setConnectedName(data.me.pushName || '');
           }
           
-          // SEMPRE garantir que webhook está configurado
-          const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook`;
-          fetch(`${wahaUrl}/api/${sessionName}/settings`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Api-Key': wahaKey,
-            },
-            body: JSON.stringify({
-              webhooks: [{
-                url: webhookUrl,
-                events: ['message']
-              }]
-            }),
-          }).catch(() => {/* Ignorar erro */});
+          // Webhook já configurado na criação da sessão
         } else if (status === 'SCAN_QR_CODE') {
           setConnectionStatus('waiting_qr');
           try {
@@ -510,7 +495,7 @@ export default function WhatsApp() {
       const wahaUrl = getSetting('waha_api_url')!;
       const wahaKey = getSetting('waha_api_key')!;
       
-      const res = await fetch(`${wahaUrl}/api/${sessionName}/auth/logout`, {
+      const res = await fetch(`${wahaUrl}/api/sessions/${sessionName}/stop`, {
         method: 'POST',
         headers: { 'X-Api-Key': wahaKey },
       });
@@ -539,11 +524,7 @@ export default function WhatsApp() {
       const wahaUrl = getSetting('waha_api_url')!;
       const wahaKey = getSetting('waha_api_key')!;
       
-      await fetch(`${wahaUrl}/api/${sessionName}/auth/logout`, {
-        method: 'POST',
-        headers: { 'X-Api-Key': wahaKey },
-      });
-      
+      // WAHA Plus: usar apenas /stop para encerrar sessão
       await fetch(`${wahaUrl}/api/sessions/${sessionName}/stop`, {
         method: 'POST',
         headers: { 'X-Api-Key': wahaKey },
@@ -1455,3 +1436,4 @@ export default function WhatsApp() {
     </div>
   );
 }
+

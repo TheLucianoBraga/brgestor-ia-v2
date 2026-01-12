@@ -1085,6 +1085,37 @@ export default function WhatsApp() {
                   </div>
                 )}
 
+                {/* Seletor de API - aparece quando desconectado */}
+                {connectionStatus === 'disconnected' && apiConfigured && (
+                  <div className="space-y-2 p-3 rounded-lg bg-muted/50 border">
+                    <p className="text-sm font-medium">Escolha a API para conectar:</p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant={selectedApiProvider === 'api1' ? 'default' : 'outline'}
+                        size="sm"
+                        className="flex-1"
+                        onClick={async () => {
+                          setSelectedApiProvider('api1');
+                          await updateMultipleSettings.mutateAsync({ whatsapp_api_provider: 'api1' });
+                        }}
+                      >
+                        API 1 {selectedApiProvider === 'api1' && '✓'}
+                      </Button>
+                      <Button
+                        variant={selectedApiProvider === 'api2' ? 'default' : 'outline'}
+                        size="sm"
+                        className="flex-1"
+                        onClick={async () => {
+                          setSelectedApiProvider('api2');
+                          await updateMultipleSettings.mutateAsync({ whatsapp_api_provider: 'api2' });
+                        }}
+                      >
+                        API 2 {selectedApiProvider === 'api2' && '✓'}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-2">
                   <Button 
                     variant="outline" 

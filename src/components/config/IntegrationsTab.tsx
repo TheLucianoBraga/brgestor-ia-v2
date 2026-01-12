@@ -41,9 +41,6 @@ export const IntegrationsTab: React.FC = () => {
   // Expanded sections state
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   
-  // WhatsApp API Provider - API 1 ou API 2
-  const [selectedApiProvider, setSelectedApiProvider] = useState<'api1' | 'api2'>('api1');
-  
   // WhatsApp API 1 state
   const [wahaUrl, setWahaUrl] = useState('');
   const [wahaApiKey, setWahaApiKey] = useState('');
@@ -134,8 +131,6 @@ export const IntegrationsTab: React.FC = () => {
 
   useEffect(() => {
     if (settings) {
-      // WhatsApp API Provider
-      setSelectedApiProvider((settings['whatsapp_api_provider'] as 'api1' | 'api2') || 'api1');
       // API 1
       setWahaUrl(settings['waha_api_url'] || '');
       setWahaApiKey(settings['waha_api_key'] || '');
@@ -207,7 +202,6 @@ export const IntegrationsTab: React.FC = () => {
       await updateMultipleSettings.mutateAsync({
         waha_api_url: wahaUrl,
         waha_api_key: wahaApiKey,
-        whatsapp_api_provider: selectedApiProvider,
       });
       toast.success('API 1 salva com sucesso');
     } finally {
@@ -227,24 +221,10 @@ export const IntegrationsTab: React.FC = () => {
       await updateMultipleSettings.mutateAsync({
         api2_url: api2Url,
         api2_api_key: api2ApiKey,
-        whatsapp_api_provider: selectedApiProvider,
       });
       toast.success('API 2 salva com sucesso');
     } finally {
       setIsSavingApi2(false);
-    }
-  };
-
-  // Save selected API provider
-  const handleSaveApiProvider = async (provider: 'api1' | 'api2') => {
-    setSelectedApiProvider(provider);
-    try {
-      await updateMultipleSettings.mutateAsync({
-        whatsapp_api_provider: provider,
-      });
-      toast.success(`${provider === 'api1' ? 'API 1' : 'API 2'} selecionada como padrão`);
-    } catch (err) {
-      console.error('Error saving API provider:', err);
     }
   };
 
@@ -630,49 +610,20 @@ export const IntegrationsTab: React.FC = () => {
             <CollapsibleContent>
               <CardContent className="space-y-6 pt-0">
                 <CardDescription>
-                  Configure a conexão com o servidor de mensagens WhatsApp
+                  Configure as credenciais das APIs de WhatsApp. A escolha de qual usar é feita na página WhatsApp ao conectar.
                 </CardDescription>
                 
-                {/* Seletor de API */}
-                <div className="space-y-3">
-                  <Label>Selecione a API de WhatsApp</Label>
-                  <div className="flex gap-3">
-                    <Button
-                      variant={selectedApiProvider === 'api1' ? 'default' : 'outline'}
-                      className="flex-1"
-                      onClick={() => handleSaveApiProvider('api1')}
-                    >
-                      API 1 {selectedApiProvider === 'api1' && '✓'}
-                    </Button>
-                    <Button
-                      variant={selectedApiProvider === 'api2' ? 'default' : 'outline'}
-                      className="flex-1"
-                      onClick={() => handleSaveApiProvider('api2')}
-                    >
-                      API 2 {selectedApiProvider === 'api2' && '✓'}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    API selecionada será usada para envio e recebimento de mensagens
-                  </p>
-                </div>
-
-                <Separator />
-
                 {/* API 1 Config */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-medium">Configuração API 1</h4>
-                    {selectedApiProvider === 'api1' && (
-                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">Ativa</Badge>
-                    )}
+                    <h4 className="font-medium">Credenciais API 1</h4>
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="waha-url">URL da API 1</Label>
                     <Input
                       id="waha-url"
-                      placeholder="https://seu-servidor.com"
+                      placeholder="http://seu-servidor:3000"
                       value={wahaUrl}
                       onChange={(e) => setWahaUrl(e.target.value)}
                     />
@@ -722,17 +673,14 @@ export const IntegrationsTab: React.FC = () => {
                 {/* API 2 Config */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
-                    <h4 className="font-medium">Configuração API 2</h4>
-                    {selectedApiProvider === 'api2' && (
-                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">Ativa</Badge>
-                    )}
+                    <h4 className="font-medium">Credenciais API 2</h4>
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="api2-url">URL da API 2</Label>
                     <Input
                       id="api2-url"
-                      placeholder="https://seu-servidor.com"
+                      placeholder="http://seu-servidor:8081"
                       value={api2Url}
                       onChange={(e) => setApi2Url(e.target.value)}
                     />

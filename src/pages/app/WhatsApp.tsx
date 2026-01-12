@@ -219,7 +219,7 @@ export default function WhatsApp() {
       
       // Step 1: Criar/iniciar sessão COM WEBHOOK
       console.log('1. Criando sessão:', sessionName);
-      const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v2`;
+      const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v3`;
       
       try {
         const createRes = await fetch(`${wahaUrl}/api/sessions`, {
@@ -281,7 +281,7 @@ export default function WhatsApp() {
             
             // Configurar webhook após conectar
             console.log('3. Configurando webhook...');
-            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v2`;
+            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v3`;
             try {
               await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
                 method: 'PUT',
@@ -290,13 +290,10 @@ export default function WhatsApp() {
                   'X-Api-Key': wahaKey,
                 },
                 body: JSON.stringify({
-                  name: sessionName,
-                  config: {
-                    webhooks: [{
-                      url: webhookUrl,
-                      events: ['message']
-                    }]
-                  }
+                  webhooks: [{
+                    url: webhookUrl,
+                    events: ['message']
+                  }]
                 }),
               });
               console.log('✅ Webhook configurado!');
@@ -387,7 +384,7 @@ export default function WhatsApp() {
             
             // Configurar webhook após conectar via QR
             console.log('✅ Conectado! Configurando webhook...');
-            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v2`;
+            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v3`;
             try {
               await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
                 method: 'PUT',

@@ -785,40 +785,42 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Find tenant
-    const { data: tenantSettings } = await supabase
-      .from('tenant_settings')
-      .select('tenant_id')
-      .eq('key', 'waha_api_url')
-      .not('value', 'is', null);
+    console.log('🔍 Buscando tenant com prefixo:', tenantPrefix);
+
+    // CORREÇÃO CRÍTICA: Buscar tenant DIRETAMENTE pela tabela tenants
+    // Não depender de tenant_settings que pode estar vazio/compartilhado
+    const { data: allTenants, error: tenantsError } = await supabase
+      .from('tenants')
+      .select('id, name')
+      .ilike('id', `${tenantPrefix}%`); // Busca que COMEÇA COM o prefixo
 
     let tenantId: string | null = null;
+    let tenantName: string | null = null;
 
-    if (tenantSettings && tenantSettings.length > 0) {
-      for (const setting of tenantSettings) {
-        if (setting.tenant_id.startsWith(tenantPrefix)) {
-          tenantId = setting.tenant_id;
-          break;
-        }
+    if (allTenants && allTenants.length > 0) {
+      // Pegar o PRIMEIRO que começa com o prefixo (mais específico)
+      const exactMatch = allTenants.find(t => t.id.startsWith(tenantPrefix));
+      if (exactMatch) {
+        tenantId = exactMatch.id;
+        tenantName = exactMatch.name;
+        console.log('✅ Tenant encontrado EXATO:', tenantId, '-', tenantName);
+      } else {
+        // Fallback: pegar primeiro da lista
+        tenantId = allTenants[0].id;
+        tenantName = allTenants[0].name;
+        console.log('⚠️ Tenant encontrado (primeiro da lista):', tenantId, '-', tenantName);
       }
     }
 
     if (!tenantId) {
-      const { data: allTenants } = await supabase.from('tenants').select('id');
-      if (allTenants) {
-        const foundTenant = allTenants.find(t => t.id.startsWith(tenantPrefix));
-        if (foundTenant) tenantId = foundTenant.id;
-      }
-    }
-
-    if (!tenantId) {
-      console.error('Tenant not found for prefix:', tenantPrefix);
-      return new Response(JSON.stringify({ success: false, error: 'Tenant not found' }), {
+      console.error('❌ Tenant NÃO ENCONTRADO para prefixo:', tenantPrefix);
+      console.error('Erro na busca:', tenantsError);
+      return new Response(JSON.stringify({ success: false, error: 'Tenant not found', prefix: tenantPrefix }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    console.log('Tenant ID found:', tenantId);
+    console.log('✅ Tenant ID confirmado:', tenantId, '(', tenantName, ')');
 
     // ========================================
     // HANDLE CALL.RECEIVED - Reject calls
@@ -962,11 +964,19 @@ Deno.serve(async (req) => {
       const from = messagePayload?.from || '';
       const chatId = messagePayload?.chatId || from;
       const senderName = messagePayload?.notifyName || messagePayload?._data?.notifyName || null;
-      const hasMedia = messagePayload?.hasMedia || false;
+      const hasMedia = messagePayload?.hasMedia === true; // FORÇAR boolean estrito
       const mediaType = messagePayload?.type || 'chat';
       // WAHA sends media URL in different places depending on version
       const mediaUrl = messagePayload?.media?.url || messagePayload?.mediaUrl || null;
       const mediaMimetype = messagePayload?.media?.mimetype || messagePayload?.mimetype || null;
+      
+      console.log('🔍 PAYLOAD ORIGINAL:', {
+        hasMedia_raw: messagePayload?.hasMedia,
+        hasMedia_boolean: hasMedia,
+        type: messagePayload?.type,
+        body_exists: !!messagePayload?.body,
+        body_length: messagePayload?.body?.length || 0
+      });
       
       // Get participant phone for group messages or use 'from' for direct messages
       const participantPhone = messagePayload?.participant || messagePayload?._data?.participant || null;
@@ -1269,22 +1279,27 @@ Deno.serve(async (req) => {
       let mediaContent: { type: 'image' | 'audio'; base64: string; mimeType: string } | null = null;
       let supabaseMediaUrl: string | null = null; // URL do Supabase para passar à IA
       
-      // Check if it's an audio/ptt message - APENAS se hasMedia for true
+      // Check if it's an audio/ptt message - APENAS se hasMedia for EXATAMENTE true
       const isAudioByMimetype = mediaMimetype?.toLowerCase().startsWith('audio/') || 
                                mediaMimetype?.toLowerCase().includes('ogg') || 
                                mediaMimetype?.toLowerCase().includes('opus') ||
                                mediaMimetype?.toLowerCase().includes('mp4');
-      const isAudioMessage = hasMedia && (mediaType === 'audio' || mediaType === 'ptt' || isAudioByMimetype);
+      const isAudioMessage = (hasMedia === true) && (mediaType === 'audio' || mediaType === 'ptt' || isAudioByMimetype);
       
-      // Check if it's image - APENAS se hasMedia for true
+      // Check if it's image - APENAS se hasMedia for EXATAMENTE true
       const isImageByMimetype = mediaMimetype?.toLowerCase().startsWith('image/');
-      const isImageMessage = hasMedia && (mediaType === 'image' || isImageByMimetype);
+      const isImageMessage = (hasMedia === true) && (mediaType === 'image' || isImageByMimetype);
       
       // Check if URL is localhost (inaccessible from edge function)
       const isLocalhostUrl = mediaUrl?.includes('localhost') || mediaUrl?.includes('127.0.0.1');
       
-      // CRÍTICO: Só detecta mídia se hasMedia=true E (isAudio OU isImage)
-      const hasMediaContent = hasMedia === true && (isAudioMessage || isImageMessage);
+      // CRÍTICO: Só detecta mídia se:
+      // 1. hasMedia é EXATAMENTE true (boolean)
+      // 2. E (isAudio OU isImage)
+      // 3. E messageBody está VAZIO ou é placeholder de mídia
+      const hasMediaContent = (hasMedia === true) && 
+                             (isAudioMessage || isImageMessage) && 
+                             (!messageBody || messageBody.trim().length === 0 || messageBody === '[Áudio recebido]' || messageBody === '[Imagem recebida]');
       
       console.log('🔍 Media detection:', { 
         hasMedia, 

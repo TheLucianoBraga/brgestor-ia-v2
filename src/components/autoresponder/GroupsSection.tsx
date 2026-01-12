@@ -47,6 +47,7 @@ export function GroupsSection({ tenantId }: GroupsSectionProps) {
   const [groups, setGroups] = useState<WhatsAppGroup[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<WhatsAppGroup | null>(null);
   const [globalEnabled, setGlobalEnabled] = useState(true);
+  const [communitiesEnabled, setCommunitiesEnabled] = useState(true);
   const [inheritFromPv, setInheritFromPv] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -63,12 +64,15 @@ export function GroupsSection({ tenantId }: GroupsSectionProps) {
       .from('tenant_settings')
       .select('key, value')
       .eq('tenant_id', tenantId)
-      .in('key', ['wa_allow_groups', 'groups_inherit_from_pv']);
+      .in('key', ['wa_allow_groups', 'wa_allow_communities', 'groups_inherit_from_pv']);
     
     if (data) {
       data.forEach((setting) => {
         if (setting.key === 'wa_allow_groups') {
           setGlobalEnabled(setting.value === 'true');
+        }
+        if (setting.key === 'wa_allow_communities') {
+          setCommunitiesEnabled(setting.value !== 'false'); // padrão: true
         }
         if (setting.key === 'groups_inherit_from_pv') {
           setInheritFromPv(setting.value === 'true');
@@ -84,6 +88,7 @@ export function GroupsSection({ tenantId }: GroupsSectionProps) {
     try {
       const settings = [
         { tenant_id: tenantId, key: 'wa_allow_groups', value: String(globalEnabled) },
+        { tenant_id: tenantId, key: 'wa_allow_communities', value: String(communitiesEnabled) },
         { tenant_id: tenantId, key: 'groups_inherit_from_pv', value: String(inheritFromPv) }
       ];
 
@@ -243,8 +248,8 @@ export function GroupsSection({ tenantId }: GroupsSectionProps) {
       {/* Config Global */}
       <Card>
         <CardHeader>
-          <CardTitle>Configuração Padrão para Grupos</CardTitle>
-          <CardDescription>Define comportamento global do auto-responder em grupos.</CardDescription>
+          <CardTitle>Configuração Padrão para Grupos e Comunidades</CardTitle>
+          <CardDescription>Define comportamento global do auto-responder em grupos e comunidades.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
@@ -253,6 +258,13 @@ export function GroupsSection({ tenantId }: GroupsSectionProps) {
               <p className="text-xs text-muted-foreground">Ativa/desativa globalmente para todos os grupos</p>
             </div>
             <Switch checked={globalEnabled} onCheckedChange={setGlobalEnabled} />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <Label>Auto-responder em comunidades</Label>
+              <p className="text-xs text-muted-foreground">Ativa/desativa globalmente para todos os grupos de comunidade</p>
+            </div>
+            <Switch checked={communitiesEnabled} onCheckedChange={setCommunitiesEnabled} />
           </div>
           <div className="flex items-center justify-between">
             <div>

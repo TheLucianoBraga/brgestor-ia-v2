@@ -18,9 +18,10 @@ export function useChildTenants() {
       return;
     }
 
-    // 🔒 VALIDAÇÃO: Evitar erro 400 com IDs placeholder
-    if (!currentTenant.id || currentTenant.id.startsWith('a0000000')) {
-      console.warn('⚠️ Tenant ID inválido ou placeholder, aguardando tenant real');
+    // 🔒 VALIDAÇÃO: Evitar erro 400 com IDs vazios ou claramente inválidos
+    // Nota: a0000000-0000-0000-0000-000000000001 é o tenant master válido
+    if (!currentTenant.id || currentTenant.id === '00000000-0000-0000-0000-000000000000') {
+      console.warn('⚠️ Tenant ID inválido, aguardando tenant real');
       setChildren([]);
       setIsLoading(false);
       return;

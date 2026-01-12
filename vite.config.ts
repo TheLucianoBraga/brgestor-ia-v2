@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => ({
         display: "standalone",
         orientation: "portrait",
         scope: "/",
-        start_url: "/",
+        start_url: "/?v=" + Date.now(),
         icons: [
           {
             src: "/pwa-192x192.png",
@@ -48,9 +48,17 @@ export default defineConfig(({ mode }) => ({
         screenshots: [],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,svg,woff2}"],
-        globIgnores: ["**/favicon.png"],
+        // Limpar cache antigo automaticamente
+        cleanupOutdatedCaches: true,
+        // Não pré-cachear tudo, usar network-first para HTML
+        globPatterns: ["**/*.{js,css,ico,svg,woff2}"],
+        // Não cachear HTML - sempre buscar do servidor
+        navigateFallback: null,
+        globIgnores: ["**/favicon.png", "**/*.html"],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        // Forçar ativação imediata do novo SW
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,

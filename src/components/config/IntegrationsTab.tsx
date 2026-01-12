@@ -45,6 +45,8 @@ export const IntegrationsTab: React.FC = () => {
   const [wahaUrl, setWahaUrl] = useState('');
   const [wahaApiKey, setWahaApiKey] = useState('');
   const [waPixKey, setWaPixKey] = useState('');
+  const [pixHolderName, setPixHolderName] = useState('');
+  const [pixKeyType, setPixKeyType] = useState('');
   const [waOwnerPhone, setWaOwnerPhone] = useState('');
   const [showWahaKey, setShowWahaKey] = useState(false);
   const [isSavingWaha, setIsSavingWaha] = useState(false);
@@ -123,7 +125,9 @@ export const IntegrationsTab: React.FC = () => {
     if (settings) {
       setWahaUrl(settings['waha_api_url'] || '');
       setWahaApiKey(settings['waha_api_key'] || '');
-      setWaPixKey(settings['wa_pix_key'] || '');
+      setWaPixKey(settings['wa_pix_key'] || settings['default_pix_key'] || '');
+      setPixHolderName(settings['pix_holder_name'] || '');
+      setPixKeyType(settings['pix_key_type'] || '');
       setWaOwnerPhone(settings['wa_owner_phone'] || '');
       // MercadoPago
       setMpAccessToken(settings['mp_access_token'] || '');
@@ -206,8 +210,11 @@ export const IntegrationsTab: React.FC = () => {
     try {
       await updateMultipleSettings.mutateAsync({
         wa_pix_key: waPixKey,
+        default_pix_key: waPixKey,
+        pix_holder_name: pixHolderName,
+        pix_key_type: pixKeyType,
       });
-      toast.success('Chave PIX salva com sucesso');
+      toast.success('Configurações PIX salvas com sucesso');
     } finally {
       setIsSavingTenantPix(false);
     }
@@ -636,15 +643,40 @@ export const IntegrationsTab: React.FC = () => {
             <CardDescription>Configure a chave PIX usada como padrão para pagamentos</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              <Label htmlFor="wa-pix-key">Chave PIX Padrão</Label>
-              <Input
-                id="wa-pix-key"
-                placeholder="Sua chave PIX (CPF, CNPJ, email, telefone ou aleatória)"
-                value={waPixKey}
-                onChange={(e) => setWaPixKey(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">Usada quando o cliente não tiver chave cadastrada</p>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="pix-holder-name">👤 Nome do Titular</Label>
+                <Input
+                  id="pix-holder-name"
+                  placeholder="Ex: BRGestor, Empresa LTDA"
+                  value={pixHolderName}
+                  onChange={(e) => setPixHolderName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="pix-key-type">📋 Tipo da Chave</Label>
+                <Select value={pixKeyType} onValueChange={setPixKeyType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CPF">CPF</SelectItem>
+                    <SelectItem value="CNPJ">CNPJ</SelectItem>
+                    <SelectItem value="Telefone">Telefone</SelectItem>
+                    <SelectItem value="E-mail">E-mail</SelectItem>
+                    <SelectItem value="Chave Aleatória">Chave Aleatória</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="wa-pix-key">🔑 Chave PIX</Label>
+                <Input
+                  id="wa-pix-key"
+                  placeholder="Digite a chave"
+                  value={waPixKey}
+                  onChange={(e) => setWaPixKey(e.target.value)}
+                />
+              </div>
             </div>
             <div className="flex justify-end mt-4">
               <Button onClick={handleSaveTenantPix} disabled={isSavingTenantPix}>

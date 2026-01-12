@@ -71,13 +71,13 @@ export function useChatbotAnalytics(startDate?: Date, endDate?: Date) {
 
       if (memoriesError) throw memoriesError;
 
-      // Fetch WhatsApp messages history
+      // Fetch WhatsApp messages history from conversation_history table
       const memoryIds = whatsappMemories?.map(m => m.id) || [];
       let whatsappMessagesData: any[] = [];
       
       if (memoryIds.length > 0) {
         const { data: messages, error: messagesError } = await supabase
-          .from('chat_messages_history')
+          .from('conversation_history')
           .select('id, memory_id, created_at')
           .in('memory_id', memoryIds)
           .gte('created_at', start.toISOString())

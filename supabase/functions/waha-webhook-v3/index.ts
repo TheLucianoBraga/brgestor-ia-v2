@@ -50,15 +50,52 @@ const PERMISSION_ACTIONS: Record<PermissionLevel, string[]> = {
     'generate_pix', 'show_services', 'show_charges', 'transfer_human', 'create_ticket'
   ],
   'VISITOR': [
-    'show_services', 'transfer_human', 'request_signup'
+    'generate_pix', 'show_services', 'show_charges', 'transfer_human', 'request_signup', 'create_ticket'
   ]
 };
 
-// Helper: Verificar se telefone bate (últimos 8 dígitos)
+// Helper: Normaliza telefone para formato padrão (apenas dígitos, sempre 11 dígitos)
+function normalizePhone(phone: string | null | undefined): string {
+  if (!phone) return '';
+  
+  // Remove tudo que não é dígito
+  let digits = phone.replace(/\D/g, '');
+  
+  // Se começar com 55 (Brasil) e tiver mais de 11 dígitos, remove o 55
+  if (digits.startsWith('55') && digits.length > 11) {
+    digits = digits.substring(2);
+  }
+  
+  // Se tiver 10 dígitos (sem o 9), adiciona o 9 após o DDD
+  if (digits.length === 10) {
+    digits = digits.substring(0, 2) + '9' + digits.substring(2);
+  }
+  
+  return digits;
+}
+
+// Helper: Verificar se telefone bate (normaliza ambos e compara)
 function phonesMatch(phone1: string, phone2: string): boolean {
-  const clean1 = phone1?.replace(/\D/g, '').slice(-8) || '';
-  const clean2 = phone2?.replace(/\D/g, '').slice(-8) || '';
-  return clean1.length >= 8 && clean2.length >= 8 && clean1 === clean2;
+  const clean1 = normalizePhone(phone1);
+  const clean2 = normalizePhone(phone2);
+  
+  console.log(`📱 phonesMatch: "${phone1}" -> "${clean1}" vs "${phone2}" -> "${clean2}"`);
+  
+  // Comparação exata após normalização
+  if (clean1.length >= 10 && clean2.length >= 10 && clean1 === clean2) {
+    return true;
+  }
+  
+  // Fallback: comparar últimos 8 dígitos (número local sem DDD)
+  const last8_1 = clean1.slice(-8);
+  const last8_2 = clean2.slice(-8);
+  
+  if (last8_1.length >= 8 && last8_2.length >= 8 && last8_1 === last8_2) {
+    console.log(`📱 phonesMatch (últimos 8): MATCH!`);
+    return true;
+  }
+  
+  return false;
 }
 
 // Helper: Calcular nível de permissão
@@ -352,13 +389,82 @@ Deno.serve(async (req) => {
     const sessionName = payload.session || '';
     const contactName = messagePayload?.notifyName || messagePayload?._data?.notifyName || null;
     const participantPhone = messagePayload?.participant || messagePayload?._data?.participant || null;
+
+    // ====================
+    // 🚨 PROTEÇÃO ANTI-LOOP DE BOTS
+    // ====================
+    
+    // 1. LISTA NEGRA - Apenas frases que CLARAMENTE indicam loop/bot
+    const blacklistPhrases = [
+      'Atendimento Automático',
+      'O que mais posso ajudar',
+      'Já notifiquei um atendente',
+      'Em breve alguém entrará em contato',
+      'ntfut.com',
+      'braga-digital-suporte',
+      'Vídeo de no mínimo',
+      'agilizar seu suporte',
+      '📩 Depois envie',
+      // Detectar mensagens repetidas/duplicadas
+      'Para agilizar seu suporte, siga estes passos',
+      'Modelo do aparelho',
+      'Descrição do problema',
+    ];
+    
+    const containsBlacklist = blacklistPhrases.some(phrase => 
+      messageBody.toLowerCase().includes(phrase.toLowerCase())
+    );
+    
+    if (containsBlacklist) {
+      console.log('🚫 LOOP BLOQUEADO: Contém frase de blacklist');
+      return new Response(JSON.stringify({ success: true, skipped: 'blacklist' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // 2. Ignorar se tem muitos emojis (típico de bot) - aumentei para 8
+    const emojiCount = (messageBody.match(/[\u{1F300}-\u{1F9FF}]/gu) || []).length;
+    if (emojiCount > 8) {
+      console.log('🚫 LOOP BLOQUEADO: Muitos emojis (bot):', emojiCount);
+      return new Response(JSON.stringify({ success: true, skipped: 'too_many_emojis' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // 3. Ignorar mensagens muito curtas ou apenas emojis
+    const cleanMessage = messageBody.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
+    if (cleanMessage.length < 2) {
+      console.log('⏭️ Ignorando mensagem muito curta ou apenas emojis');
+      return new Response(JSON.stringify({ success: true, skipped: 'too_short' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // 4. Rate limiting - usar timestamp do payload
+    const messageTimestamp = messagePayload?.timestamp || messagePayload?._data?.t || 0;
+    const now = Math.floor(Date.now() / 1000);
+    
+    // Se a mensagem tem mais de 30 segundos, ignorar (possível replay)
+    if (messageTimestamp && (now - messageTimestamp) > 30) {
+      console.log('⏭️ Ignorando mensagem antiga (possível replay):', now - messageTimestamp, 'segundos');
+      return new Response(JSON.stringify({ success: true, skipped: 'old_message' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+    
+    // 4. Detectar se a mensagem é idêntica à última resposta que enviamos
+    // (isso indica loop com outro bot que está copiando nossa resposta)
     
     // Detectar tipo de chat
     const isGroupMessage = from.endsWith('@g.us') || chatId.endsWith('@g.us');
     const isNewsletterChannel = from.endsWith('@newsletter') || chatId.endsWith('@newsletter');
     const isLidFormat = from.endsWith('@lid') || chatId.endsWith('@lid');
+    // Considerar chat privado se termina com formatos conhecidos OU se contém número de telefone
     const isPrivateChat = from.endsWith('@c.us') || from.endsWith('@s.whatsapp.net') || 
-                         chatId.endsWith('@c.us') || chatId.endsWith('@s.whatsapp.net') || isLidFormat;
+                         chatId.endsWith('@c.us') || chatId.endsWith('@s.whatsapp.net') || 
+                         isLidFormat ||
+                         // Fallback: se tem telefone no 'from' e não é grupo, é privado
+                         (!isGroupMessage && !isNewsletterChannel && /^\d+/.test(from));
     
     // Detectar se é grupo de comunidade (vem no payload do WAHA)
     const isCommunityGroup = messagePayload?.isGroup && (
@@ -401,7 +507,31 @@ Deno.serve(async (req) => {
     console.log('✅ Tenant encontrado:', tenantId);
 
     // LIMPAR TELEFONE para busca consistente
-    const cleanPhone = from.replace(/\D/g, '').replace(/^55/, '');
+    // O WAHA pode enviar diferentes formatos: @c.us, @s.whatsapp.net, @lid (linked device), @g.us (grupo)
+    // Para @lid, precisamos tentar pegar o telefone real de _data.author ou chatId
+    let phoneRaw = from;
+    
+    // Se é @lid (Linked Device ID), tentar pegar telefone real
+    if (from.includes('@lid')) {
+      // Tentar pegar de _data.author, chatId, ou participant
+      const authorPhone = messagePayload?._data?.author?.replace(/@.*$/, '') || '';
+      const chatIdPhone = chatId?.replace(/@.*$/, '') || '';
+      const participantPhoneClean = participantPhone?.replace(/@.*$/, '') || '';
+      
+      // Usar o que parecer mais com telefone (10-13 dígitos, começando com 55 ou DDD)
+      const possiblePhones = [authorPhone, chatIdPhone, participantPhoneClean].filter(p => {
+        const digits = p.replace(/\D/g, '');
+        return digits.length >= 10 && digits.length <= 13;
+      });
+      
+      phoneRaw = possiblePhones[0] || from;
+      console.log('📱 @lid detectado, buscando telefone real:', { authorPhone, chatIdPhone, participantPhoneClean, escolhido: phoneRaw });
+    }
+    
+    // Remover sufixos do WhatsApp
+    phoneRaw = phoneRaw.replace(/@c\.us$/, '').replace(/@s\.whatsapp\.net$/, '').replace(/@lid$/, '').replace(/@g\.us$/, '');
+    const cleanPhone = phoneRaw.replace(/\D/g, '');
+    console.log('📱 Telefone final:', { from, phoneRaw, cleanPhone });
     
     // ====================
     // 0. BUSCAR CONFIGURAÇÕES PRIMEIRO (para detectar owner)
@@ -419,13 +549,93 @@ Deno.serve(async (req) => {
     const wahaApiKey = settingsMap['waha_api_key'];
     const ownerPhone = settingsMap['wa_owner_phone'] || '';
     const requireEmailVerification = settingsMap['wa_require_email_verification'] === 'true';
+    
+    // Verificar se auto-responder está ativado
+    const autoEnabled = settingsMap['wa_auto_enabled'] !== 'false'; // Padrão: ativado
+    if (!autoEnabled) {
+      console.log('🚫 Auto-responder desativado nas configurações');
+      return new Response(JSON.stringify({ success: true, skipped: 'auto_disabled' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
 
     if (!geminiApiKey || !wahaUrl || !wahaApiKey) {
-      console.error('❌ Configurações faltando');
+      console.error('❌ Configurações faltando - gemini:', !!geminiApiKey, 'waha:', !!wahaUrl, 'key:', !!wahaApiKey);
       return new Response(JSON.stringify({ success: false, error: 'Missing config' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+    
+    console.log('✅ Configurações OK - WAHA:', wahaUrl);
+
+    // ====================
+    // 🚨 PROTEÇÃO ANTI-LOOP - VERIFICAÇÃO NO BANCO
+    // ====================
+    
+    // 5. Verificar se respondemos recentemente para este número (últimos 5 segundos)
+    const { data: recentResponses } = await supabase
+      .from('conversation_history')
+      .select('content, timestamp')
+      .eq('tenant_id', tenantId)
+      .eq('phone', cleanPhone)
+      .eq('role', 'assistant')
+      .order('timestamp', { ascending: false })
+      .limit(3);
+    
+    if (recentResponses && recentResponses.length > 0) {
+      const lastResponse = recentResponses[0];
+      const lastResponseTime = new Date(lastResponse.timestamp).getTime();
+      const timeSinceLastResponse = Date.now() - lastResponseTime;
+      
+      // Se respondemos há menos de 5 segundos, ignorar
+      if (timeSinceLastResponse < 5000) {
+        console.log('⏳ Rate limit: respondemos há', Math.round(timeSinceLastResponse/1000), 'segundos - ignorando');
+        return new Response(JSON.stringify({ success: true, skipped: 'rate_limited' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      // Verificar se a mensagem recebida é similar à nossa última resposta (loop)
+      const similarity = (a: string, b: string) => {
+        const wordsA = a.toLowerCase().split(/\s+/).slice(0, 10);
+        const wordsB = b.toLowerCase().split(/\s+/).slice(0, 10);
+        const matches = wordsA.filter(w => wordsB.includes(w)).length;
+        return matches / Math.max(wordsA.length, wordsB.length);
+      };
+      
+      const similarityScore = similarity(messageBody, lastResponse.content);
+      if (similarityScore > 0.5) {
+        console.log('🔄 LOOP DETECTADO! Mensagem similar à nossa resposta:', similarityScore.toFixed(2));
+        return new Response(JSON.stringify({ success: true, skipped: 'loop_detected' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      
+      // Verificar se recebemos a mesma mensagem múltiplas vezes (spam/loop)
+      const { data: recentMessages } = await supabase
+        .from('conversation_history')
+        .select('content')
+        .eq('tenant_id', tenantId)
+        .eq('phone', cleanPhone)
+        .eq('role', 'user')
+        .order('timestamp', { ascending: false })
+        .limit(5);
+      
+      if (recentMessages) {
+        const sameMessageCount = recentMessages.filter(m => 
+          similarity(m.content, messageBody) > 0.8
+        ).length;
+        
+        if (sameMessageCount >= 3) {
+          console.log('🔄 SPAM/LOOP DETECTADO! Mesma mensagem', sameMessageCount, 'vezes');
+          return new Response(JSON.stringify({ success: true, skipped: 'spam_detected' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+      }
+    }
+    
+    console.log('✅ Proteção anti-loop: OK');
 
     // ====================
     // 0.0 FILTRO DE GRUPOS E COMUNIDADES
@@ -515,9 +725,18 @@ Deno.serve(async (req) => {
     // ====================
     // 0.1 VERIFICAR SE É OWNER (antes de criar memória)
     // ====================
-    const isOwnerByPhone = ownerPhone && phonesMatch(cleanPhone, ownerPhone);
+    const cleanOwnerPhone = ownerPhone?.replace(/\D/g, '') || '';
+    const isOwnerByPhone = cleanOwnerPhone && phonesMatch(cleanPhone, cleanOwnerPhone);
     const ownerEmail = settingsMap['wa_owner_email'] || '';
-    console.log('🔐 Owner check:', { ownerPhone, cleanPhone, isOwnerByPhone, requireEmailVerification });
+    console.log('🔐 Owner check DETALHADO:', { 
+      ownerPhoneRaw: ownerPhone, 
+      ownerPhoneClean: cleanOwnerPhone,
+      cleanPhoneIncoming: cleanPhone,
+      last8Owner: cleanOwnerPhone.slice(-8),
+      last8Incoming: cleanPhone.slice(-8),
+      isOwnerByPhone, 
+      requireEmailVerification 
+    });
     
     // ====================
     // 0.2 VERIFICAR VALIDAÇÃO POR EMAIL (se mensagem contém email)
@@ -757,7 +976,105 @@ Deno.serve(async (req) => {
     // (settings já foram buscadas antes)
 
     // ====================
-    // 4.5 FASE C: DETECTAR INTENÇÃO
+    // 4.4 BUSCAR CONFIGURAÇÕES DE IA AVANÇADA
+    // ====================
+    const aiExecutiveMode = settingsMap['ai_executive_mode'] === 'true';
+    const aiProactiveSuggestions = settingsMap['ai_proactive_suggestions'] === 'true';
+    const aiBackgroundAnalysis = settingsMap['ai_background_analysis'] === 'true';
+    const aiLearningEnabled = settingsMap['ai_learning_enabled'] === 'true';
+    
+    console.log('🧠 IA Avançada:', { aiExecutiveMode, aiProactiveSuggestions, aiBackgroundAnalysis, aiLearningEnabled });
+
+    // ====================
+    // 4.5 ANÁLISE EM BACKGROUND (cobranças vencidas, alertas, etc)
+    // ====================
+    let backgroundAlerts: string[] = [];
+    
+    if (aiBackgroundAnalysis && customerData) {
+      // Verificar cobranças vencidas
+      const overdueCharges = customerData.customer_charges?.filter((c: any) => c.status === 'overdue') || [];
+      if (overdueCharges.length > 0) {
+        const totalOverdue = overdueCharges.reduce((sum: number, c: any) => sum + (c.amount || 0), 0);
+        backgroundAlerts.push(`⚠️ ATENÇÃO: Cliente tem ${overdueCharges.length} cobrança(s) VENCIDA(S) totalizando R$ ${totalOverdue.toFixed(2).replace('.', ',')}`);
+      }
+      
+      // Verificar vencimentos próximos (7 dias)
+      const today = new Date();
+      const in7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const upcomingCharges = customerData.customer_charges?.filter((c: any) => {
+        if (c.status !== 'pending') return false;
+        const dueDate = new Date(c.due_date);
+        return dueDate >= today && dueDate <= in7Days;
+      }) || [];
+      
+      if (upcomingCharges.length > 0) {
+        backgroundAlerts.push(`📅 Cliente tem ${upcomingCharges.length} fatura(s) vencendo nos próximos 7 dias`);
+      }
+      
+      // Verificar se é cliente novo (menos de 7 dias)
+      if (memory && memory.messages_count <= 3) {
+        backgroundAlerts.push('🆕 Este é um cliente NOVO ou com poucas interações - seja acolhedor!');
+      }
+    }
+    
+    // Análise para ADMIN/OWNER
+    if (aiBackgroundAnalysis && (memory?.permission_level === 'OWNER' || memory?.permission_level === 'ADMIN')) {
+      // Buscar métricas rápidas
+      const { count: pendingChargesCount } = await supabase
+        .from('customer_charges')
+        .select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .eq('status', 'pending');
+      
+      const { count: overdueCount } = await supabase
+        .from('customer_charges')
+        .select('*', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .eq('status', 'overdue');
+      
+      if ((overdueCount || 0) > 0) {
+        backgroundAlerts.push(`📊 ADMIN: Há ${overdueCount} cobranças VENCIDAS no sistema`);
+      }
+      if ((pendingChargesCount || 0) > 10) {
+        backgroundAlerts.push(`📊 ADMIN: ${pendingChargesCount} cobranças pendentes aguardando envio`);
+      }
+    }
+
+    // ====================
+    // 4.6 SISTEMA DE APRENDIZADO
+    // ====================
+    if (aiLearningEnabled && memory) {
+      try {
+        // Salvar padrão de interação (horário, canal, intenção)
+        const hour = new Date().getHours();
+        const timeSlot = hour < 12 ? 'morning' : hour < 18 ? 'afternoon' : 'evening';
+        
+        await supabase.from('expense_ai_learning').upsert({
+          tenant_id: tenantId,
+          type: 'interaction_pattern',
+          key: `phone_${cleanPhone}_time`,
+          value: timeSlot,
+          confidence: 0.7,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'tenant_id,type,key' });
+        
+        // Salvar canal preferido
+        await supabase.from('expense_ai_learning').upsert({
+          tenant_id: tenantId,
+          type: 'channel_preference',
+          key: `phone_${cleanPhone}`,
+          value: 'whatsapp',
+          confidence: 0.9,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'tenant_id,type,key' });
+        
+      } catch (learnError) {
+        console.log('⚠️ Erro no sistema de aprendizado:', learnError);
+      }
+    }
+
+    // ====================
+    // 4.7 FASE C: DETECTAR INTENÇÃO
     // ====================
     const intent = detectIntent(messageBody, memory);
     console.log('🎯 Intenção detectada:', intent);
@@ -815,6 +1132,47 @@ Deno.serve(async (req) => {
 6. Use emojis com moderação
 7. Quebre linhas para melhor leitura`;
 
+    // REGRA CRÍTICA: TRANSFERÊNCIA PARA ATENDENTE
+    systemPrompt += `\n\n🚫🚫🚫 REGRA SOBRE TRANSFERIR PARA ATENDENTE 🚫🚫🚫
+⛔ NUNCA use [ACTION:transfer_human] automaticamente!
+⛔ SOMENTE transfira se o cliente disser EXATAMENTE: "falar com atendente", "quero um humano", "pessoa real", "atendente humano"
+⛔ "Links" NÃO é pedido de atendente!
+⛔ "Sou master" NÃO é pedido de atendente!
+⛔ Perguntas gerais NÃO são pedido de atendente!
+⛔ RESPONDA a pergunta! NÃO transfira só porque não sabe!
+✅ Sempre tente resolver a dúvida PRIMEIRO
+✅ Só ofereça atendente se o cliente pedir explicitamente`;
+
+    // REGRA CRÍTICA: NÃO INVENTAR DADOS
+    systemPrompt += `\n\n🚨🚨🚨 REGRA SUPREMA - LEIA COM ATENÇÃO 🚨🚨🚨
+⛔ NUNCA, EM HIPÓTESE ALGUMA, INVENTE:
+   - Preços ou valores
+   - Nomes de planos ou serviços
+   - Recursos ou funcionalidades
+   - Promoções ou descontos
+   - CHAVES PIX (EXTREMAMENTE PROIBIDO!)
+   
+✅ Use APENAS os dados fornecidos abaixo nas seções "DADOS REAIS".
+✅ Se não houver dados cadastrados, diga: "No momento ainda não temos ofertas cadastradas no sistema."
+✅ Se perguntarem algo que não está nos dados, diga que vai verificar.`;
+
+    // REGRA ESPECÍFICA PARA PIX
+    const configuredPixKey = settingsMap['default_pix_key'] || settingsMap['wa_pix_key'] || '';
+    if (configuredPixKey) {
+      systemPrompt += `\n\n💳 === REGRA ABSOLUTA SOBRE PIX ===`;
+      systemPrompt += `\n🚫🚫🚫 PROIBIDO ESCREVER QUALQUER CHAVE PIX NA SUA RESPOSTA! 🚫🚫🚫`;
+      systemPrompt += `\n⛔ NÃO escreva números de CNPJ, CPF, email ou telefone como chave PIX!`;
+      systemPrompt += `\n⛔ NÃO invente chaves como "03207303000125" ou qualquer outra!`;
+      systemPrompt += `\n✅ SEMPRE que pedirem PIX, APENAS use: [ACTION:generate_pix]`;
+      systemPrompt += `\n✅ O sistema vai enviar a chave correta automaticamente!`;
+      systemPrompt += `\n⚠️ APÓS o PIX ser enviado, NÃO repita informações! Apenas pergunte: "Posso ajudar com mais alguma coisa?"`;
+    } else {
+      systemPrompt += `\n\n💳 === PIX NÃO CONFIGURADO ===`;
+      systemPrompt += `\n⚠️ Chave PIX NÃO está cadastrada no sistema!`;
+      systemPrompt += `\n⚠️ Se pedirem PIX, diga: "No momento não temos chave PIX configurada. Vou transferir para um atendente."`;
+      systemPrompt += `\n⚠️ E use [ACTION:transfer_human] para transferir!`;
+    }
+
     // 5.1.5 FASE C: Adicionar intenção detectada ao contexto
     const intentDescriptions: Record<string, string> = {
       'greeting': 'Saudação/cumprimento',
@@ -848,7 +1206,8 @@ Deno.serve(async (req) => {
     } else if (intent === 'signup') {
       systemPrompt += `\n💡 AÇÃO: Apresente os serviços e ofereça link de cadastro se disponível`;
     } else if (intent === 'handoff') {
-      systemPrompt += `\n💡 AÇÃO: Confirme que vai transferir para atendente. Use [ACTION:transfer_human]`;
+      systemPrompt += `\n💡 AÇÃO: SOMENTE use [ACTION:transfer_human] se o cliente EXPLICITAMENTE pedir para falar com atendente/humano!`;
+      systemPrompt += `\n⚠️ NÃO transfira automaticamente! Pergunte primeiro se deseja falar com um atendente.`;
     } else if (intent === 'service_inquiry' && customerData) {
       systemPrompt += `\n💡 AÇÃO: Use os dados do cliente acima para responder sobre serviços`;
     }
@@ -919,16 +1278,20 @@ Deno.serve(async (req) => {
 
     // 5.4 Serviços disponíveis
     if (services && services.length > 0) {
-      systemPrompt += `\n\n=== SERVIÇOS DISPONÍVEIS ===`;
+      systemPrompt += `\n\n=== SERVIÇOS DISPONÍVEIS (DADOS REAIS) ===`;
       for (const svc of services) {
         const price = svc.price ? `R$ ${svc.price.toFixed(2).replace('.', ',')}` : 'Sob consulta';
         systemPrompt += `\n- ${svc.name}: ${svc.description || 'Sem descrição'} | Preço: ${price}`;
       }
+    } else {
+      systemPrompt += `\n\n=== SERVIÇOS ===`;
+      systemPrompt += `\n⚠️ NENHUM SERVIÇO CADASTRADO NO MOMENTO.`;
+      systemPrompt += `\n💡 Se perguntarem sobre serviços/preços, informe que ainda não há ofertas disponíveis no catálogo.`;
     }
 
     // 5.5 Planos
     if (plans && plans.length > 0) {
-      systemPrompt += `\n\n=== PLANOS ===`;
+      systemPrompt += `\n\n=== PLANOS DISPONÍVEIS (DADOS REAIS) ===`;
       for (const plan of plans) {
         const price = plan.price ? `R$ ${plan.price.toFixed(2).replace('.', ',')}` : 'Sob consulta';
         systemPrompt += `\n- ${plan.name}: ${plan.description || ''} | ${price}/${plan.billing_cycle || 'mensal'}`;
@@ -936,6 +1299,21 @@ Deno.serve(async (req) => {
           systemPrompt += ` | Recursos: ${JSON.stringify(plan.features)}`;
         }
       }
+    } else {
+      systemPrompt += `\n\n=== PLANOS ===`;
+      systemPrompt += `\n⚠️ NENHUM PLANO CADASTRADO NO MOMENTO.`;
+    }
+    
+    // INSTRUÇÃO CRÍTICA: NÃO INVENTAR VALORES
+    const hasAnyData = (services && services.length > 0) || (plans && plans.length > 0);
+    if (!hasAnyData) {
+      systemPrompt += `\n\n🚨 INSTRUÇÃO CRÍTICA: NÃO HÁ SERVIÇOS OU PLANOS CADASTRADOS!`;
+      systemPrompt += `\n⛔ NUNCA invente preços, valores ou nomes de planos.`;
+      systemPrompt += `\n⛔ Se perguntarem sobre preços/planos, diga: "No momento ainda não temos ofertas cadastradas no sistema. Por favor, entre em contato com a equipe para mais informações."`;
+    } else {
+      systemPrompt += `\n\n⚠️ REGRA ABSOLUTA: Use APENAS os dados listados acima!`;
+      systemPrompt += `\n⛔ NUNCA invente preços, planos ou serviços que não estejam listados.`;
+      systemPrompt += `\n⛔ Se não encontrar o que o cliente pergunta, diga que verificará ou que não está no catálogo.`;
     }
 
     // 5.6 Contexto baseado no NÍVEL DE PERMISSÃO
@@ -1090,6 +1468,55 @@ Deno.serve(async (req) => {
       systemPrompt += `\n- "exportar clientes" → [ACTION:export_data:{"type":"customers"}]`;
     }
 
+    // ====================
+    // 5.10 ALERTAS DE BACKGROUND (ANÁLISE INTELIGENTE)
+    // ====================
+    if (backgroundAlerts.length > 0) {
+      systemPrompt += `\n\n🔔 === ALERTAS IMPORTANTES ===`;
+      for (const alert of backgroundAlerts) {
+        systemPrompt += `\n${alert}`;
+      }
+      systemPrompt += `\n\n💡 Use esses alertas para guiar a conversa de forma proativa!`;
+    }
+
+    // ====================
+    // 5.11 SUGESTÕES PROATIVAS
+    // ====================
+    if (aiProactiveSuggestions) {
+      systemPrompt += `\n\n=== MODO SUGESTÕES PROATIVAS ATIVO ===`;
+      systemPrompt += `\nAo final de CADA resposta, inclua 2-3 sugestões relevantes:`;
+      systemPrompt += `\n\n💡 *O que mais posso ajudar?*`;
+      
+      // Sugestões baseadas no contexto
+      if (customerData && !customerData.customer_charges?.some((c: any) => c.status === 'pending' || c.status === 'overdue')) {
+        systemPrompt += `\n• "Ver meus serviços" → [ACTION:show_services]`;
+      }
+      if (customerData?.customer_charges?.some((c: any) => c.status === 'pending' || c.status === 'overdue')) {
+        systemPrompt += `\n• "Ver minhas faturas" → [ACTION:show_charges]`;
+        systemPrompt += `\n• "Gerar PIX" → [ACTION:generate_pix]`;
+      }
+      if (!customerData) {
+        systemPrompt += `\n• "Conhecer planos"`;
+        systemPrompt += `\n• "Me cadastrar"`;
+      }
+      
+      systemPrompt += `\n\n⚡ Inclua sempre sugestões para manter a conversa fluindo!`;
+    }
+
+    // ====================
+    // 5.12 MODO EXECUTIVO
+    // ====================
+    if (aiExecutiveMode) {
+      systemPrompt += `\n\n=== MODO EXECUTIVO ATIVO ===`;
+      systemPrompt += `\n🚀 Você está no modo EXECUTIVO - seja mais direto e ágil:`;
+      systemPrompt += `\n• NÃO pergunte "posso ajudar?" - já vá ajudando`;
+      systemPrompt += `\n• NÃO peça confirmação para ações de visualização`;
+      systemPrompt += `\n• Seja conciso - máximo 2 parágrafos por resposta`;
+      systemPrompt += `\n• Execute ações automaticamente quando for óbvio`;
+      systemPrompt += `\n• Se o cliente perguntar sobre cobrança, já execute [ACTION:show_charges]`;
+      systemPrompt += `\n• Se pedir PIX, já execute [ACTION:generate_pix]`;
+    }
+
     console.log('✅ System prompt montado:', systemPrompt.length, 'caracteres');
 
     // ====================
@@ -1149,6 +1576,7 @@ Deno.serve(async (req) => {
     // ====================
     const actionMatch = replyText.match(/\[ACTION:([a-z_]+)(?::(.+?))?\]/i);
     let actionResult: string | null = null;
+    let skipAIReply = false; // Flag para pular resposta da IA quando ação já enviou mensagens
     
     if (actionMatch) {
       const actionType = actionMatch[1];
@@ -1201,18 +1629,178 @@ Deno.serve(async (req) => {
             break;
             
           case 'generate_pix':
-            // TODO: Integrar com sistema de pagamento
-            actionResult = '\n\n💳 Para gerar o PIX, um atendente entrará em contato em breve!';
+            // LÓGICA INTELIGENTE DE PIX - BUSCA DAS CONFIGURAÇÕES
+            const pixKey = settingsMap['default_pix_key'] || settingsMap['wa_pix_key'] || '';
+            const pixHolderName = settingsMap['pix_holder_name'] || settingsMap['ai_company_name'] || 'Empresa';
+            
+            // USAR TIPO CONFIGURADO (prioridade) ou auto-detectar como fallback
+            const configuredPixType = settingsMap['pix_key_type'] || '';
+            
+            const detectPixKeyType = (key: string): string => {
+              // Se tem tipo configurado, usar ele!
+              if (configuredPixType) return configuredPixType;
+              
+              // Fallback: auto-detectar apenas para CNPJ e E-mail (únicos que não conflitam)
+              const cleanKey = key.replace(/\D/g, '');
+              // CNPJ: 14 dígitos (único caso sem ambiguidade)
+              if (/^\d{14}$/.test(cleanKey)) return 'CNPJ';
+              // E-mail (único caso sem ambiguidade)
+              if (key.includes('@') && key.includes('.')) return 'E-mail';
+              // Chave aleatória (32 caracteres hexadecimais ou UUID)
+              if (/^[a-f0-9-]{32,36}$/i.test(key)) return 'Chave Aleatória';
+              // CPF ou Telefone: 11 dígitos - NÃO DÁ PARA SABER, retornar genérico
+              return 'PIX';
+            };
+            
+            const pixKeyType = detectPixKeyType(pixKey);
+            
+            // SE NÃO TEM PIX CONFIGURADO - TRANSFERIR PARA SUPORTE
+            if (!pixKey) {
+              console.log('⚠️ Chave PIX não configurada - transferindo para suporte');
+              actionResult = '\n\n⚠️ No momento não temos chave PIX configurada no sistema. Vou transferir você para um atendente que poderá ajudar!';
+              
+              // Notificar admin
+              const adminPhonePix = settingsMap['wa_owner_phone'] || '';
+              if (adminPhonePix) {
+                const cleanAdminPix = adminPhonePix.replace(/\D/g, '');
+                const pixNotifyMsg = `🔔 *SOLICITAÇÃO DE PIX*\n\n👤 Cliente: ${contactName || cleanPhone}\n📱 Telefone: ${cleanPhone}\n⚠️ PIX não configurado no sistema!`;
+                try {
+                  await fetch(`${wahaUrl}/api/sendText`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Api-Key': wahaApiKey },
+                    body: JSON.stringify({ session: sessionName, chatId: `${cleanAdminPix}@c.us`, text: pixNotifyMsg }),
+                  });
+                } catch (e) { console.log('⚠️ Erro ao notificar admin sobre PIX'); }
+              }
+              break;
+            }
+            
+            // TEM PIX CONFIGURADO - ENVIAR 2 MENSAGENS
+            const sendPixKey = async () => {
+              const sendChatIdPix = from.includes('@') ? from : `${from}@c.us`;
+              
+              // MENSAGEM 1: Formatada completa com a chave
+              const pixMsg = `💳 *Chave PIX para pagamento:*\n\n📋 *Tipo:* ${pixKeyType}\n👤 *Titular:* ${pixHolderName}\n🔑 *Chave:* ${pixKey}`;
+              
+              await fetch(`${wahaUrl}/api/sendText`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Api-Key': wahaApiKey },
+                body: JSON.stringify({ session: sessionName, chatId: sendChatIdPix, text: pixMsg }),
+              });
+              
+              // Pequeno delay para garantir ordem
+              await new Promise(r => setTimeout(r, 500));
+              
+              // MENSAGEM 2: APENAS A CHAVE SOLTA (facilita copiar)
+              await fetch(`${wahaUrl}/api/sendText`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Api-Key': wahaApiKey },
+                body: JSON.stringify({ session: sessionName, chatId: sendChatIdPix, text: pixKey }),
+              });
+              
+              console.log('✅ Chave PIX enviada:', pixKey, '| Tipo:', pixKeyType, '| Titular:', pixHolderName);
+            };
+            
+            // Verificar se cliente está cadastrado
+            if (customerData && customerData.id) {
+              // Cliente cadastrado - verificar se tem cobranças pendentes
+              const pendingChargesForPix = customerData.customer_charges?.filter((c: any) => 
+                c.status === 'pending' || c.status === 'overdue'
+              ) || [];
+              
+              if (pendingChargesForPix.length > 0) {
+                // Tem faturas pendentes - mostrar e perguntar
+                const totalPending = pendingChargesForPix.reduce((sum: number, c: any) => sum + (c.amount || 0), 0);
+                const formattedTotal = `R$ ${totalPending.toFixed(2).replace('.', ',')}`;
+                
+                actionResult = `\n\n💳 *Olá ${customerData.full_name?.split(' ')[0] || 'Cliente'}!*`;
+                actionResult += `\n\nVocê possui ${pendingChargesForPix.length} fatura(s) pendente(s), totalizando *${formattedTotal}*.`;
+                actionResult += `\n\n📝 *Suas faturas:*`;
+                for (const charge of pendingChargesForPix.slice(0, 3)) {
+                  const amount = `R$ ${charge.amount.toFixed(2).replace('.', ',')}`;
+                  const dueDate = new Date(charge.due_date).toLocaleDateString('pt-BR');
+                  const status = charge.status === 'overdue' ? '⚠️ VENCIDO' : '📅';
+                  actionResult += `\n${status} ${charge.description}: ${amount} (venc: ${dueDate})`;
+                }
+                
+                // Enviar a chave PIX também
+                await sendPixKey();
+                actionResult += `\n\n✅ Chave PIX enviada! Posso ajudar com mais alguma coisa?`;
+                
+                // Marcar para não enviar resposta duplicada da IA
+                skipAIReply = true;
+                replyText = actionResult.trim();
+                
+                // Salvar contexto
+                if (memory) {
+                  await supabase.from('chat_memory').update({
+                    metadata: { ...memory.metadata, pix_sent: true, pending_amount: totalPending }
+                  }).eq('id', memory.id);
+                }
+              } else {
+                // Cliente sem faturas - enviar apenas a chave PIX
+                await sendPixKey();
+                // Mensagem simples e direta
+                skipAIReply = true;
+                replyText = '✅ Chave PIX enviada! Posso ajudar com mais alguma coisa?';
+              }
+            } else {
+              // Cliente NÃO cadastrado - enviar apenas a chave PIX
+              await sendPixKey();
+              // Mensagem simples e direta
+              skipAIReply = true;
+              replyText = '✅ Chave PIX enviada!\n\n💡 Após o pagamento, envie o comprovante aqui para confirmação.';
+            }
             break;
             
           case 'transfer_human':
-            // TODO: Marcar conversa para atendimento humano
-            actionResult = '\n\n👤 Certo! Um atendente humano entrará em contato em breve.';
+            // TRANSFERIR PARA ATENDENTE HUMANO COM NOTIFICAÇÃO
+            const adminPhone = settingsMap['wa_owner_phone'] || settingsMap['wa_admin_phone'] || '';
+            const cleanAdminPhone = adminPhone.replace(/\D/g, '');
+            
             // Atualizar memória para indicar que precisa de atendimento humano
             if (memory) {
               await supabase.from('chat_memory').update({
-                metadata: { ...memory.metadata, needs_human: true, requested_at: new Date().toISOString() }
+                metadata: { 
+                  ...memory.metadata, 
+                  needs_human: true, 
+                  requested_at: new Date().toISOString(),
+                  reason: actionData.reason || messageBody
+                }
               }).eq('id', memory.id);
+            }
+            
+            // Notificar o admin/owner via WhatsApp
+            if (cleanAdminPhone) {
+              const clienteName = customerData?.full_name || contactName || 'Cliente';
+              const clientePhone = cleanPhone;
+              const motivo = actionData.reason || 'Solicitou atendimento humano';
+              
+              const adminMessage = `🔔 *ATENDIMENTO SOLICITADO*\n\n` +
+                `👤 *Cliente:* ${clienteName}\n` +
+                `📱 *Telefone:* ${clientePhone}\n` +
+                `💬 *Motivo:* ${motivo}\n` +
+                `⏰ *Horário:* ${new Date().toLocaleString('pt-BR')}\n\n` +
+                `📝 *Última mensagem:*\n${messageBody.substring(0, 200)}...`;
+              
+              try {
+                await fetch(`${wahaUrl}/api/sendText`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'X-Api-Key': wahaApiKey },
+                  body: JSON.stringify({
+                    session: sessionName,
+                    chatId: `${cleanAdminPhone}@c.us`,
+                    text: adminMessage
+                  }),
+                });
+                console.log('✅ Admin notificado:', cleanAdminPhone);
+              } catch (notifyError) {
+                console.log('⚠️ Erro ao notificar admin:', notifyError);
+              }
+              
+              actionResult = '\n\n👤 Entendido! Já notifiquei um atendente sobre sua solicitação. Em breve alguém entrará em contato!';
+            } else {
+              actionResult = '\n\n👤 Certo! Um atendente humano entrará em contato em breve.';
             }
             break;
             
@@ -1369,23 +1957,204 @@ Deno.serve(async (req) => {
     }
 
     // ====================
-    // 9. ENVIAR RESPOSTA VIA WAHA
+    // 8.7 SISTEMA DE APRENDIZADO - APÓS RESPOSTA
+    // ====================
+    if (aiLearningEnabled && intent) {
+      try {
+        // Aprender padrão de intenção para este contato
+        const intentKey = `phone_${cleanPhone}_intent_${intent}`;
+        
+        // Incrementar confiança para este padrão
+        const { data: existingPattern } = await supabase
+          .from('expense_ai_learning')
+          .select('confidence')
+          .eq('tenant_id', tenantId)
+          .eq('type', 'intent_pattern')
+          .eq('key', intentKey)
+          .maybeSingle();
+        
+        const newConfidence = Math.min((existingPattern?.confidence || 0) + 0.1, 1.0);
+        
+        await supabase.from('expense_ai_learning').upsert({
+          tenant_id: tenantId,
+          type: 'intent_pattern',
+          key: intentKey,
+          value: intent,
+          confidence: newConfidence,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'tenant_id,type,key' });
+        
+        // Se ação foi executada, aprender padrão mensagem → ação
+        if (actionMatch) {
+          const actionType = actionMatch[1];
+          const messagePattern = messageBody.toLowerCase().substring(0, 50);
+          
+          await supabase.from('expense_ai_learning').upsert({
+            tenant_id: tenantId,
+            type: 'action_pattern',
+            key: `msg_${messagePattern.replace(/[^a-z0-9]/g, '_')}`,
+            value: actionType,
+            confidence: 0.8,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'tenant_id,type,key' });
+        }
+        
+        console.log('🧠 Padrão aprendido:', intent);
+      } catch (learnError) {
+        console.log('⚠️ Erro no aprendizado pós-resposta:', learnError);
+      }
+    }
+
+    // ====================
+    // 9. FILTRO DE SEGURANÇA - REMOVER PIX INVENTADO
+    // ====================
+    // Se a IA inventou uma chave PIX diferente da configurada, remover
+    const realPixKey = settingsMap['default_pix_key'] || settingsMap['wa_pix_key'] || '';
+    
+    // Padrões de PIX inventado (CNPJ, CPF, email, telefone que não seja a chave real)
+    const fakePixPatterns = [
+      /A chave PIX.*é:?\s*[\d\.\-\/]+/gi,
+      /Chave:?\s*\`?[\d]{11,14}\`?/gi,  // CNPJ/CPF
+      /PIX:?\s*[\d]{11,14}/gi,
+      /03207303000125/g,  // CNPJ específico que está aparecendo errado
+      /\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}/g,  // CNPJ formatado
+      /\d{3}\.\d{3}\.\d{3}-\d{2}/g,  // CPF formatado
+    ];
+    
+    let cleanedReply = replyText;
+    for (const pattern of fakePixPatterns) {
+      if (realPixKey && cleanedReply.match(pattern)) {
+        const match = cleanedReply.match(pattern)?.[0];
+        // Só remove se NÃO for a chave real
+        if (match && !match.includes(realPixKey.replace(/\D/g, ''))) {
+          console.log('🚫 Removendo PIX inventado:', match);
+          cleanedReply = cleanedReply.replace(pattern, '[PIX será enviado separadamente]');
+        }
+      }
+    }
+    replyText = cleanedReply;
+
+    // ====================
+    // 10. ENVIAR RESPOSTA VIA WAHA (apenas se não foi skipAIReply)
     // ====================
     const sendChatId = from.includes('@') ? from : `${from}@c.us`;
-    await fetch(`${wahaUrl}/api/sendText`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'X-Api-Key': wahaApiKey
-      },
-      body: JSON.stringify({
-        session: sessionName,
-        chatId: sendChatId,
-        text: replyText
-      }),
-    });
+    
+    // Se skipAIReply=true, a ação já enviou as mensagens necessárias
+    // Apenas enviar se tiver conteúdo útil
+    if (!skipAIReply || replyText.trim().length > 10) {
+      await fetch(`${wahaUrl}/api/sendText`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Api-Key': wahaApiKey
+        },
+        body: JSON.stringify({
+          session: sessionName,
+          chatId: sendChatId,
+          text: replyText
+        }),
+      });
+      console.log('✅ Mensagem enviada!');
+    } else {
+      console.log('⏭️ skipAIReply ativo, ação já enviou mensagens');
+    }
 
-    console.log('✅ Mensagem enviada!');
+    // ====================
+    // 11. LÓGICA DE AVALIAÇÃO (PEDIR 1X APÓS ATENDIMENTO)
+    // ====================
+    try {
+      // Condições para pedir avaliação:
+      // 1. Configuração habilitada
+      // 2. Pelo menos 3 mensagens trocadas
+      // 3. Não pediu avaliação nos últimos 7 dias
+      // 4. Intenção atual indica fim de atendimento (thanks, handoff resolvido, etc)
+      
+      const askRatingEnabled = settingsMap['wa_ask_rating'] !== 'false'; // Padrão: habilitado
+      const finishIntents = ['thanks', 'goodbye', 'rejection'];
+      const isFinishingConversation = finishIntents.includes(intent) || 
+        messageBody.toLowerCase().match(/obrigad[oa]|valeu|vlw|brigad[oa]|tchau|até|falou|resolvido|era isso/);
+      
+      if (askRatingEnabled && memory && isFinishingConversation) {
+        const messagesCount = memory.messages_count || 0;
+        const lastRatingAsked = memory.metadata?.last_rating_asked;
+        const daysSinceLastRating = lastRatingAsked 
+          ? Math.floor((Date.now() - new Date(lastRatingAsked).getTime()) / (1000 * 60 * 60 * 24))
+          : 999;
+        
+        // Se tem pelo menos 3 mensagens E não pediu avaliação nos últimos 7 dias
+        if (messagesCount >= 3 && daysSinceLastRating >= 7) {
+          console.log('⭐ Enviando pedido de avaliação...');
+          
+          // Aguardar um pouco para não parecer automático demais
+          await new Promise(r => setTimeout(r, 2000));
+          
+          const ratingMessage = `⭐ *Sua opinião é importante!*\n\nComo foi seu atendimento hoje?\n\n` +
+            `1️⃣ - Péssimo 😠\n` +
+            `2️⃣ - Ruim 😕\n` +
+            `3️⃣ - Regular 😐\n` +
+            `4️⃣ - Bom 🙂\n` +
+            `5️⃣ - Excelente 😍\n\n` +
+            `_Responda com o número de 1 a 5_`;
+          
+          await fetch(`${wahaUrl}/api/sendText`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Api-Key': wahaApiKey },
+            body: JSON.stringify({ session: sessionName, chatId: sendChatId, text: ratingMessage }),
+          });
+          
+          // Marcar que pediu avaliação
+          await supabase.from('chat_memory').update({
+            metadata: { 
+              ...memory.metadata, 
+              last_rating_asked: new Date().toISOString(),
+              awaiting_rating: true
+            }
+          }).eq('id', memory.id);
+          
+          console.log('✅ Pedido de avaliação enviado!');
+        }
+      }
+      
+      // Verificar se está respondendo à avaliação
+      if (memory?.metadata?.awaiting_rating) {
+        const ratingMatch = messageBody.match(/^[1-5]$/);
+        if (ratingMatch) {
+          const rating = parseInt(ratingMatch[0]);
+          console.log('⭐ Avaliação recebida:', rating);
+          
+          // Salvar avaliação
+          await supabase.from('chat_ratings').insert({
+            tenant_id: tenantId,
+            phone: cleanPhone,
+            customer_id: customerData?.id || null,
+            rating: rating,
+            created_at: new Date().toISOString()
+          });
+          
+          // Limpar flag de aguardando
+          await supabase.from('chat_memory').update({
+            metadata: { ...memory.metadata, awaiting_rating: false, last_rating: rating }
+          }).eq('id', memory.id);
+          
+          // Agradecer
+          const thankMessages: Record<number, string> = {
+            1: '😔 Sentimos muito pela experiência. Vamos melhorar!',
+            2: '😕 Obrigado pelo feedback. Vamos trabalhar para melhorar!',
+            3: '😐 Obrigado pela avaliação! Sempre buscamos melhorar.',
+            4: '🙂 Fico feliz que gostou! Obrigado pelo feedback!',
+            5: '😍 Que alegria! Muito obrigado pela avaliação! ⭐'
+          };
+          
+          await fetch(`${wahaUrl}/api/sendText`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-Api-Key': wahaApiKey },
+            body: JSON.stringify({ session: sessionName, chatId: sendChatId, text: thankMessages[rating] || 'Obrigado!' }),
+          });
+        }
+      }
+    } catch (ratingError) {
+      console.log('⚠️ Erro na lógica de avaliação:', ratingError);
+    }
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

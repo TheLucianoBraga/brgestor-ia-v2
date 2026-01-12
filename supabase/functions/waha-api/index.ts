@@ -71,13 +71,13 @@ Deno.serve(async (req) => {
       return json({ success: false, error: 'Parâmetros obrigatórios: action e tenantId' }, 400);
     }
     
-    console.log(`🔵 WAHA-API: ${action} para tenant ${tenantId}`);
+    console.log(`🔵 WAHA-API: ${action} para tenant ${tenantId}, user ${user.id}`);
 
     // Validar se o usuário tem acesso ao tenant
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('current_tenant_id')
-      .eq('id', user.id)
+      .eq('user_id', user.id)
       .single();
 
     if (profileError || !profile) {
@@ -85,10 +85,49 @@ Deno.serve(async (req) => {
       return json({ success: false, error: 'Perfil não encontrado' }, 403);
     }
 
-    if (profile.current_tenant_id !== tenantId) {
-      console.error('❌ Tentativa de acesso ao tenant não autorizado');
+    console.log(`🔵 Profile current_tenant_id: ${profile.current_tenant_id}, requested: ${tenantId}`);
+
+    // Verificar se o tenantId passado é o current_tenant_id OU se é membro do tenant
+    let hasAccess = profile.current_tenant_id === tenantId;
+    
+    if (!hasAccess) {
+      // Verificar se é membro do tenant
+      const { data: membership } = await supabase
+        .from('tenant_members')
+        .select('id, role_in_tenant')
+        .eq('user_id', user.id)
+        .eq('tenant_id', tenantId)
+        .eq('status', 'active')
+        .maybeSingle();
+      
+      hasAccess = !!membership;
+      console.log(`🔵 Membership check: ${hasAccess ? 'encontrado' : 'não encontrado'}`, membership);
+    }
+    
+    if (!hasAccess) {
+      // Última tentativa: verificar se é o owner do tenant via tenants table
+      const { data: tenantData } = await supabase
+        .from('tenants')
+        .select('owner_id')
+        .eq('id', tenantId)
+        .maybeSingle();
+      
+      if (tenantData?.owner_id === user.id) {
+        hasAccess = true;
+        console.log('✅ Acesso concedido via owner_id');
+      }
+    }
+    
+    if (!hasAccess) {
+      console.error('❌ Tentativa de acesso ao tenant não autorizado:', { 
+        userId: user.id, 
+        requestedTenant: tenantId, 
+        currentTenant: profile.current_tenant_id 
+      });
       return json({ success: false, error: 'Acesso negado ao tenant' }, 403);
     }
+    
+    console.log('✅ Acesso autorizado ao tenant');
 
     // Get WAHA settings
     const { data: settings, error: settingsError } = await supabase
@@ -619,87 +658,125 @@ async function syncGroups(baseUrl: string, apiKey: string, session: string, tena
       'X-Api-Key': apiKey 
     };
 
-    // Use the groups endpoint which returns participant data
-    const groupsRes = await fetch(`${baseUrl}/api/${session}/groups`, {
+    // Try WAHA Plus endpoint first: /api/{session}/groups
+    let groupsRes = await fetch(`${baseUrl}/api/${session}/groups`, {
       method: 'GET',
       headers
     });
 
+    // If that fails, try the WAHA Core endpoint: /api/groups?session={session}
+    if (!groupsRes.ok) {
+      console.log('Trying alternative groups endpoint...');
+      groupsRes = await fetch(`${baseUrl}/api/groups?session=${session}`, {
+        method: 'GET',
+        headers
+      });
+    }
+
+    // If still failing, try /api/{session}/chats and filter groups
+    if (!groupsRes.ok) {
+      console.log('Trying chats endpoint to filter groups...');
+      groupsRes = await fetch(`${baseUrl}/api/${session}/chats`, {
+        method: 'GET',
+        headers
+      });
+      
+      if (groupsRes.ok) {
+        const chatsData = await groupsRes.json();
+        const allChats = Array.isArray(chatsData) ? chatsData : [];
+        // Filter only groups (id ends with @g.us)
+        const groups = allChats.filter((chat: any) => {
+          const chatId = chat.id?._serialized || chat.id || '';
+          return chatId.endsWith('@g.us');
+        });
+        
+        return await processGroups(groups, tenantId, supabase);
+      }
+    }
+
     if (!groupsRes.ok) {
       const errorText = await groupsRes.text();
-      console.error('Failed to fetch groups:', errorText);
-      return { success: false, error: 'Erro ao buscar grupos do WhatsApp' };
+      console.error('Failed to fetch groups:', groupsRes.status, errorText);
+      return { success: false, error: `Erro ao buscar grupos: ${groupsRes.status}` };
     }
 
     const groupsData = await groupsRes.json();
     const groups = Array.isArray(groupsData) ? groupsData : [];
-    console.log(`Found ${groups.length} groups`);
     
-    // Log first group structure for debugging
-    if (groups.length > 0) {
-      console.log('Sample group structure:', JSON.stringify(groups[0], null, 2));
-    }
-
-    // Upsert each group to database
-    const upsertPromises = groups.map(async (group: any) => {
-      // Data might be in groupMetadata (WAHA format)
-      const metadata = group.groupMetadata || group;
-      
-      // Handle different id formats
-      const idSource = metadata.id || group.id;
-      const groupId = typeof idSource === 'string' 
-        ? idSource 
-        : (idSource?._serialized || (idSource?.user ? `${idSource.user}@${idSource.server}` : String(idSource || '')));
-      
-      // Get participant count - check groupMetadata first, then fallback
-      const participants = metadata.participants || group.participants || [];
-      const participantCount = metadata.size || participants.length || group.participantsCount || group.size || 0;
-      
-      // Check if current user is admin - check in groupMetadata
-      const isAdmin = group.isAdmin || 
-        group.iAmAdmin ||
-        metadata.announce !== undefined ||
-        false;
-      
-      // Get group name from various possible fields
-      const groupName = metadata.subject || metadata.name || group.name || group.subject || groupId;
-
-      console.log(`Group "${groupName}": ${participantCount} participants (size: ${metadata.size}, array: ${participants.length})`);
-
-      const groupData = {
-        tenant_id: tenantId,
-        waha_group_id: groupId,
-        name: groupName,
-        participant_count: participantCount,
-        is_admin: isAdmin,
-        synced_at: new Date().toISOString()
-      };
-
-      const { error } = await supabase
-        .from('whatsapp_groups')
-        .upsert(groupData, { 
-          onConflict: 'tenant_id,waha_group_id',
-          ignoreDuplicates: false 
-        });
-
-      if (error) {
-        console.error(`Error upserting group ${groupId}:`, error);
-      }
-
-      return error ? null : groupData;
-    });
-
-    await Promise.all(upsertPromises);
-
-    return { 
-      success: true, 
-      data: { 
-        synced: groups.length,
-        message: `${groups.length} grupos sincronizados` 
-      } 
-    };
+    return await processGroups(groups, tenantId, supabase);
   } catch (error) {
     console.error('syncGroups error:', error);
     return { success: false, error: 'Erro ao sincronizar grupos' };
   }
+}
+
+async function processGroups(groups: any[], tenantId: string, supabase: any): Promise<WAHAResponse> {
+  console.log(`Found ${groups.length} groups`);
+  
+  // Log first group structure for debugging
+  if (groups.length > 0) {
+    console.log('Sample group structure:', JSON.stringify(groups[0], null, 2));
+  }
+
+  // Upsert each group to database
+  const upsertPromises = groups.map(async (group: any) => {
+    // Data might be in groupMetadata (WAHA format)
+    const metadata = group.groupMetadata || group;
+    
+    // Handle different id formats
+    const idSource = metadata.id || group.id;
+    const groupId = typeof idSource === 'string' 
+      ? idSource 
+      : (idSource?._serialized || (idSource?.user ? `${idSource.user}@${idSource.server}` : String(idSource || '')));
+    
+    // Remove @g.us suffix for storage
+    const cleanGroupId = groupId.replace('@g.us', '');
+    
+    // Get participant count - check groupMetadata first, then fallback
+    const participants = metadata.participants || group.participants || [];
+    const participantCount = metadata.size || participants.length || group.participantsCount || group.size || 0;
+    
+    // Check if current user is admin - check in groupMetadata
+    const isAdmin = group.isAdmin || 
+      group.iAmAdmin ||
+      metadata.announce !== undefined ||
+      false;
+    
+    // Get group name from various possible fields
+    const groupName = metadata.subject || metadata.name || group.name || group.subject || cleanGroupId;
+
+    console.log(`Group "${groupName}": ${participantCount} participants`);
+
+    const groupData = {
+      tenant_id: tenantId,
+      waha_group_id: cleanGroupId,
+      name: groupName,
+      participant_count: participantCount,
+      is_admin: isAdmin,
+      synced_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('whatsapp_groups')
+      .upsert(groupData, { 
+        onConflict: 'tenant_id,waha_group_id',
+        ignoreDuplicates: false 
+      });
+
+    if (error) {
+      console.error(`Error upserting group ${cleanGroupId}:`, error);
+    }
+
+    return error ? null : groupData;
+  });
+
+  await Promise.all(upsertPromises);
+
+  return { 
+    success: true, 
+    data: { 
+      synced: groups.length,
+      message: `${groups.length} grupos sincronizados` 
+    } 
+  };
 }

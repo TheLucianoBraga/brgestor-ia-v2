@@ -41,15 +41,26 @@ export const IntegrationsTab: React.FC = () => {
   // Expanded sections state
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   
-  // WhatsApp state
+  // WhatsApp API Provider - API 1 ou API 2
+  const [selectedApiProvider, setSelectedApiProvider] = useState<'api1' | 'api2'>('api1');
+  
+  // WhatsApp API 1 state
   const [wahaUrl, setWahaUrl] = useState('');
   const [wahaApiKey, setWahaApiKey] = useState('');
+  const [showWahaKey, setShowWahaKey] = useState(false);
+  const [isSavingWaha, setIsSavingWaha] = useState(false);
+  
+  // WhatsApp API 2 state
+  const [api2Url, setApi2Url] = useState('');
+  const [api2ApiKey, setApi2ApiKey] = useState('');
+  const [showApi2Key, setShowApi2Key] = useState(false);
+  const [isSavingApi2, setIsSavingApi2] = useState(false);
+  
+  // PIX and Owner state
   const [waPixKey, setWaPixKey] = useState('');
   const [pixHolderName, setPixHolderName] = useState('');
   const [pixKeyType, setPixKeyType] = useState('');
   const [waOwnerPhone, setWaOwnerPhone] = useState('');
-  const [showWahaKey, setShowWahaKey] = useState(false);
-  const [isSavingWaha, setIsSavingWaha] = useState(false);
   const [isSavingOwner, setIsSavingOwner] = useState(false);
 
   // MercadoPago state
@@ -123,8 +134,15 @@ export const IntegrationsTab: React.FC = () => {
 
   useEffect(() => {
     if (settings) {
+      // WhatsApp API Provider
+      setSelectedApiProvider((settings['whatsapp_api_provider'] as 'api1' | 'api2') || 'api1');
+      // API 1
       setWahaUrl(settings['waha_api_url'] || '');
       setWahaApiKey(settings['waha_api_key'] || '');
+      // API 2
+      setApi2Url(settings['api2_url'] || '');
+      setApi2ApiKey(settings['api2_api_key'] || '');
+      // PIX e Owner
       setWaPixKey(settings['wa_pix_key'] || settings['default_pix_key'] || '');
       setPixHolderName(settings['pix_holder_name'] || '');
       setPixKeyType(settings['pix_key_type'] || '');
@@ -177,10 +195,10 @@ export const IntegrationsTab: React.FC = () => {
     }
   };
 
-  // Master-only: save WAHA API configuration (URL + API Key)
+  // Master-only: save API 1 configuration
   const handleSaveWaha = async () => {
     if (!isMaster) {
-      toast.error('Somente o tenant Master pode configurar o WAHA');
+      toast.error('Somente o tenant Master pode configurar a API');
       return;
     }
 
@@ -189,10 +207,44 @@ export const IntegrationsTab: React.FC = () => {
       await updateMultipleSettings.mutateAsync({
         waha_api_url: wahaUrl,
         waha_api_key: wahaApiKey,
+        whatsapp_api_provider: selectedApiProvider,
       });
-      toast.success('Configurações WAHA salvas com sucesso');
+      toast.success('API 1 salva com sucesso');
     } finally {
       setIsSavingWaha(false);
+    }
+  };
+
+  // Master-only: save API 2 configuration
+  const handleSaveApi2 = async () => {
+    if (!isMaster) {
+      toast.error('Somente o tenant Master pode configurar a API');
+      return;
+    }
+
+    setIsSavingApi2(true);
+    try {
+      await updateMultipleSettings.mutateAsync({
+        api2_url: api2Url,
+        api2_api_key: api2ApiKey,
+        whatsapp_api_provider: selectedApiProvider,
+      });
+      toast.success('API 2 salva com sucesso');
+    } finally {
+      setIsSavingApi2(false);
+    }
+  };
+
+  // Save selected API provider
+  const handleSaveApiProvider = async (provider: 'api1' | 'api2') => {
+    setSelectedApiProvider(provider);
+    try {
+      await updateMultipleSettings.mutateAsync({
+        whatsapp_api_provider: provider,
+      });
+      toast.success(`${provider === 'api1' ? 'API 1' : 'API 2'} selecionada como padrão`);
+    } catch (err) {
+      console.error('Error saving API provider:', err);
     }
   };
 
@@ -562,7 +614,7 @@ export const IntegrationsTab: React.FC = () => {
         </Collapsible>
       )}
 
-      {/* WhatsApp / WAHA - Only for Master */}
+      {/* WhatsApp - Only for Master */}
       {isMaster && (
         <Collapsible open={expandedSections['waha']} onOpenChange={() => toggleSection('waha')}>
           <Card>
@@ -570,64 +622,159 @@ export const IntegrationsTab: React.FC = () => {
               id="waha"
               icon={MessageCircle}
               iconColor="text-green-600"
-              title="WhatsApp"
+              title="WhatsApp - Conexão API"
               badge={<Badge variant="outline" className="text-xs">Apenas Master</Badge>}
               isOpen={expandedSections['waha']}
-              configured={isConfigured(['waha_api_url', 'waha_api_key'])}
+              configured={isConfigured(['waha_api_url', 'waha_api_key', 'api2_url', 'api2_api_key'])}
             />
             <CollapsibleContent>
-              <CardContent className="space-y-4 pt-0">
+              <CardContent className="space-y-6 pt-0">
                 <CardDescription>
-                  Configure a conexão com o servidor WAHA para envio de mensagens
+                  Configure a conexão com o servidor de mensagens WhatsApp
                 </CardDescription>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="waha-url">URL da API WAHA</Label>
-                  <Input
-                    id="waha-url"
-                    placeholder="https://seu-servidor-waha.com"
-                    value={wahaUrl}
-                    onChange={(e) => setWahaUrl(e.target.value)}
-                  />
+                {/* Seletor de API */}
+                <div className="space-y-3">
+                  <Label>Selecione a API de WhatsApp</Label>
+                  <div className="flex gap-3">
+                    <Button
+                      variant={selectedApiProvider === 'api1' ? 'default' : 'outline'}
+                      className="flex-1"
+                      onClick={() => handleSaveApiProvider('api1')}
+                    >
+                      API 1 {selectedApiProvider === 'api1' && '✓'}
+                    </Button>
+                    <Button
+                      variant={selectedApiProvider === 'api2' ? 'default' : 'outline'}
+                      className="flex-1"
+                      onClick={() => handleSaveApiProvider('api2')}
+                    >
+                      API 2 {selectedApiProvider === 'api2' && '✓'}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    API selecionada será usada para envio e recebimento de mensagens
+                  </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="waha-key">Token de Autenticação</Label>
-                  <div className="relative">
+                <Separator />
+
+                {/* API 1 Config */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-medium">Configuração API 1</h4>
+                    {selectedApiProvider === 'api1' && (
+                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">Ativa</Badge>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="waha-url">URL da API 1</Label>
                     <Input
-                      id="waha-key"
-                      type={showWahaKey ? 'text' : 'password'}
-                      placeholder="Seu token de API"
-                      value={wahaApiKey}
-                      onChange={(e) => setWahaApiKey(e.target.value)}
-                      className="pr-10"
+                      id="waha-url"
+                      placeholder="https://seu-servidor.com"
+                      value={wahaUrl}
+                      onChange={(e) => setWahaUrl(e.target.value)}
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-full px-3"
-                      onClick={() => setShowWahaKey(!showWahaKey)}
-                    >
-                      {showWahaKey ? (
-                        <EyeOff className="w-4 h-4 text-muted-foreground" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="waha-key">Token de Autenticação</Label>
+                    <div className="relative">
+                      <Input
+                        id="waha-key"
+                        type={showWahaKey ? 'text' : 'password'}
+                        placeholder="Seu token de API"
+                        value={wahaApiKey}
+                        onChange={(e) => setWahaApiKey(e.target.value)}
+                        className="pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setShowWahaKey(!showWahaKey)}
+                      >
+                        {showWahaKey ? (
+                          <EyeOff className="w-4 h-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button onClick={handleSaveWaha} disabled={isSavingWaha}>
+                      {isSavingWaha ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       ) : (
-                        <Eye className="w-4 h-4 text-muted-foreground" />
+                        <Save className="w-4 h-4 mr-2" />
                       )}
+                      {isSavingWaha ? 'Salvando...' : 'Salvar API 1'}
                     </Button>
                   </div>
                 </div>
 
+                <Separator />
 
-                <div className="flex justify-end">
-                  <Button onClick={handleSaveWaha} disabled={isSavingWaha}>
-                    {isSavingWaha ? (
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    ) : (
-                      <Save className="w-4 h-4 mr-2" />
+                {/* API 2 Config */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-medium">Configuração API 2</h4>
+                    {selectedApiProvider === 'api2' && (
+                      <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">Ativa</Badge>
                     )}
-                    {isSavingWaha ? 'Salvando...' : 'Salvar'}
-                  </Button>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="api2-url">URL da API 2</Label>
+                    <Input
+                      id="api2-url"
+                      placeholder="https://seu-servidor.com"
+                      value={api2Url}
+                      onChange={(e) => setApi2Url(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="api2-key">Token de Autenticação</Label>
+                    <div className="relative">
+                      <Input
+                        id="api2-key"
+                        type={showApi2Key ? 'text' : 'password'}
+                        placeholder="Seu token de API"
+                        value={api2ApiKey}
+                        onChange={(e) => setApi2ApiKey(e.target.value)}
+                        className="pr-10"
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-0 top-0 h-full px-3"
+                        onClick={() => setShowApi2Key(!showApi2Key)}
+                      >
+                        {showApi2Key ? (
+                          <EyeOff className="w-4 h-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="w-4 h-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end">
+                    <Button onClick={handleSaveApi2} disabled={isSavingApi2}>
+                      {isSavingApi2 ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Save className="w-4 h-4 mr-2" />
+                      )}
+                      {isSavingApi2 ? 'Salvando...' : 'Salvar API 2'}
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </CollapsibleContent>

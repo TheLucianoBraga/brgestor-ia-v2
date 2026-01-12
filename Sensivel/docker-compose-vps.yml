@@ -1,0 +1,175 @@
+version: "3.8"
+
+services:
+  # ==========================================
+  # TYPEBOT - SEMPRE ATIVO (sem profiles)
+  # ==========================================
+  typebot-db:
+    image: postgres:16
+    container_name: typebot-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=typebot
+      - POSTGRES_USER=typebot
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    volumes:
+      - typebot_db:/var/lib/postgresql/data
+    networks:
+      - saas_network
+    ports:
+      - "5433:5432"
+
+  typebot-builder:
+    image: baptistearno/typebot-builder:latest
+    container_name: typebot-builder
+    restart: unless-stopped
+    depends_on:
+      - typebot-db
+    environment:
+      - DATABASE_URL=postgresql://typebot:${DATABASE_PASSWORD}@typebot-db:5432/typebot
+      - NEXTAUTH_URL=${TYPEBOT_BUILDER_URL}
+      - NEXT_PUBLIC_VIEWER_URL=${TYPEBOT_VIEWER_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_REGION=${S3_REGION}
+    networks:
+      - saas_network
+    ports:
+      - "3002:3000"
+
+  typebot-viewer:
+    image: baptistearno/typebot-viewer:latest
+    container_name: typebot-viewer
+    restart: unless-stopped
+    depends_on:
+      - typebot-db
+    environment:
+      - DATABASE_URL=postgresql://typebot:${DATABASE_PASSWORD}@typebot-db:5432/typebot
+      - NEXTAUTH_URL=${TYPEBOT_BUILDER_URL}
+      - NEXT_PUBLIC_VIEWER_URL=${TYPEBOT_VIEWER_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
+      - S3_SECRET_KEY=${S3_SECRET_KEY}
+      - S3_BUCKET=${S3_BUCKET}
+      - S3_REGION=${S3_REGION}
+    networks:
+      - saas_network
+    ports:
+      - "3001:3000"
+
+  # ==========================================
+  # WAHA - PROFILE waha (porta 3000)
+  # ==========================================
+  waha:
+    image: devlikeapro/waha-plus:latest
+    container_name: waha
+    restart: unless-stopped
+    profiles:
+      - waha
+    environment:
+      - WHATSAPP_HOOK_URL=${WHATSAPP_HOOK_URL}
+      - WHATSAPP_HOOK_EVENTS=message,state.change,auth_failure,ack,group.join
+      - WHATSAPP_START_SESSION=default
+      - WAHA_LICENSE_KEY=${WAHA_LICENSE_KEY}
+    volumes:
+      - waha_sessions:/app/sessions
+      - waha_media:/app/media
+    networks:
+      - saas_network
+    ports:
+      - "3000:3000"
+
+  # ==========================================
+  # EVOLUTION API V2 - PROFILE evolution (porta 8081)
+  # ==========================================
+  evolution-redis:
+    image: redis:7-alpine
+    container_name: evolution-redis
+    restart: unless-stopped
+    profiles:
+      - evolution
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - evolution_redis:/data
+    networks:
+      - saas_network
+
+  evolution-api:
+    image: atendai/evolution-api:v2.1.1
+    container_name: evolution-api
+    restart: unless-stopped
+    profiles:
+      - evolution
+    depends_on:
+      - evolution-redis
+    # DNS do Google para resolver problema de DNS na Hostinger
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      - SERVER_TYPE=http
+      - SERVER_PORT=8080
+      - LOG_LEVEL=ERROR
+      - LOG_COLOR=true
+      - DEL_INSTANCE=false
+      # Database Config - IMPORTANTE: DATABASE_PROVIDER é obrigatório!
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_ENABLED=true
+      - DATABASE_CONNECTION_URI=${DATABASE_CONNECTION_URI}
+      - DATABASE_CONNECTION_DB_PREFIX_NAME=evodb
+      # Redis Config - desabilitado temporariamente
+      - REDIS_ENABLED=false
+      # - REDIS_URI=redis://:${REDIS_PASSWORD}@evolution-redis:6379
+      # Webhook Config
+      - WEBHOOK_GLOBAL_ENABLED=true
+      - WEBHOOK_GLOBAL_URL=${EVOLUTION_WEBHOOK_URL}
+      - WEBHOOK_GLOBAL_WEBHOOK_BY_EVENTS=true
+      # Session Config
+      - CONFIG_SESSION_PHONE_CLIENT=BRGestor
+      - CONFIG_SESSION_PHONE_NAME=Chrome
+      # API Config
+      - AUTHENTICATION_TYPE=apikey
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY}
+      # Provider Config
+      - PROVIDER_ENABLED=false
+    volumes:
+      - evolution_instances:/evolution/instances
+      - evolution_store:/evolution/store
+    networks:
+      - saas_network
+    ports:
+      - "8081:8080"
+
+networks:
+  saas_network:
+    driver: bridge
+    name: saas_network
+
+volumes:
+  # Typebot
+  typebot_db:
+    name: typebot_db
+
+  # WAHA
+  waha_sessions:
+    name: waha_sessions
+  waha_media:
+    name: waha_media
+
+  # Evolution API
+  evolution_instances:
+    name: evolution_instances
+  evolution_store:
+    name: evolution_store
+  evolution_redis:
+    name: evolution_redis

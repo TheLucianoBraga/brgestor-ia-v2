@@ -23,21 +23,26 @@ dist-ssr
 *.sln
 *.sw?
 .env
-# --- SEGURANÇA ---
+# --- SEGURANÇA E ARQUIVOS SENSÍVEIS ---
 *.pem
 *.key
 deploy_key*
 .env
 .env.*
 dist.tar.gz
+Sensivel/
+AlteraçōesVscode/
+AlteraçõesVscode/
+temp/
+*.sql
+missing_tables_migration.sql
+updated_allowed_tables.js
 
 # --- VPS / LOCAL ---
 VPS_DOCUMENTACAO_COMPLETA.md
 MELHORIAS_RELATORIOS.md
 vps-deploy.sh
 scripts/safe-deploy.sh
-*.sql
-AlteraçōesVscode/
 
 # --- BUILDS ---
 dev-dist/

@@ -419,14 +419,17 @@ export default function WhatsApp() {
           'apikey': apiKey,
         },
         body: JSON.stringify({
-          enabled: true,
-          url: webhookUrl,
-          webhookByEvents: true,
-          events: ['MESSAGES_UPSERT']
+          webhook: {
+            enabled: true,
+            url: webhookUrl,
+            webhookByEvents: true,
+            events: ['MESSAGES_UPSERT']
+          }
         }),
       });
+      console.log('✅ Webhook configurado para Evolution IA');
     } catch (e) {
-      console.log('Erro ao configurar webhook:', e);
+      console.error('❌ Erro ao configurar webhook:', e);
     }
 
     // Step 3: Conectar instância e buscar QR

@@ -1,0 +1,19 @@
+{
+  "name": "brgestor-vps-services",
+  "version": "1.0.0",
+  "description": "Serviços de backend do BRGestor para rodar na VPS",
+  "main": "polling-service.js",
+  "scripts": {
+    "start": "node polling-service.js",
+    "start:pm2": "pm2 start polling-service.js --name brgestor-polling",
+    "stop:pm2": "pm2 stop brgestor-polling",
+    "restart:pm2": "pm2 restart brgestor-polling",
+    "logs:pm2": "pm2 logs brgestor-polling"
+  },
+  "dependencies": {
+    "pg": "^8.11.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

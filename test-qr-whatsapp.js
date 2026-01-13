@@ -3,7 +3,7 @@ console.log('🧪 TESTE STATUS - ENDPOINT PÚBLICO');
 
 const testStatus = async () => {
   try {
-    const response = await fetch('https://uoogxqtbasbvcmtgxzcu.supabase.co/functions/v1/whatsapp/status', {
+    const response = await fetch('http://72.60.14.172:3001/api/whatsapp/status', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

@@ -21,7 +21,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 export const UsersSettingsTab: React.FC = () => {

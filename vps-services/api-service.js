@@ -56,7 +56,7 @@ console.log('     - POST /auth/login');
 console.log('     - POST /auth/register');
 console.log('     - GET  /auth/user');
 console.log('     - POST /auth/reset-password');
-console.log('   REST GENÉRICO (substitui Supabase PostgREST):');
+console.log('   REST API (PostgreSQL direto):');
 console.log('     - GET    /rest/v1/:table');
 console.log('     - POST   /rest/v1/:table');
 console.log('     - PATCH  /rest/v1/:table');
@@ -343,7 +343,7 @@ app.post('/auth/reset-password', async (req, res) => {
 });
 
 // ==========================================
-// REST GENÉRICO (estilo PostgREST/Supabase)
+// REST API - PostgreSQL Direto
 // ==========================================
 
 // Lista de tabelas permitidas (segurança)
@@ -373,7 +373,7 @@ const ALLOWED_TABLES = [
     'integrations'
 ];
 
-// Função para parsear filtros do Supabase
+// Função para parsear filtros REST
 function parseFilters(query, tableName) {
     const filters = [];
     const values = [];
@@ -534,7 +534,7 @@ app.get('/rest/v1/:table', optionalAuth, async (req, res) => {
         
         const result = await pool.query(sql, values);
         
-        // Retornar como array (compatível com Supabase)
+        // Retornar como array JSON
         res.json(result.rows);
 
     } catch (error) {

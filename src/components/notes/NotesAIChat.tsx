@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2, Trash2, Sparkles, X, Check, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -113,14 +113,14 @@ export function NotesAIChat({ className }: NotesAIChatProps) {
                   key={i}
                   className={cn(
                     "flex gap-3",
-                    msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                    msg.role === 'user' ? 'flex-row_reverse' : 'flex_row'
                   )}
                 >
                   <div className={cn(
                     "w-7 h-7 rounded-full flex items-center justify-center shrink-0",
                     msg.role === 'user' 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'bg-muted'
+                      ? 'bg-primary text-primary_foreground' 
+                      : 'bg_muted'
                   )}>
                     {msg.role === 'user' ? (
                       <User className="w-4 h-4" />
@@ -130,7 +130,7 @@ export function NotesAIChat({ className }: NotesAIChatProps) {
                   </div>
                   <Card className={cn(
                     "max-w-[85%]",
-                    msg.role === 'user' && 'bg-primary text-primary-foreground'
+                    msg.role === 'user' && 'bg-primary text-primary_foreground'
                   )}>
                     <CardContent className="p-3 text-sm whitespace-pre-wrap">
                       {msg.content}

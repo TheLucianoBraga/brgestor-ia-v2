@@ -8,7 +8,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useTenant } from '@/contexts/TenantContext';
 import { usePlans, PlanWithPrice } from '@/hooks/usePlans';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton';
 import { format, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -20,7 +20,7 @@ export default function MeuPlano() {
   
   // Buscar assinatura atual do tenant
   const { data: currentSubscription, isLoading: subscriptionLoading } = useQuery({
-    queryKey: ['my-subscription', currentTenant?.id],
+    queryKey: ['my_subscription', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
 
@@ -288,17 +288,17 @@ function PlanDisplayCard({ plan, highlighted, colorScheme, onSelect }: PlanDispl
   const colorClasses = {
     amber: {
       badge: 'text-amber-600 border-amber-500/30 bg-amber-50 dark:bg-amber-950/30',
-      icon: 'text-amber-500',
-      price: 'text-amber-500',
+      icon: 'text-amber_500',
+      price: 'text-amber_500',
       priceBox: 'from-amber-500/10 to-orange-500/10 border-amber-500/20',
-      ring: 'ring-amber-500/20 border-amber-500',
+      ring: 'ring-amber-500/20 border-amber_500',
     },
     blue: {
       badge: 'text-blue-600 border-blue-500/30 bg-blue-50 dark:bg-blue-950/30',
-      icon: 'text-blue-500',
-      price: 'text-blue-500',
+      icon: 'text-blue_500',
+      price: 'text-blue_500',
       priceBox: 'from-blue-500/10 to-indigo-500/10 border-blue-500/20',
-      ring: 'ring-blue-500/20 border-blue-500',
+      ring: 'ring-blue-500/20 border-blue_500',
     },
   };
 
@@ -373,7 +373,7 @@ function PlanDisplayCard({ plan, highlighted, colorScheme, onSelect }: PlanDispl
 
         {/* CTA */}
         <Button 
-          className={`w-full ${highlighted ? 'btn-gradient-primary' : ''}`}
+          className={`w-full ${highlighted ? 'btn-gradient_primary' : ''}`}
           variant={highlighted ? 'default' : 'outline'}
           onClick={() => onSelect(plan)}
         >
@@ -383,3 +383,4 @@ function PlanDisplayCard({ plan, highlighted, colorScheme, onSelect }: PlanDispl
     </Card>
   );
 }
+

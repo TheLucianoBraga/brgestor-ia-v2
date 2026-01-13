@@ -9,8 +9,8 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { supabase } from '@/integrations/supabase/client';
+} from '@/components/ui/dropdown_menu';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -48,7 +48,7 @@ export function AITextAssistant({ value, onUpdate, disabled, className }: AIText
 
   const callAI = async (type: string, prompt: string, context?: any): Promise<string | null> => {
     try {
-      const { data, error } = await supabase.functions.invoke('ai-generate', {
+      const { data, error } = await supabase.rpc('ai_generate', {
         body: {
           type,
           prompt,
@@ -153,11 +153,11 @@ export function AITextAssistant({ value, onUpdate, disabled, className }: AIText
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="bg-popover z-50">
             <DropdownMenuItem onClick={() => handleAction('translate', 'en')}>
-              {loadingAction === 'translate-en' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {loadingAction === 'translate_en' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               🇺🇸 Inglês
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleAction('translate', 'es')}>
-              {loadingAction === 'translate-es' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {loadingAction === 'translate_es' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               🇪🇸 Espanhol
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -170,15 +170,15 @@ export function AITextAssistant({ value, onUpdate, disabled, className }: AIText
           </DropdownMenuSubTrigger>
           <DropdownMenuSubContent className="bg-popover z-50">
             <DropdownMenuItem onClick={() => handleAction('tone', 'friendly')}>
-              {loadingAction === 'tone-friendly' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {loadingAction === 'tone_friendly' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               😊 Amigável
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleAction('tone', 'sales')}>
-              {loadingAction === 'tone-sales' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {loadingAction === 'tone_sales' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               💼 Vendedor/Persuasivo
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleAction('tone', 'executive')}>
-              {loadingAction === 'tone-executive' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {loadingAction === 'tone_executive' && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
               👔 Executivo/Comercial
             </DropdownMenuItem>
           </DropdownMenuSubContent>
@@ -187,3 +187,4 @@ export function AITextAssistant({ value, onUpdate, disabled, className }: AIText
     </DropdownMenu>
   );
 }
+

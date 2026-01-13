@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Bot, User, Loader2, ThumbsUp, ThumbsDown, AlertCircle, Volume2, VolumeX, Globe, History, Trash2, Moon, Sun, Monitor, Plus, Image, Mic } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { ScrollArea } from '@/components/ui/scroll_area';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown_menu';
 import { useChatbotAdvanced, type ChatMessage, type MenuOption } from '@/hooks/useChatbotAdvanced';
 import { ChatActionCard, ServiceCard, ChargeCard, PlanCard, type ChatAction } from './ChatActionCard';
 import { cn } from '@/lib/utils';
@@ -174,7 +174,7 @@ export function ChatWidget({ isOpen: controlledIsOpen, onOpenChange, fullScreen 
 
   const getHeaderSubtitle = () => {
     if (tenantType === 'cliente' && customerName) {
-      return `Olá, ${customerName.split(' ')[0]}!`;
+      return `Olá, ${customerName.split(' ')[0] || 'Cliente'}!`;
     }
     return 'Online agora';
   };
@@ -225,7 +225,7 @@ export function ChatWidget({ isOpen: controlledIsOpen, onOpenChange, fullScreen 
               fullScreen 
                 ? "h-full rounded-none" 
                 : "h-[650px] max-h-[85vh] rounded-[2rem]",
-              resolvedTheme === 'dark' ? 'bg-zinc-950 text-zinc-100 border-zinc-800' : 'bg-white text-zinc-900 border-zinc-200'
+              resolvedTheme === 'dark' ? 'bg-zinc-950 text-zinc-100 border-zinc_800' : 'bg-white text-zinc-900 border-zinc_200'
             )}>
               <div className="relative overflow-hidden px-6 py-6 bg-primary text-primary-foreground">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
@@ -302,8 +302,8 @@ export function ChatWidget({ isOpen: controlledIsOpen, onOpenChange, fullScreen 
               </div>
 
               {proactiveAlerts.length > 0 && (
-                <div className={cn("px-3 py-2 border-b", resolvedTheme === 'dark' ? 'bg-amber-950/30 border-amber-800' : 'bg-amber-50 border-amber-200')}>
-                  <div className={cn("flex items-center gap-2", resolvedTheme === 'dark' ? 'text-amber-400' : 'text-amber-700')}>
+                <div className={cn("px-3 py-2 border-b", resolvedTheme === 'dark' ? 'bg-amber-950/30 border-amber_800' : 'bg-amber-50 border-amber_200')}>
+                  <div className={cn("flex items-center gap-2", resolvedTheme === 'dark' ? 'text-amber_400' : 'text-amber_700')}>
                     <AlertCircle className="h-4 w-4" />
                     <span className="text-xs font-medium">{proactiveAlerts[0]}</span>
                   </div>
@@ -314,7 +314,7 @@ export function ChatWidget({ isOpen: controlledIsOpen, onOpenChange, fullScreen 
                 <div className="space-y-6">
                   {configLoading ? (
                     <div className="flex justify-center py-8">
-                      <Loader2 className={cn("h-6 w-6 animate-spin", resolvedTheme === 'dark' ? 'text-zinc-400' : 'text-zinc-500')} />
+                      <Loader2 className={cn("h-6 w-6 animate-spin", resolvedTheme === 'dark' ? 'text-zinc_400' : 'text-zinc_500')} />
                     </div>
                   ) : (
                     <>
@@ -330,12 +330,12 @@ export function ChatWidget({ isOpen: controlledIsOpen, onOpenChange, fullScreen 
                       ))}
                       {isThinking && (
                         <div className="flex gap-3 items-center text-muted-foreground">
-                          <div className={cn("h-10 w-10 rounded-2xl flex items-center justify-center animate-pulse", resolvedTheme === 'dark' ? 'bg-zinc-800' : 'bg-zinc-100')}>
+                          <div className={cn("h-10 w-10 rounded-2xl flex items-center justify-center animate-pulse", resolvedTheme === 'dark' ? 'bg-zinc_800' : 'bg-zinc_100')}>
                             <Bot className="h-5 w-5 text-primary" />
                           </div>
                           <div className="flex flex-col gap-1">
                             {isSearchingWeb && (
-                              <div className={cn("flex items-center gap-2 text-xs", resolvedTheme === 'dark' ? 'text-blue-400' : 'text-blue-600')}>
+                              <div className={cn("flex items-center gap-2 text-xs", resolvedTheme === 'dark' ? 'text-blue_400' : 'text-blue_600')}>
                                 <Globe className="h-3 w-3 animate-spin" />
                                 <span>Buscando na internet...</span>
                               </div>
@@ -354,7 +354,7 @@ export function ChatWidget({ isOpen: controlledIsOpen, onOpenChange, fullScreen 
                 </div>
               </ScrollArea>
 
-              <div className={cn("p-6 border-t backdrop-blur-md", resolvedTheme === 'dark' ? 'bg-zinc-950/80 border-zinc-800' : 'bg-white/80 border-zinc-100')}>
+              <div className={cn("p-6 border-t backdrop-blur-md", resolvedTheme === 'dark' ? 'bg-zinc-950/80 border-zinc_800' : 'bg-white/80 border-zinc_100')}>
                 <div className="relative flex items-end gap-3 bg-secondary/30 dark:bg-zinc-900/50 p-2 rounded-[1.5rem] border border-transparent focus-within:border-primary/20 focus-within:bg-background transition-all duration-200">
                   <div className="flex items-center gap-1 pl-1">
                     <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'image')} />
@@ -379,7 +379,7 @@ export function ChatWidget({ isOpen: controlledIsOpen, onOpenChange, fullScreen 
                     <Send className="h-5 w-5" />
                   </Button>
                 </div>
-                <p className={cn("text-[10px] text-center mt-4 font-bold uppercase tracking-widest opacity-40", resolvedTheme === 'dark' ? 'text-zinc-500' : 'text-zinc-400')}>
+                <p className={cn("text-[10px] text-center mt-4 font-bold uppercase tracking-widest opacity-40", resolvedTheme === 'dark' ? 'text-zinc_500' : 'text-zinc_400')}>
                   Powered by BRGestor • IA Ativa ✨
                 </p>
               </div>
@@ -408,15 +408,15 @@ function MessageBubble({ message, onOptionClick, onActionExecute, onFeedback, is
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={cn('flex gap-3', isBot ? 'justify-start' : 'justify-end')}>
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={cn('flex gap_3', isBot ? 'justify_start' : 'justify_end')}>
       {isBot && (
-        <div className={cn("flex-shrink-0 h-10 w-10 rounded-2xl flex items-center justify-center shadow-sm", isDarkTheme ? 'bg-zinc-800 border border-zinc-700' : 'bg-zinc-100 border border-zinc-200')}>
+        <div className={cn("flex-shrink-0 h-10 w-10 rounded-2xl flex items-center justify-center shadow-sm", isDarkTheme ? 'bg-zinc-800 border border-zinc_700' : 'bg-zinc-100 border border-zinc_200')}>
           <Bot className="h-5 w-5 text-primary" />
         </div>
       )}
-      <div className={cn('max-w-[85%] space-y-2', isBot ? 'items-start' : 'items-end')}>
-        <div className={cn('rounded-[1.5rem] px-5 py-3 text-sm leading-relaxed shadow-sm', isBot ? (isDarkTheme ? 'bg-zinc-800 text-zinc-100 rounded-tl-none border border-zinc-700' : 'bg-zinc-100 text-zinc-900 rounded-tl-none border border-zinc-200') : 'bg-primary text-primary-foreground rounded-tr-none shadow-primary/10')}>
-          <div className={cn("whitespace-pre-wrap max-w-none [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:my-2 [&>ul]:pl-4 [&>li]:mb-1", isDarkTheme ? 'prose-invert' : '')} dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }} />
+      <div className={cn('max-w-[85%] space-y_2', isBot ? 'items_start' : 'items_end')}>
+        <div className={cn('rounded-[1.5rem] px-5 py-3 text-sm leading-relaxed shadow_sm', isBot ? (isDarkTheme ? 'bg-zinc-800 text-zinc-100 rounded-tl-none border border-zinc_700' : 'bg-zinc-100 text-zinc-900 rounded-tl-none border border-zinc_200') : 'bg-primary text-primary-foreground rounded-tr-none shadow-primary/10')}>
+          <div className={cn("whitespace-pre-wrap max-w-none [&>p]:mb-2 [&>p:last-child]:mb-0 [&>ul]:my-2 [&>ul]:pl-4 [&>li]:mb-1", isDarkTheme ? 'prose_invert' : '')} dangerouslySetInnerHTML={{ __html: formatMarkdown(message.content) }} />
         </div>
         {isBot && message.richContent && (
           <div className="space-y-2 w-full">
@@ -438,7 +438,7 @@ function MessageBubble({ message, onOptionClick, onActionExecute, onFeedback, is
         )}
         {isBot && message.suggestions && message.suggestions.length > 0 && (
           <div className="mt-3 space-y-1.5">
-            <span className={cn("text-[10px] font-semibold uppercase tracking-wide", isDarkTheme ? 'text-zinc-400' : 'text-zinc-500')}>
+            <span className={cn("text-[10px] font-semibold uppercase tracking-wide", isDarkTheme ? 'text-zinc_400' : 'text-zinc_500')}>
               💡 Sugestões Rápidas
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -458,8 +458,8 @@ function MessageBubble({ message, onOptionClick, onActionExecute, onFeedback, is
                   className={cn(
                     "h-7 px-3 text-xs rounded-full border transition-all",
                     isDarkTheme 
-                      ? 'border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 hover:border-primary' 
-                      : 'border-zinc-200 bg-zinc-50 hover:bg-white hover:border-primary'
+                      ? 'border-zinc-700 bg-zinc-800/50 hover:bg-zinc-700 hover:border_primary' 
+                      : 'border-zinc-200 bg-zinc-50 hover:bg-white hover:border_primary'
                   )}
                 >
                   {suggestion}
@@ -470,12 +470,12 @@ function MessageBubble({ message, onOptionClick, onActionExecute, onFeedback, is
         )}
         {isBot && !feedbackGiven && message.content.length > 50 && (
           <div className="flex items-center gap-2 mt-1">
-            <span className={cn("text-[10px]", isDarkTheme ? 'text-zinc-500' : 'text-zinc-400')}>Útil?</span>
-            <button onClick={() => handleFeedback(true)} className={cn("hover:text-green-600 transition-colors", isDarkTheme ? 'text-zinc-500' : 'text-zinc-400')}><ThumbsUp className="h-3 w-3" /></button>
-            <button onClick={() => handleFeedback(false)} className={cn("hover:text-red-600 transition-colors", isDarkTheme ? 'text-zinc-500' : 'text-zinc-400')}><ThumbsDown className="h-3 w-3" /></button>
+            <span className={cn("text-[10px]", isDarkTheme ? 'text-zinc_500' : 'text-zinc_400')}>Útil?</span>
+            <button onClick={() => handleFeedback(true)} className={cn("hover:text-green-600 transition-colors", isDarkTheme ? 'text-zinc_500' : 'text-zinc_400')}><ThumbsUp className="h-3 w-3" /></button>
+            <button onClick={() => handleFeedback(false)} className={cn("hover:text-red-600 transition-colors", isDarkTheme ? 'text-zinc_500' : 'text-zinc_400')}><ThumbsDown className="h-3 w-3" /></button>
           </div>
         )}
-        <p className={cn("text-[10px] px-1", isDarkTheme ? 'text-zinc-500' : 'text-zinc-400')}>{new Date(message.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+        <p className={cn("text-[10px] px-1", isDarkTheme ? 'text-zinc_500' : 'text-zinc_400')}>{new Date(message.timestamp).toLocaleTimeString('pt-BR', { hour: '2_digit', minute: '2_digit' })}</p>
       </div>
       {!isBot && (
         <div className="flex-shrink-0 h-10 w-10 rounded-2xl bg-primary flex items-center justify-center shadow-sm">

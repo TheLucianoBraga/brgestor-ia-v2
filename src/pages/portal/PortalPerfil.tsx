@@ -280,7 +280,7 @@ export default function PortalPerfil() {
                       <div className="grid gap-4 sm:grid-cols-3">
                         {[
                           { id: 'allow_whatsapp', label: 'WhatsApp', icon: Smartphone },
-                          { id: 'allow_email', label: 'E-mail', icon: Mail },
+                          { id: 'allow_email', label: 'E_mail', icon: Mail },
                           { id: 'allow_portal_notifications', label: 'Portal', icon: Bell },
                         ].map((pref) => (
                           <div 

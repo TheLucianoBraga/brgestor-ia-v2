@@ -42,7 +42,7 @@ import { useTemplates } from '@/hooks/useTemplates';
 import { useTenant } from '@/contexts/TenantContext';
 import { useChargeScheduleGenerator } from '@/hooks/useChargeScheduleGenerator';
 import { useWahaCreateSession } from '@/hooks/useWahaCreateSession';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -153,7 +153,7 @@ export default function WhatsApp() {
       try {
         const res = await fetch(`${apiUrl}/api/sessions/${sessionName}`, {
           method: 'GET',
-          headers: { 'X-Api-Key': apiKey },
+          headers: { 'X-Api_Key': apiKey },
         });
         
         if (res.ok && mounted) {
@@ -295,7 +295,7 @@ export default function WhatsApp() {
   const generateQRCodeApi1 = async (sessionName: string) => {
     const apiUrl = getSetting('waha_api_url')!;
     const apiKey = getSetting('waha_api_key')!;
-    const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v3`;
+    const webhookUrl = `http://72.60.14.172:3001/api/webhooks/whatsapp`;
     
     console.log('🔵 [API 1] Gerando QR Code...', sessionName);
     
@@ -304,8 +304,8 @@ export default function WhatsApp() {
       const createRes = await fetch(`${apiUrl}/api/sessions`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'X-Api-Key': apiKey,
+          'Content_Type': 'application/json',
+          'X-Api_Key': apiKey,
         },
         body: JSON.stringify({
           name: sessionName,
@@ -323,7 +323,7 @@ export default function WhatsApp() {
         // Sessão já existe, tentar iniciar
         await fetch(`${apiUrl}/api/sessions/${sessionName}/start`, {
           method: 'POST',
-          headers: { 'X-Api-Key': apiKey },
+          headers: { 'X-Api_Key': apiKey },
         });
       }
     } catch (e) {
@@ -338,7 +338,7 @@ export default function WhatsApp() {
 
       const statusRes = await fetch(`${apiUrl}/api/sessions/${sessionName}`, {
         method: 'GET',
-        headers: { 'X-Api-Key': apiKey },
+        headers: { 'X-Api_Key': apiKey },
       });
 
       if (statusRes.ok) {
@@ -355,12 +355,12 @@ export default function WhatsApp() {
           const qrRes = await fetch(`${apiUrl}/api/${sessionName}/auth/qr`, {
             method: 'GET',
             headers: {
-              'X-Api-Key': apiKey,
+              'X-Api_Key': apiKey,
               'Accept': 'image/png',
             },
           });
 
-          if (qrRes.ok && qrRes.headers.get('content-type')?.includes('image')) {
+          if (qrRes.ok && qrRes.headers.get('content_type')?.includes('image')) {
             const buffer = await qrRes.arrayBuffer();
             const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
             setQrCode(`data:image/png;base64,${base64}`);
@@ -380,7 +380,7 @@ export default function WhatsApp() {
   const generateQRCodeApi2 = async (instanceName: string) => {
     const apiUrl = getSetting('api2_url')!;
     const apiKey = getSetting('api2_api_key')!;
-    const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/evolution-webhook`;
+    const webhookUrl = `http://72.60.14.172:3001/api/webhooks/evolution`;
     
     console.log('🔵 [API 2] Gerando QR Code...', instanceName);
     
@@ -389,13 +389,13 @@ export default function WhatsApp() {
       const createRes = await fetch(`${apiUrl}/instance/create`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content_Type': 'application/json',
           'apikey': apiKey,
         },
         body: JSON.stringify({
           instanceName: instanceName,
           qrcode: true,
-          integration: 'WHATSAPP-BAILEYS',
+          integration: 'WHATSAPP_BAILEYS',
         }),
       });
       
@@ -415,7 +415,7 @@ export default function WhatsApp() {
       await fetch(`${apiUrl}/webhook/set/${instanceName}`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content_Type': 'application/json',
           'apikey': apiKey,
         },
         body: JSON.stringify({
@@ -568,7 +568,7 @@ export default function WhatsApp() {
         
         const res = await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
           method: 'GET',
-          headers: { 'X-Api-Key': wahaKey },
+          headers: { 'X-Api_Key': wahaKey },
         });
         
         if (res.ok) {
@@ -588,13 +588,13 @@ export default function WhatsApp() {
             
             // Configurar webhook após conectar via QR
             console.log('✅ Conectado! Configurando webhook...');
-            const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/waha-webhook-v3`;
+            const webhookUrl = `http://72.60.14.172:3001/api/webhooks/whatsapp`;
             try {
               await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
                 method: 'PUT',
                 headers: {
-                  'Content-Type': 'application/json',
-                  'X-Api-Key': wahaKey,
+                  'Content_Type': 'application/json',
+                  'X-Api_Key': wahaKey,
                 },
                 body: JSON.stringify({
                   name: sessionName,
@@ -641,7 +641,7 @@ export default function WhatsApp() {
         
         const res = await fetch(`${apiUrl}/api/sessions/${instanceName}`, {
           method: 'GET',
-          headers: { 'X-Api-Key': apiKey },
+          headers: { 'X-Api_Key': apiKey },
         });
         
         if (res.ok) {
@@ -719,7 +719,7 @@ export default function WhatsApp() {
         
         await fetch(`${apiUrl}/api/sessions/${instanceName}/stop`, {
           method: 'POST',
-          headers: { 'X-Api-Key': apiKey },
+          headers: { 'X-Api_Key': apiKey },
         });
       } else {
         const apiUrl = getSetting('api2_url')!;
@@ -755,7 +755,7 @@ export default function WhatsApp() {
         
         await fetch(`${apiUrl}/api/sessions/${instanceName}/stop`, {
           method: 'POST',
-          headers: { 'X-Api-Key': apiKey },
+          headers: { 'X-Api_Key': apiKey },
         });
       } else {
         const apiUrl = getSetting('api2_url')!;
@@ -803,8 +803,8 @@ export default function WhatsApp() {
         const res = await fetch(`${apiUrl}/api/sendText`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'X-Api-Key': apiKey,
+            'Content_Type': 'application/json',
+            'X-Api_Key': apiKey,
           },
           body: JSON.stringify({
             session: instanceName,
@@ -825,7 +825,7 @@ export default function WhatsApp() {
         const res = await fetch(`${apiUrl}/message/sendText/${instanceName}`, {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
+            'Content_Type': 'application/json',
             'apikey': apiKey,
           },
           body: JSON.stringify({
@@ -911,10 +911,10 @@ export default function WhatsApp() {
           <div className="min-w-0">
             <p className={`font-medium text-xs sm:text-sm truncate ${
               connectionStatus === 'connected' 
-                ? 'text-emerald-600' 
+                ? 'text-emerald_600' 
                 : connectionStatus === 'waiting_qr'
-                ? 'text-amber-600'
-                : 'text-destructive'
+                ? 'text-amber_600'
+                : 'text_destructive'
             }`}>
               {connectionStatus === 'connected' 
                 ? `Conectado${connectedName ? ` - ${connectedName}` : ''}`
@@ -935,7 +935,7 @@ export default function WhatsApp() {
             disabled={isRefreshing}
             className="h-8 px-2 sm:px-3"
           >
-            <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isRefreshing ? 'animate_spin' : ''}`} />
           </Button>
           {connectionStatus === 'connected' && (
             <>
@@ -1062,7 +1062,7 @@ export default function WhatsApp() {
                       </p>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={handleRefreshStatus} disabled={isRefreshing}>
-                          <RefreshCw className={`h-4 w-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+                          <RefreshCw className={`h-4 w-4 mr-1 ${isRefreshing ? 'animate_spin' : ''}`} />
                           Atualizar
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => { setQrCode(''); setConnectionStatus('disconnected'); }}>
@@ -1126,7 +1126,7 @@ export default function WhatsApp() {
                     onClick={handleRefreshStatus}
                     disabled={isRefreshing}
                   >
-                    <RefreshCw className={`h-4 w-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`h-4 w-4 mr-1 ${isRefreshing ? 'animate_spin' : ''}`} />
                     Atualizar
                   </Button>
                   
@@ -1731,4 +1731,5 @@ export default function WhatsApp() {
     </div>
   );
 }
+
 

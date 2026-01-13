@@ -10,7 +10,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { ExpenseWithRelations } from '@/hooks/useExpenses';
 import {
   MoreHorizontal,
@@ -121,10 +121,10 @@ export const ExpenseCard: React.FC<ExpenseCardProps> = ({
   };
 
   const getBorderColor = () => {
-    if (isPaid) return 'border-l-emerald-500';
-    if (isOverdue) return 'border-l-destructive';
-    if (isPending) return 'border-l-amber-500';
-    return 'border-l-muted';
+    if (isPaid) return 'border-l-emerald_500';
+    if (isOverdue) return 'border-l_destructive';
+    if (isPending) return 'border-l-amber_500';
+    return 'border-l_muted';
   };
 
   const getCategoryBgColor = () => {

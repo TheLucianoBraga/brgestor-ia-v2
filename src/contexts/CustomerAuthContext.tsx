@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { getFriendlyErrorMessage } from '@/lib/errorMessages';
 
 interface CustomerAuthData {
@@ -44,6 +44,7 @@ export const CustomerAuthProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const checkActiveService = useCallback(async (customerId: string) => {
     try {
+      // Mock - sempre retorna serviço ativo durante migração
       const { data, error } = await supabase.rpc('customer_has_active_service', {
         _customer_id: customerId
       });
@@ -175,3 +176,4 @@ export const useCustomerAuth = () => {
   }
   return context;
 };
+

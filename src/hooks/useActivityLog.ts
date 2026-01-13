@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Json } from '@/integrations/supabase/types';
@@ -30,7 +30,7 @@ export const useActivityLog = (filters?: ActivityLogFilters, page = 1, pageSize 
   const queryClient = useQueryClient();
 
   const logsQuery = useQuery({
-    queryKey: ['activity-logs', currentTenant?.id, filters, page, pageSize],
+    queryKey: ['activity_logs', currentTenant?.id, filters, page, pageSize],
     queryFn: async () => {
       if (!currentTenant?.id) return { logs: [], total: 0 };
 
@@ -93,13 +93,13 @@ export const useActivityLog = (filters?: ActivityLogFilters, page = 1, pageSize 
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['activity-logs'] });
+      queryClient.invalidateQueries({ queryKey: ['activity_logs'] });
     },
   });
 
   // Get unique actions from logs for filter dropdown
   const actionsQuery = useQuery({
-    queryKey: ['activity-log-actions', currentTenant?.id],
+    queryKey: ['activity-log_actions', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
@@ -119,7 +119,7 @@ export const useActivityLog = (filters?: ActivityLogFilters, page = 1, pageSize 
 
   // Get unique resources from logs for filter dropdown
   const resourcesQuery = useQuery({
-    queryKey: ['activity-log-resources', currentTenant?.id],
+    queryKey: ['activity-log_resources', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
@@ -169,3 +169,4 @@ export const logActivityDirect = async (
     console.error('Failed to log activity:', error);
   }
 };
+

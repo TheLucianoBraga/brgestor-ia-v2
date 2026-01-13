@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 import { addDays, setHours, setMinutes, parseISO } from 'date-fns';
@@ -152,7 +152,7 @@ export const useChargeScheduleGenerator = () => {
 
   // Query to count pending schedules
   const pendingSchedulesQuery = useQuery({
-    queryKey: ['pending-charge-schedules-count', currentTenant?.id],
+    queryKey: ['pending-charge-schedules_count', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return 0;
 
@@ -220,7 +220,7 @@ export const useChargeScheduleGenerator = () => {
       return { deleted: deleted?.length || 0, created };
     },
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ['pending-charge-schedules-count'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-charge-schedules_count'] });
       toast.success(`Agendamentos regenerados: ${result.created} criados, ${result.deleted} removidos`);
     },
     onError: (error: any) => {
@@ -231,7 +231,7 @@ export const useChargeScheduleGenerator = () => {
   // Mutation to test scheduled charges processing
   const testScheduledCharges = useMutation({
     mutationFn: async () => {
-      const response = await supabase.functions.invoke('process-scheduled-charges');
+      const response = await supabase.rpc('process_scheduled_charges');
       
       if (response.error) throw response.error;
       return response.data;
@@ -242,7 +242,7 @@ export const useChargeScheduleGenerator = () => {
       } else {
         toast.error(result?.error || 'Erro ao processar cobranças');
       }
-      queryClient.invalidateQueries({ queryKey: ['pending-charge-schedules-count'] });
+      queryClient.invalidateQueries({ queryKey: ['pending-charge-schedules_count'] });
     },
     onError: (error: any) => {
       toast.error(error.message || 'Erro ao testar cobranças agendadas');
@@ -256,3 +256,4 @@ export const useChargeScheduleGenerator = () => {
     testScheduledCharges,
   };
 };
+

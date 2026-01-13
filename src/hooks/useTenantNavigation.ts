@@ -58,7 +58,7 @@ const getNavigationByType = (type: Tenant['type'] | null): NavigationStructure =
             items: [
               { title: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
               { title: 'Relatórios', href: '/app/relatorios', icon: BarChart3 },
-              { title: 'Meu Plano', href: '/app/meu-plano', icon: Crown },
+              { title: 'Meu Plano', href: '/app/meu_plano', icon: Crown },
             ],
           },
           {
@@ -99,8 +99,8 @@ const getNavigationByType = (type: Tenant['type'] | null): NavigationStructure =
             label: 'Gestão',
             items: [
               { title: 'Organizações', href: '/app/contas', icon: Building2 },
-              { title: 'Revendas', href: '/app/gestao-revendas', icon: Store },
-              { title: 'Cobrança de Ativos', href: '/app/cobranca-ativos', icon: DollarSign },
+              { title: 'Revendas', href: '/app/gestao_revendas', icon: Store },
+              { title: 'Cobrança de Ativos', href: '/app/cobranca_ativos', icon: DollarSign },
               { title: 'Planos', href: '/app/planos', icon: CreditCard },
               { title: 'Cupons', href: '/app/cupons', icon: Ticket },
             ],
@@ -108,8 +108,8 @@ const getNavigationByType = (type: Tenant['type'] | null): NavigationStructure =
           {
             label: 'Automação',
             items: [
-              { title: 'Atendimento IA', href: '/app/atendimento-ia', icon: Bot },
-              { title: 'Notificações', href: '/app/notificacoes-center', icon: Bell },
+              { title: 'Atendimento IA', href: '/app/atendimento_ia', icon: Bot },
+              { title: 'Notificações', href: '/app/notificacoes_center', icon: Bell },
             ],
           },
           {
@@ -131,7 +131,7 @@ const getNavigationByType = (type: Tenant['type'] | null): NavigationStructure =
             items: [
               { title: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
               { title: 'Relatórios', href: '/app/relatorios', icon: BarChart3 },
-              { title: 'Meu Plano', href: '/app/meu-plano', icon: Crown },
+              { title: 'Meu Plano', href: '/app/meu_plano', icon: Crown },
             ],
           },
           {
@@ -171,7 +171,7 @@ const getNavigationByType = (type: Tenant['type'] | null): NavigationStructure =
           {
             label: 'Gestão',
             items: [
-              { title: 'Revendas', href: '/app/gestao-revendas', icon: Store },
+              { title: 'Revendas', href: '/app/gestao_revendas', icon: Store },
               { title: 'Planos', href: '/app/planos', icon: CreditCard },
               { title: 'Cupons', href: '/app/cupons', icon: Ticket },
             ],
@@ -179,8 +179,8 @@ const getNavigationByType = (type: Tenant['type'] | null): NavigationStructure =
           {
             label: 'Automação',
             items: [
-              { title: 'Atendimento IA', href: '/app/atendimento-ia', icon: Bot },
-              { title: 'Notificações', href: '/app/notificacoes-center', icon: Bell },
+              { title: 'Atendimento IA', href: '/app/atendimento_ia', icon: Bot },
+              { title: 'Notificações', href: '/app/notificacoes_center', icon: Bell },
             ],
           },
           {
@@ -202,7 +202,7 @@ const getNavigationByType = (type: Tenant['type'] | null): NavigationStructure =
             items: [
               { title: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
               { title: 'Relatórios', href: '/app/relatorios', icon: BarChart3 },
-              { title: 'Meu Plano', href: '/app/meu-plano', icon: Crown },
+              { title: 'Meu Plano', href: '/app/meu_plano', icon: Crown },
             ],
           },
           {
@@ -264,7 +264,7 @@ const getNavigationByType = (type: Tenant['type'] | null): NavigationStructure =
             label: 'Serviços',
             items: [
               { title: 'Catálogo', href: '/cliente/servicos', icon: Package },
-              { title: 'Meus Serviços', href: '/cliente/meus-servicos', icon: RefreshCcw },
+              { title: 'Meus Serviços', href: '/cliente/meus_servicos', icon: RefreshCcw },
             ],
           },
           {

@@ -2,7 +2,7 @@ import { useCustomerAuth } from '@/contexts/CustomerAuthContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 interface PortalCustomerInfo {
   customerId: string | undefined;
@@ -29,7 +29,7 @@ export function usePortalCustomerId(): PortalCustomerInfo {
 
   // For Supabase Auth cliente users, we need to find their customer record
   const { data: supabaseCustomer, isLoading: customerLoading } = useQuery({
-    queryKey: ['portal-customer-by-tenant', currentTenant?.id],
+    queryKey: ['portal-customer-by_tenant', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
       
@@ -91,3 +91,4 @@ export function usePortalCustomerId(): PortalCustomerInfo {
     authType: null,
   };
 }
+

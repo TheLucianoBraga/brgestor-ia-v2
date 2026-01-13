@@ -78,12 +78,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, requireTenant = 
   // 1. requireTenant is true
   // 2. User needs to select a tenant (has no current_tenant_id)
   // 3. We're not already on the select-tenant page
-  if (requireTenant && needsTenantSelection && location.pathname !== '/app/select-tenant') {
+  if (requireTenant && needsTenantSelection && location.pathname !== '/app/select_tenant') {
     return <Navigate to="/app/select-tenant" replace />;
   }
 
   // Redirect cliente type tenants from /app/* to portal
-  if (currentTenant && currentTenant.type === 'cliente' && location.pathname.startsWith('/app')) {
+  if (currentTenant?.type === 'cliente' && location.pathname.startsWith('/app')) {
     return <Navigate to="/portal/dashboard" replace />;
   }
 

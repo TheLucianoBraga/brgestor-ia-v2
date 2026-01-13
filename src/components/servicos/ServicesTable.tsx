@@ -84,7 +84,7 @@ export const ServicesTable: React.FC<ServicesTableProps> = ({
               <TableRow 
                 key={service.id}
                 className={cn(
-                  !service.active && 'opacity-60',
+                  !service.active && 'opacity_60',
                   isVariation && 'bg-muted/30'
                 )}
               >

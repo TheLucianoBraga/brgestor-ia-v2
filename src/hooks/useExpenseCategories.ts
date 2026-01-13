@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
@@ -15,7 +15,7 @@ export const useExpenseCategories = () => {
 
   // Fetch categories
   const categoriesQuery = useQuery({
-    queryKey: ['expense-categories', tenantId],
+    queryKey: ['expense_categories', tenantId],
     queryFn: async () => {
       if (!tenantId) return [];
 
@@ -47,7 +47,7 @@ export const useExpenseCategories = () => {
       return category;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expense-categories', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['expense_categories', tenantId] });
       toast.success('Categoria criada com sucesso');
     },
     onError: (error) => {
@@ -70,7 +70,7 @@ export const useExpenseCategories = () => {
       return category;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expense-categories', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['expense_categories', tenantId] });
       toast.success('Categoria atualizada com sucesso');
     },
     onError: (error) => {
@@ -90,7 +90,7 @@ export const useExpenseCategories = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expense-categories', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['expense_categories', tenantId] });
       toast.success('Categoria removida com sucesso');
     },
     onError: (error) => {
@@ -108,3 +108,4 @@ export const useExpenseCategories = () => {
     deleteCategory,
   };
 };
+

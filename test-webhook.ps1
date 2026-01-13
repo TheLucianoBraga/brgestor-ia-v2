@@ -4,7 +4,7 @@ param(
     [string]$Phone = "5511999999999"
 )
 
-$webhookUrl = "https://uoogxqtbasbvcmtgxzcu.supabase.co/functions/v1/waha-webhook"
+$webhookUrl = "http://72.60.14.172:3001/api/webhooks/whatsapp"
 
 $payload = @{
     event = "message"

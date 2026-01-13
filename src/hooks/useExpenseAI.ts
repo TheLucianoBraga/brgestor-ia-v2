@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -40,13 +40,11 @@ export const useExpenseAI = () => {
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      const { data, error } = await supabase.functions.invoke('expense-ai', {
-        body: {
+      const { data, error } = await supabase.rpc('ai_ai', {
           message,
           tenantId: currentTenant.id,
           previousMessages: messages.slice(-10) // Last 10 messages for context
-        }
-      });
+        });
 
       if (error) throw error;
 
@@ -86,13 +84,11 @@ export const useExpenseAI = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('expense-ai', {
-        body: {
+      const { data, error } = await supabase.rpc('ai_ai', {
           tenantId: currentTenant.id,
           action: 'execute',
           actionData: pendingAction
-        }
-      });
+        });
 
       if (error) throw error;
 
@@ -140,3 +136,4 @@ export const useExpenseAI = () => {
     clearMessages,
   };
 };
+

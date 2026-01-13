@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -19,7 +19,7 @@ import { TenantSwitcher } from './TenantSwitcher';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { useTenant } from '@/contexts/TenantContext';
 import { useCustomerAuth } from '@/contexts/CustomerAuthContext';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { ThemeToggle } from '@/components/ui/theme_toggle';
 import { cn } from '@/lib/utils';
 
 export const DesktopHeader: React.FC = () => {

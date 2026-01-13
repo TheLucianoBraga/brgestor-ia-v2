@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { startOfMonth, endOfMonth, subMonths, format, addDays } from 'date-fns';
 
@@ -43,13 +43,13 @@ export function useDashboardMetrics() {
 
     // Subscribe to multiple tables for comprehensive dashboard updates
     const channel = supabase
-      .channel('dashboard-realtime')
+      .channel('dashboard_realtime')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'customer_charges' },
         () => {
           console.log('🔄 Dashboard realtime: customer_charges changed');
-          queryClient.invalidateQueries({ queryKey: ['dashboard-metrics', currentTenant.id] });
+          queryClient.invalidateQueries({ queryKey: ['dashboard_metrics', currentTenant.id] });
         }
       )
       .on(
@@ -57,7 +57,7 @@ export function useDashboardMetrics() {
         { event: '*', schema: 'public', table: 'customers' },
         () => {
           console.log('🔄 Dashboard realtime: customers changed');
-          queryClient.invalidateQueries({ queryKey: ['dashboard-metrics', currentTenant.id] });
+          queryClient.invalidateQueries({ queryKey: ['dashboard_metrics', currentTenant.id] });
         }
       )
       .on(
@@ -65,7 +65,7 @@ export function useDashboardMetrics() {
         { event: '*', schema: 'public', table: 'customer_items' },
         () => {
           console.log('🔄 Dashboard realtime: customer_items changed');
-          queryClient.invalidateQueries({ queryKey: ['dashboard-metrics', currentTenant.id] });
+          queryClient.invalidateQueries({ queryKey: ['dashboard_metrics', currentTenant.id] });
         }
       )
       .on(
@@ -73,7 +73,7 @@ export function useDashboardMetrics() {
         { event: '*', schema: 'public', table: 'customer_plan_subscriptions' },
         () => {
           console.log('🔄 Dashboard realtime: subscriptions changed');
-          queryClient.invalidateQueries({ queryKey: ['dashboard-metrics', currentTenant.id] });
+          queryClient.invalidateQueries({ queryKey: ['dashboard_metrics', currentTenant.id] });
         }
       )
       .subscribe();
@@ -84,7 +84,7 @@ export function useDashboardMetrics() {
   }, [currentTenant?.id, queryClient]);
 
   const { data: metrics, isLoading, error } = useQuery({
-    queryKey: ['dashboard-metrics', currentTenant?.id],
+    queryKey: ['dashboard_metrics', currentTenant?.id],
     queryFn: async (): Promise<DashboardMetrics> => {
       if (!currentTenant?.id) {
         throw new Error('No tenant selected');
@@ -96,7 +96,7 @@ export function useDashboardMetrics() {
       const previousMonthStart = startOfMonth(subMonths(now, 1));
       const previousMonthEnd = endOfMonth(subMonths(now, 1));
       const next7Days = addDays(now, 7);
-      const todayStr = format(now, 'yyyy-MM-dd');
+      const todayStr = format(now, 'yyyy-MM_dd');
 
       const tenantId = currentTenant.id;
       
@@ -218,8 +218,8 @@ export function useDashboardMetrics() {
           )
         `)
         .eq('customers.tenant_id', tenantId)
-        .gte('due_date', format(now, 'yyyy-MM-dd'))
-        .lte('due_date', format(next7Days, 'yyyy-MM-dd'))
+        .gte('due_date', format(now, 'yyyy-MM_dd'))
+        .lte('due_date', format(next7Days, 'yyyy-MM_dd'))
         .eq('status', 'active')
         .order('due_date', { ascending: true })
         .limit(5);
@@ -243,7 +243,7 @@ export function useDashboardMetrics() {
         .select('amount')
         .eq('tenant_id', tenantId)
         .gte('due_date', todayStr)
-        .lte('due_date', format(next7Days, 'yyyy-MM-dd'))
+        .lte('due_date', format(next7Days, 'yyyy-MM_dd'))
         .eq('status', 'pending');
 
       // Calculate metrics - combinar customer_items + customer_charges
@@ -330,3 +330,4 @@ export function useDashboardMetrics() {
     revenueChange,
   };
 }
+

@@ -1,5 +1,9 @@
-// Exemplo de Edge Function para Supabase
-// Arquivo: supabase/functions/whatsapp/index.ts
+// ⚠️  ARQUIVO HISTÓRICO - NÃO USAR ⚠️ 
+// Este arquivo é da época do Supabase Edge Functions
+// Foi substituído por whatsapp-local-service.js no VPS
+// Mantido apenas para referência histórica
+
+// CÓDIGO OBSOLETO ABAIXO:
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'

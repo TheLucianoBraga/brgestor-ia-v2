@@ -249,11 +249,11 @@ const Dashboard: React.FC = () => {
                   <div key={customer.id} className="flex items-center justify-between p-3 bg-secondary/30 rounded-xl border border-border/50 hover:bg-secondary/50 transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                        {customer.full_name.charAt(0)}
+                        {customer.full_name?.charAt(0) ?? 'C'}
                       </div>
                       <div>
-                        <p className="text-sm font-bold">{customer.full_name}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium">{customer.email}</p>
+                        <p className="text-sm font-bold">{customer.full_name || 'Cliente'}</p>
+                        <p className="text-[10px] text-muted-foreground font-medium">{customer.email || ''}</p>
                       </div>
                     </div>
                     <Button 

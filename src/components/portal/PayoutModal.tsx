@@ -102,10 +102,10 @@ export function PayoutModal({
               value={pixKey}
               onChange={(e) => setPixKey(e.target.value)}
               placeholder={
-                pixKeyType === 'cpf' ? '000.000.000-00' :
-                pixKeyType === 'cnpj' ? '00.000.000/0000-00' :
+                pixKeyType === 'cpf' ? '000.000.000_00' :
+                pixKeyType === 'cnpj' ? '00.000.000/0000_00' :
                 pixKeyType === 'email' ? 'email@exemplo.com' :
-                pixKeyType === 'phone' ? '(00) 00000-0000' :
+                pixKeyType === 'phone' ? '(00) 00000_0000' :
                 'Cole sua chave aleatória'
               }
               required

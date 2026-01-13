@@ -1,4 +1,4 @@
-// WhatsApp Provider Adapter - Supabase Edge Functions
+// WhatsApp Provider Adapter - Serviços Locais VPS
 // Adapter Pattern para Evolution API ou WAHA
 
 interface WhatsAppProvider {
@@ -325,47 +325,41 @@ export async function getProviderStatus(): Promise<any> {
   }
 }
 
-// Exemplo de uso em Supabase Edge Function:
+// Exemplo de uso em Express.js local:
 /*
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createInstance, sendMessage, getProviderStatus } from "./whatsapp-adapter.ts"
+const express = require('express');
+const { createInstance, sendMessage, getProviderStatus } = require('./whatsapp-adapter');
 
-serve(async (req) => {
-  const { method } = req;
-  const url = new URL(req.url);
-  
+const app = express();
+
+app.post('/whatsapp/create-instance', async (req, res) => {
   try {
-    switch (url.pathname) {
-      case '/create-instance':
-        if (method !== 'POST') return new Response('Method not allowed', { status: 405 });
-        const { userId } = await req.json();
-        const result = await createInstance(userId);
-        return new Response(JSON.stringify(result), {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      
-      case '/send-message':
-        if (method !== 'POST') return new Response('Method not allowed', { status: 405 });
-        const { phone, text } = await req.json();
-        const messageResult = await sendMessage(phone, text);
-        return new Response(JSON.stringify(messageResult), {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      
-      case '/status':
-        const statusResult = await getProviderStatus();
-        return new Response(JSON.stringify(statusResult), {
-          headers: { 'Content-Type': 'application/json' },
-        });
-      
-      default:
-        return new Response('Not found', { status: 404 });
-    }
+    const { userId } = req.body;
+    const result = await createInstance(userId);
+    res.json(result);
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    });
+    res.status(500).json({ error: error.message });
   }
 });
+
+app.post('/whatsapp/send-message', async (req, res) => {
+  try {
+    const { phone, text } = req.body;
+    const result = await sendMessage(phone, text);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/whatsapp/status', async (req, res) => {
+  try {
+    const result = await getProviderStatus();
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(3001, () => console.log('WhatsApp API running on port 3001'));
 */

@@ -32,7 +32,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 
 export const MobileNav: React.FC = () => {
   const location = useLocation();
@@ -55,7 +55,7 @@ export const MobileNav: React.FC = () => {
                 className={cn(
                   'flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-all touch-manipulation relative',
                   'min-h-[48px] min-w-[48px]',
-                  isActive ? 'text-primary' : 'text-muted-foreground'
+                  isActive ? 'text_primary' : 'text-muted_foreground'
                 )}
               >
                 <AnimatePresence>
@@ -97,7 +97,7 @@ export const MobileNav: React.FC = () => {
             className={cn(
               'flex flex-col items-center justify-center gap-0.5 flex-1 py-2 transition-all touch-manipulation relative',
               'min-h-[48px] min-w-[48px]',
-              isChatActive ? 'text-primary' : 'text-muted-foreground hover:text-primary'
+              isChatActive ? 'text_primary' : 'text-muted-foreground hover:text_primary'
             )}
           >
             <AnimatePresence>
@@ -285,10 +285,10 @@ export const MobileHeader: React.FC<MobileHeaderProps> = () => {
                         to={item.href}
                         onClick={() => setMenuOpen(false)}
                         className={cn(
-                          'flex items-center gap-3 px-4 py-3 mx-2 rounded-lg transition-colors',
+                          'flex items-center gap-3 px-4 py-3 mx-2 rounded-lg transition_colors',
                           isActive 
-                            ? 'bg-primary text-primary-foreground' 
-                            : 'hover:bg-muted'
+                            ? 'bg-primary text-primary_foreground' 
+                            : 'hover:bg_muted'
                         )}
                       >
                         <item.icon className="w-5 h-5" />

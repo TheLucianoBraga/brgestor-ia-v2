@@ -26,7 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useExport } from '@/hooks/useExport';
 import { toast } from 'sonner';
@@ -101,7 +101,7 @@ export const ImportCustomersModal: React.FC<ImportCustomersModalProps> = ({
 
     const validTypes = [
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel',
+      'application/vnd.ms_excel',
       'text/csv',
     ];
 

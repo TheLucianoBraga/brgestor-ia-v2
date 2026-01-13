@@ -27,7 +27,7 @@ export const useTrialNotifications = () => {
         duration: 10000,
         action: {
           label: 'Ver Planos',
-          onClick: () => navigate('/app/meu-plano'),
+          onClick: () => navigate('/app/meu_plano'),
         },
       });
       sessionStorage.setItem(notificationKey, 'true');
@@ -37,7 +37,7 @@ export const useTrialNotifications = () => {
         duration: 8000,
         action: {
           label: 'Ver Planos',
-          onClick: () => navigate('/app/meu-plano'),
+          onClick: () => navigate('/app/meu_plano'),
         },
       });
       sessionStorage.setItem(notificationKey, 'true');
@@ -47,7 +47,7 @@ export const useTrialNotifications = () => {
         duration: 6000,
         action: {
           label: 'Ver Planos',
-          onClick: () => navigate('/app/meu-plano'),
+          onClick: () => navigate('/app/meu_plano'),
         },
       });
       sessionStorage.setItem(notificationKey, 'true');

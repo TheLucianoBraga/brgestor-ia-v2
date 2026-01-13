@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { useReferral } from '@/hooks/useReferral';
@@ -284,3 +284,4 @@ export const RenewalModal: React.FC<RenewalModalProps> = ({
     </Dialog>
   );
 };
+

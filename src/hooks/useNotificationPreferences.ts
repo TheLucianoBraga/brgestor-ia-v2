@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -47,7 +47,7 @@ export const useNotificationPreferences = () => {
   const queryClient = useQueryClient();
 
   const { data: preferences, isLoading } = useQuery({
-    queryKey: ['notification-preferences', currentTenant?.id, user?.id],
+    queryKey: ['notification_preferences', currentTenant?.id, user?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
 
@@ -103,7 +103,7 @@ export const useNotificationPreferences = () => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notification-preferences'] });
+      queryClient.invalidateQueries({ queryKey: ['notification_preferences'] });
       toast.success('Preferências salvas');
     },
     onError: (error) => {
@@ -118,3 +118,4 @@ export const useNotificationPreferences = () => {
     updatePreferences,
   };
 };
+

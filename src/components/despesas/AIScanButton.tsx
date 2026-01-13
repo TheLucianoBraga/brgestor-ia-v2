@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -55,7 +55,7 @@ export const AIScanButton: React.FC<AIScanButtonProps> = ({ onScanComplete }) =>
       // Upload to Supabase Storage
       const fileName = `scan-${Date.now()}-${file.name}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('expense-scans')
+        .from('expense_scans')
         .upload(`${currentTenant.id}/${fileName}`, file);
 
       if (uploadError) {
@@ -71,7 +71,7 @@ export const AIScanButton: React.FC<AIScanButtonProps> = ({ onScanComplete }) =>
       });
 
       // Send to AI for analysis
-      const { data, error } = await supabase.functions.invoke('ai-generate', {
+      const { data, error } = await supabase.rpc('ai_generate', {
         body: {
           type: 'chat',
           prompt: `Analise esta imagem de comprovante/nota fiscal e extraia:
@@ -203,3 +203,4 @@ export const AIScanButton: React.FC<AIScanButtonProps> = ({ onScanComplete }) =>
     </>
   );
 };
+

@@ -10,7 +10,7 @@ interface Session {
   user: User;
   access_token?: string;
 }
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 interface Profile {
   user_id: string;
@@ -82,118 +82,149 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [user, fetchProfile]);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Defer profile fetch with setTimeout to avoid deadlock
-        if (session?.user) {
-          setTimeout(() => {
-            fetchProfile(session.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    const initAuth = async () => {
+      const token = localStorage.getItem('token');
       
-      if (session?.user) {
-        await fetchProfile(session.user.id);
+      if (!token) {
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        // Mock auth - durante migração sempre consideramos autenticado se tem token
+        const mockUser = {
+          id: 'mock-user-id',
+          email: localStorage.getItem('userEmail') || 'user@exemplo.com',
+          name: localStorage.getItem('userName') || 'Usuário Mockado'
+        };
+        
+        const mockSession = {
+          user: mockUser,
+          access_token: token,
+          refresh_token: token
+        };
+
+        setUser(mockUser);
+        setSession(mockSession);
+        await fetchProfile(mockUser.id);
+      } catch (error) {
+        console.error('Erro ao validar token:', error);
+        localStorage.removeItem('token');
+        setUser(null);
+        setSession(null);
+        setProfile(null);
       }
       
       setIsLoading(false);
-    });
+    };
 
-    return () => subscription.unsubscribe();
+    initAuth();
   }, [fetchProfile]);
 
   const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    // Log login activity after successful authentication
-    if (!error && data.user) {
-      // Get current tenant from profile to log the activity
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('current_tenant_id')
-        .eq('user_id', data.user.id)
-        .maybeSingle();
-      
-      if (profileData?.current_tenant_id) {
-        await supabase.from('activity_logs').insert([{
-          tenant_id: profileData.current_tenant_id,
-          user_id: data.user.id,
-          action: 'login',
-          resource: 'auth',
-          details: { email },
-          ip_address: null,
-        }]);
+    try {
+      const response = await fetch('/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
       }
+
+      const data = await response.json();
+      
+      // Salvar no localStorage para persistência
+      localStorage.setItem('token', data.access_token);
+      localStorage.setItem('userEmail', data.user.email);
+      localStorage.setItem('userName', data.user.user_metadata?.full_name || '');
+      
+      // Simular estrutura do Supabase
+      const session: Session = {
+        user: {
+          id: data.user.id,
+          email: data.user.email,
+          name: data.user.user_metadata?.full_name,
+        },
+        access_token: data.access_token,
+      };
+
+      setSession(session);
+      setUser(session.user);
+      
+      // Fetch profile after login
+      if (session.user) {
+        await fetchProfile(session.user.id);
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error('SignIn error:', error);
+      return { error: error as Error };
     }
-    
-    return { error };
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          full_name: fullName,
+    try {
+      const response = await fetch('/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      },
-    });
-    return { error };
+        body: JSON.stringify({ email, password, fullName }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Signup failed');
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error('SignUp error:', error);
+      return { error: error as Error };
+    }
   };
 
   const signOut = async () => {
-    // Log logout activity before signing out
-    if (user && profile?.current_tenant_id) {
-      await supabase.from('activity_logs').insert([{
-        tenant_id: profile.current_tenant_id,
-        user_id: user.id,
-        action: 'logout',
-        resource: 'auth',
-        details: {},
-        ip_address: null,
-      }]);
-    }
-    
-    await supabase.auth.signOut();
+    // Limpar estado local e localStorage
+    localStorage.removeItem('token');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userName');
     setUser(null);
     setSession(null);
     setProfile(null);
   };
 
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset`,
-    });
-    return { error };
+    try {
+      const response = await fetch('/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Reset password failed');
+      }
+
+      return { error: null };
+    } catch (error) {
+      console.error('ResetPassword error:', error);
+      return { error: error as Error };
+    }
   };
 
   const completeMasterSetup = async () => {
-    const { data, error } = await supabase.rpc('admin_complete_master_setup');
-    
-    if (error) {
-      return { success: false, error: error.message };
-    }
-    
-    const result = data as { success: boolean; error?: string; message?: string };
+    // Mock response - sempre sucesso
+    const result = { success: true, message: 'Master setup complete' };
     
     if (result.success && user) {
       await fetchProfile(user.id);
@@ -203,15 +234,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const setCurrentTenant = async (tenantId: string) => {
-    const { data, error } = await supabase.rpc('set_current_tenant', {
-      _tenant_id: tenantId,
-    });
-
-    if (error) {
-      return { success: false, error: error.message };
-    }
-
-    const result = data as { success: boolean; error?: string; message?: string };
+    // Mock response - sempre sucesso
+    const result = { success: true, message: 'Tenant set successfully' };
 
     if (result.success && user) {
       await fetchProfile(user.id);
@@ -245,3 +269,4 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

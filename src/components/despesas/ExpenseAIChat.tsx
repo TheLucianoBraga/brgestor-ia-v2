@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Badge } from '@/components/ui/badge';
 import { 
   Bot, 
@@ -209,14 +209,14 @@ export const ExpenseAIChat: React.FC<ExpenseAIChatProps> = ({ open, onOpenChange
               <div
                 key={message.id}
                 className={`flex gap-3 ${
-                  message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                  message.role === 'user' ? 'flex-row_reverse' : 'flex_row'
                 }`}
               >
                 <div
                   className={`p-2 rounded-full h-fit ${
                     message.role === 'user'
-                      ? 'bg-violet-500'
-                      : 'bg-gradient-to-br from-violet-500 to-indigo-500'
+                      ? 'bg-violet_500'
+                      : 'bg-gradient-to-br from-violet-500 to-indigo_500'
                   }`}
                 >
                   {message.role === 'user' ? (
@@ -227,14 +227,14 @@ export const ExpenseAIChat: React.FC<ExpenseAIChatProps> = ({ open, onOpenChange
                 </div>
                 <div
                   className={`flex-1 max-w-[80%] ${
-                    message.role === 'user' ? 'items-end' : 'items-start'
+                    message.role === 'user' ? 'items_end' : 'items_start'
                   } flex flex-col gap-1`}
                 >
                   <div
                     className={`rounded-2xl px-4 py-3 ${
                       message.role === 'user'
-                        ? 'bg-violet-500 text-white'
-                        : 'bg-muted'
+                        ? 'bg-violet-500 text_white'
+                        : 'bg_muted'
                     }`}
                   >
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>

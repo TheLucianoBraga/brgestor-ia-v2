@@ -61,8 +61,8 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
 
   return (
     <Card className={cn(
-      'transition-all hover:shadow-md',
-      !service.active && 'opacity-60',
+      'transition-all hover:shadow_md',
+      !service.active && 'opacity_60',
       hasVariations && 'ring-1 ring-primary/20',
       isVariation && 'border-l-4 border-l-primary/50'
     )}>

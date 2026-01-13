@@ -5,7 +5,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { useTheme } from '@/contexts/ThemeContext';
 
 export function ThemeToggle() {
@@ -26,21 +26,21 @@ export function ThemeToggle() {
       <DropdownMenuContent align="end" className="bg-popover border-border z-50">
         <DropdownMenuItem 
           onClick={() => setTheme('light')}
-          className={theme === 'light' ? 'bg-accent' : ''}
+          className={theme === 'light' ? 'bg_accent' : ''}
         >
           <Sun className="mr-2 h-4 w-4" />
           Claro
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => setTheme('dark')}
-          className={theme === 'dark' ? 'bg-accent' : ''}
+          className={theme === 'dark' ? 'bg_accent' : ''}
         >
           <Moon className="mr-2 h-4 w-4" />
           Escuro
         </DropdownMenuItem>
         <DropdownMenuItem 
           onClick={() => setTheme('system')}
-          className={theme === 'system' ? 'bg-accent' : ''}
+          className={theme === 'system' ? 'bg_accent' : ''}
         >
           <Monitor className="mr-2 h-4 w-4" />
           Sistema

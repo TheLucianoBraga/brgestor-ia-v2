@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -342,7 +342,7 @@ export const CustomerDetailsDrawer: React.FC<CustomerDetailsDrawerProps> = ({
       pending: { variant: 'secondary', label: 'Pendente', className: 'bg-amber-500/20 text-amber-400 border-amber-500/30' },
       paid: { variant: 'default', label: 'Pago', className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
       overdue: { variant: 'destructive', label: 'Vencido', className: 'bg-red-500/20 text-red-400 border-red-500/30' },
-      cancelled: { variant: 'outline', label: 'Cancelado', className: 'bg-muted text-muted-foreground' },
+      cancelled: { variant: 'outline', label: 'Cancelado', className: 'bg-muted text-muted_foreground' },
     };
     const config = variants[status] || variants.pending;
     return (
@@ -369,7 +369,7 @@ export const CustomerDetailsDrawer: React.FC<CustomerDetailsDrawerProps> = ({
                 <SheetTitle className="text-xl">{customer.full_name}</SheetTitle>
                 <p className="text-sm text-muted-foreground">{customer.whatsapp} • {customer.email}</p>
               </div>
-              <Badge variant={customer.status === 'active' ? 'default' : 'secondary'} className={customer.status === 'active' ? 'bg-emerald-500/20 text-emerald-400' : ''}>
+              <Badge variant={customer.status === 'active' ? 'default' : 'secondary'} className={customer.status === 'active' ? 'bg-emerald-500/20 text-emerald_400' : ''}>
                 {customer.status === 'active' ? 'Ativo' : 'Inativo'}
               </Badge>
             </div>

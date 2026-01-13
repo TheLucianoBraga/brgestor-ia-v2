@@ -156,19 +156,19 @@ export function AIControlPanel() {
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${executiveMode ? 'bg-green-500' : 'bg-gray-300'}`} />
+              <div className={`w-2 h-2 rounded-full ${executiveMode ? 'bg-green_500' : 'bg-gray_300'}`} />
               <span>Modo Executivo</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${proactiveSuggestions ? 'bg-green-500' : 'bg-gray-300'}`} />
+              <div className={`w-2 h-2 rounded-full ${proactiveSuggestions ? 'bg-green_500' : 'bg-gray_300'}`} />
               <span>Sugestões Proativas</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${backgroundAnalysis ? 'bg-green-500' : 'bg-gray-300'}`} />
+              <div className={`w-2 h-2 rounded-full ${backgroundAnalysis ? 'bg-green_500' : 'bg-gray_300'}`} />
               <span>Análise em Background</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${learningEnabled ? 'bg-green-500' : 'bg-gray-300'}`} />
+              <div className={`w-2 h-2 rounded-full ${learningEnabled ? 'bg-green_500' : 'bg-gray_300'}`} />
               <span>Aprendizado Ativo</span>
             </div>
           </div>

@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Badge } from '@/components/ui/badge';
 import { useTemplates, TEMPLATE_TYPES, processTemplateVariables } from '@/hooks/useTemplates';
 import { format, differenceInDays } from 'date-fns';

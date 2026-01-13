@@ -112,7 +112,7 @@ const Logs: React.FC = () => {
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `logs-${format(new Date(), 'yyyy-MM-dd-HHmmss')}.csv`;
+    link.download = `logs-${format(new Date(), 'yyyy-MM-dd_HHmmss')}.csv`;
     link.click();
   };
 
@@ -140,7 +140,7 @@ const Logs: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className={hasActiveFilters ? 'border-primary' : ''}
+              className={hasActiveFilters ? 'border_primary' : ''}
             >
               <Filter className="h-4 w-4 mr-2" />
               Filtros

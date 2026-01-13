@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { logActivityDirect } from '@/hooks/useActivityLog';
@@ -20,7 +20,7 @@ export const useTenantSettings = () => {
   const queryClient = useQueryClient();
 
   const { data: settings, isLoading } = useQuery({
-    queryKey: ['tenant-settings', currentTenant?.id],
+    queryKey: ['tenant_settings', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return {};
       
@@ -68,7 +68,7 @@ export const useTenantSettings = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-settings', currentTenant?.id] });
+      queryClient.invalidateQueries({ queryKey: ['tenant_settings', currentTenant?.id] });
     },
     onError: (error) => {
       console.error('Error updating setting:', error);
@@ -93,7 +93,7 @@ export const useTenantSettings = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-settings', currentTenant?.id] });
+      queryClient.invalidateQueries({ queryKey: ['tenant_settings', currentTenant?.id] });
       // Removed toast - callers should show their own toast if needed
     },
     onError: (error) => {
@@ -120,7 +120,7 @@ export const useTenantSettings = () => {
       if (error) throw error;
     },
     onSuccess: (_, updatedSettings) => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-settings', currentTenant?.id] });
+      queryClient.invalidateQueries({ queryKey: ['tenant_settings', currentTenant?.id] });
       toast.success('Configurações salvas com sucesso');
       if (currentTenant?.id) {
         logActivityDirect(currentTenant.id, user?.id || null, 'config_change', 'config', {
@@ -147,3 +147,4 @@ export const useTenantSettings = () => {
     updateMultipleSettingsWithToast,
   };
 };
+

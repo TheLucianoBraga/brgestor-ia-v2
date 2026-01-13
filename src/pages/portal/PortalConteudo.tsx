@@ -30,8 +30,8 @@ export default function PortalConteudo() {
 
   const filteredPosts = posts
     .filter(post => 
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.content.toLowerCase().includes(searchQuery.toLowerCase())
+      (post.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (post.content || '').toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
       // Prioritize featured posts

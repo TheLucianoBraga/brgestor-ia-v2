@@ -20,7 +20,7 @@ const ResetPassword: React.FC = () => {
     e.preventDefault();
     
     if (!email) {
-      toast.error('Informe seu e-mail');
+      toast.error('Informe seu e_mail');
       return;
     }
 

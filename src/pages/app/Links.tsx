@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTenant } from '@/contexts/TenantContext';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -52,7 +52,7 @@ const Links: React.FC = () => {
 
   // Buscar domínio customizado das configurações do tenant
   const { data: customDomain } = useQuery({
-    queryKey: ['tenant-custom-domain', currentTenant?.id],
+    queryKey: ['tenant-custom_domain', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
       
@@ -71,7 +71,7 @@ const Links: React.FC = () => {
 
   // Buscar ou criar código único do tenant
   const { data: refCode, isLoading: isLoadingCode } = useQuery({
-    queryKey: ['tenant-ref-code', currentTenant?.id],
+    queryKey: ['tenant-ref_code', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
       
@@ -108,7 +108,7 @@ const Links: React.FC = () => {
 
   // Buscar histórico de indicações
   const { data: history, isLoading: isLoadingHistory } = useQuery({
-    queryKey: ['referral-history-simple', currentTenant?.id],
+    queryKey: ['referral-history_simple', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
       
@@ -222,7 +222,7 @@ const Links: React.FC = () => {
       />
 
       {/* Links Específicos */}
-      <div className={`grid gap-4 ${canSeeRevendaLink ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
+      <div className={`grid gap-4 ${canSeeRevendaLink ? 'md:grid-cols_2' : 'md:grid-cols_1'}`}>
         {/* Link Cliente - Visível para todos */}
         <Card className="bg-card border-border">
           <CardHeader className="pb-3">

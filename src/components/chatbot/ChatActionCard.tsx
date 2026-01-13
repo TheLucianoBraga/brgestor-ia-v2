@@ -43,7 +43,7 @@ export function ChatActionCard({ action, onExecute }: ChatActionCardProps) {
           title: 'Gerar PIX',
           description: 'Clique para gerar o código PIX para pagamento',
           buttonText: 'Gerar PIX',
-          color: 'text-green-600',
+          color: 'text-green_600',
           bgColor: 'bg-green-50 dark:bg-green-950/30'
         };
       case 'show_plans':
@@ -52,7 +52,7 @@ export function ChatActionCard({ action, onExecute }: ChatActionCardProps) {
           title: 'Planos Disponíveis',
           description: 'Veja os planos disponíveis para upgrade',
           buttonText: 'Ver Planos',
-          color: 'text-blue-600',
+          color: 'text-blue_600',
           bgColor: 'bg-blue-50 dark:bg-blue-950/30'
         };
       case 'create_ticket':
@@ -61,7 +61,7 @@ export function ChatActionCard({ action, onExecute }: ChatActionCardProps) {
           title: 'Abrir Ticket de Suporte',
           description: action.payload.subject || 'Criar ticket de suporte',
           buttonText: 'Criar Ticket',
-          color: 'text-orange-600',
+          color: 'text-orange_600',
           bgColor: 'bg-orange-50 dark:bg-orange-950/30'
         };
       case 'transfer_human':
@@ -70,7 +70,7 @@ export function ChatActionCard({ action, onExecute }: ChatActionCardProps) {
           title: 'Falar com Atendente',
           description: 'Transferir para atendimento humano via WhatsApp',
           buttonText: 'Abrir WhatsApp',
-          color: 'text-purple-600',
+          color: 'text-purple_600',
           bgColor: 'bg-purple-50 dark:bg-purple-950/30'
         };
       case 'show_services':
@@ -79,7 +79,7 @@ export function ChatActionCard({ action, onExecute }: ChatActionCardProps) {
           title: 'Seus Serviços',
           description: 'Visualize seus serviços ativos',
           buttonText: 'Ver Serviços',
-          color: 'text-cyan-600',
+          color: 'text-cyan_600',
           bgColor: 'bg-cyan-50 dark:bg-cyan-950/30'
         };
       case 'show_charges':
@@ -88,7 +88,7 @@ export function ChatActionCard({ action, onExecute }: ChatActionCardProps) {
           title: 'Suas Faturas',
           description: 'Visualize suas faturas pendentes',
           buttonText: 'Ver Faturas',
-          color: 'text-amber-600',
+          color: 'text-amber_600',
           bgColor: 'bg-amber-50 dark:bg-amber-950/30'
         };
       default:
@@ -97,7 +97,7 @@ export function ChatActionCard({ action, onExecute }: ChatActionCardProps) {
           title: 'Ação',
           description: 'Executar ação',
           buttonText: 'Executar',
-          color: 'text-gray-600',
+          color: 'text-gray_600',
           bgColor: 'bg-gray-50 dark:bg-gray-950/30'
         };
     }
@@ -170,10 +170,10 @@ interface ServiceCardProps {
 export function ServiceCard({ service }: ServiceCardProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'expired': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+      case 'active': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green_200';
+      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow_200';
+      case 'expired': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red_200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray_200';
     }
   };
 

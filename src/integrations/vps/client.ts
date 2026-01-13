@@ -53,7 +53,7 @@ class QueryBuilder {
       const url = `${this.baseURL}/rest/v1/${this.tableName}?${this.queryParams.toString()}`;
       
       const headers: Record<string, string> = {
-        'Content-Type': 'application/json',
+        'Content_Type': 'application/json',
         'Prefer': 'return=representation',
       };
 
@@ -274,7 +274,7 @@ class BRGestorAPIClient {
     const url = `${this.baseURL}${endpoint}`;
     
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      'Content_Type': 'application/json',
       ...(options.headers as Record<string, string> || {})
     };
 
@@ -392,7 +392,7 @@ class BRGestorAPIClient {
 
     resetPasswordForEmail: async (email: string, options?: { redirectTo?: string }): Promise<{ data: any; error: Error | null }> => {
       try {
-        await this.request('/auth/reset-password', {
+        await this.request('/auth/reset_password', {
           method: 'POST',
           body: JSON.stringify({ email, redirectTo: options?.redirectTo })
         });

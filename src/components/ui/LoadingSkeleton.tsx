@@ -15,16 +15,16 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({
   const baseClasses = 'animate-pulse-soft bg-muted rounded';
 
   const variants = {
-    text: 'h-4 w-full',
-    card: 'h-32 w-full rounded-lg',
-    avatar: 'h-10 w-10 rounded-full',
-    button: 'h-10 w-24 rounded-md',
-    table: 'h-12 w-full',
-    chart: 'h-64 w-full rounded-lg',
+    text: 'h-4 w_full',
+    card: 'h-32 w-full rounded_lg',
+    avatar: 'h-10 w-10 rounded_full',
+    button: 'h-10 w-24 rounded_md',
+    table: 'h-12 w_full',
+    chart: 'h-64 w-full rounded_lg',
   };
 
   return (
-    <div className={cn('space-y-3', className)} role="status" aria-label="Carregando...">
+    <div className={cn('space-y_3', className)} role="status" aria-label="Carregando...">
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className={cn(baseClasses, variants[variant])} />
       ))}

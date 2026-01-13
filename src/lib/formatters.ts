@@ -3,13 +3,15 @@
  * Fonte única de verdade para formatação de valores no sistema
  */
 
+import { normalizeLanguageTag } from './locale';
+
 /**
  * Formata valor numérico para moeda brasileira (BRL)
  * @param value - Valor numérico
  * @param showSymbol - Se deve exibir o símbolo R$ (default: true)
  */
 export const formatCurrency = (value: number, showSymbol = true): string => {
-  const formatted = new Intl.NumberFormat('pt-BR', {
+  const formatted = new Intl.NumberFormat(normalizeLanguageTag(), {
     style: 'currency',
     currency: 'BRL',
   }).format(value);
@@ -35,7 +37,7 @@ export const formatCurrencyIntl = (value: number, currency: string = 'brl'): str
     gbp: 'GBP',
   };
   
-  return new Intl.NumberFormat('pt-BR', {
+  return new Intl.NumberFormat(normalizeLanguageTag(), {
     style: 'currency',
     currency: currencyMap[currency.toLowerCase()] || 'BRL',
   }).format(value);
@@ -50,18 +52,18 @@ export const formatDate = (date: string | Date, includeTime = false): string => 
   const d = typeof date === 'string' ? new Date(date) : date;
   
   if (includeTime) {
-    return d.toLocaleString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
+    return d.toLocaleString(normalizeLanguageTag(), {
+      day: '2_digit',
+      month: '2_digit',
       year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: '2_digit',
+      minute: '2_digit',
     });
   }
   
-  return d.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
+  return d.toLocaleDateString(normalizeLanguageTag(), {
+    day: '2_digit',
+    month: '2_digit',
     year: 'numeric',
   });
 };
@@ -146,5 +148,5 @@ export const formatPercent = (value: number, decimals = 0): string => {
  * Formata número com separador de milhar
  */
 export const formatNumber = (value: number): string => {
-  return new Intl.NumberFormat('pt-BR').format(value);
+  return new Intl.NumberFormat(normalizeLanguageTag()).format(value);
 };

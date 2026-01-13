@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -60,7 +60,7 @@ export const useCustomerApproval = () => {
 
       // Se tiver imagem, enviar imagem com legenda
       if (imageUrl) {
-        await supabase.functions.invoke('waha-api', {
+        await supabase.rpc('waha_api', {
           body: {
             tenantId: currentTenant.id,
             action: 'sendImage',
@@ -73,7 +73,7 @@ export const useCustomerApproval = () => {
         });
       } else {
         // Enviar apenas texto
-        await supabase.functions.invoke('waha-api', {
+        await supabase.rpc('waha_api', {
           body: {
             tenantId: currentTenant.id,
             action: 'sendText',
@@ -160,7 +160,7 @@ export const useCustomerApproval = () => {
         return;
       }
 
-      queryClient.invalidateQueries({ queryKey: ['customer-services'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_services'] });
       queryClient.invalidateQueries({ queryKey: ['subscriptions'] });
       toast.success('Serviço assinado com sucesso!');
 
@@ -209,3 +209,4 @@ export const useCustomerApproval = () => {
     subscribeToService,
   };
 };
+

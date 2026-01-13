@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 import { useTenant } from '@/contexts/TenantContext';
 
@@ -42,7 +42,7 @@ export const useChargeSchedules = () => {
   const { currentTenant } = useTenant();
 
   const schedulesQuery = useQuery({
-    queryKey: ['charge-schedules', currentTenant?.id],
+    queryKey: ['charge_schedules', currentTenant?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('charge_schedules')
@@ -60,7 +60,7 @@ export const useChargeSchedules = () => {
   });
 
   const pendingSchedulesQuery = useQuery({
-    queryKey: ['charge-schedules-pending', currentTenant?.id],
+    queryKey: ['charge-schedules_pending', currentTenant?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('charge_schedules')
@@ -88,7 +88,7 @@ export const useChargeSchedules = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['charge-schedules'] });
+      queryClient.invalidateQueries({ queryKey: ['charge_schedules'] });
     },
     onError: (error: Error) => {
       console.error('Erro ao criar agendamento:', error);
@@ -111,7 +111,7 @@ export const useChargeSchedules = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['charge-schedules'] });
+      queryClient.invalidateQueries({ queryKey: ['charge_schedules'] });
     },
     onError: (error: Error) => {
       console.error('Erro ao criar agendamentos:', error);
@@ -128,7 +128,7 @@ export const useChargeSchedules = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['charge-schedules'] });
+      queryClient.invalidateQueries({ queryKey: ['charge_schedules'] });
       toast.success('Agendamento cancelado');
     },
     onError: (error: Error) => {
@@ -146,7 +146,7 @@ export const useChargeSchedules = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['charge-schedules'] });
+      queryClient.invalidateQueries({ queryKey: ['charge_schedules'] });
       toast.success('Agendamento excluído');
     },
     onError: (error: Error) => {
@@ -168,7 +168,7 @@ export const useChargeSchedules = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['charge-schedules'] });
+      queryClient.invalidateQueries({ queryKey: ['charge_schedules'] });
       toast.success('Cobrança reagendada para reenvio!');
     },
     onError: (error: Error) => {
@@ -212,3 +212,4 @@ export const useChargeSchedules = () => {
     getCustomerScheduleStatus,
   };
 };
+

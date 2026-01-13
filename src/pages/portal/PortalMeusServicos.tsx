@@ -225,7 +225,7 @@ const PortalMeusServicos: React.FC = () => {
                         </div>
                         <div className="space-y-1">
                           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Expiração</p>
-                          <p className={cn("text-sm font-semibold flex items-center gap-1.5", nearExpiration ? 'text-amber-500' : '')}>
+                          <p className={cn("text-sm font-semibold flex items-center gap-1.5", nearExpiration ? 'text-amber_500' : '')}>
                             {getExpirationDisplay(item)}
                             {nearExpiration && <AlertTriangle className="w-4 h-4" />}
                           </p>

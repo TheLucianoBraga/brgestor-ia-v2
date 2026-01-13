@@ -16,7 +16,7 @@ import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { toast } from 'sonner';
 import { CurrencyInput } from '@/components/ui/currency-input';
 import { SYSTEM_FEATURES } from '@/data/systemFeatures';
@@ -535,7 +535,7 @@ export const GestaoPlanoModal: React.FC<GestaoPlanoModalProps> = ({
                               className="flex items-center gap-2 flex-1 cursor-pointer"
                               onClick={() => toggleCategoryExpand(category.id)}
                             >
-                              <Icon className={cn('w-4 h-4', category.color)} />
+                              <Icon className={cn('w-4 h_4', category.color)} />
                               <span className="font-medium text-sm flex-1">{category.name}</span>
                               {selectedCount > 0 && (
                                 <Badge variant="secondary" className="text-xs">
@@ -597,7 +597,7 @@ export const GestaoPlanoModal: React.FC<GestaoPlanoModalProps> = ({
                                             <div
                                               key={feature.name}
                                               className={cn(
-                                                'flex items-center gap-2 p-1.5 rounded transition-colors',
+                                                'flex items-center gap-2 p-1.5 rounded transition_colors',
                                                 isSelected ? 'bg-primary/10' : 'hover:bg-muted/20'
                                               )}
                                             >

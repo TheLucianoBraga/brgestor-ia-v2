@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { 
   referralService, 
   ReferralLink, 
@@ -35,7 +35,7 @@ export function useReferral(customerId: string | undefined, options?: UseReferra
 
   // Query key baseado no tipo de busca
   const queryKey = byTenantId 
-    ? ['referral-by-tenant', customerId] 
+    ? ['referral-by_tenant', customerId] 
     : ['referral', customerId, tenantId];
 
   // ========== Query: Buscar Referral Link ==========
@@ -54,7 +54,7 @@ export function useReferral(customerId: string | undefined, options?: UseReferra
 
   // ========== Query: Buscar Clientes Indicados ==========
   const referredUsersQuery = useQuery({
-    queryKey: ['referred-users', referralLinkQuery.data?.id],
+    queryKey: ['referred_users', referralLinkQuery.data?.id],
     queryFn: async (): Promise<ReferredCustomer[]> => {
       if (!referralLinkQuery.data?.id) return [];
       return referralService.getReferredUsers(referralLinkQuery.data.id);
@@ -64,7 +64,7 @@ export function useReferral(customerId: string | undefined, options?: UseReferra
 
   // ========== Query: Buscar Transações ==========
   const transactionsQuery = useQuery({
-    queryKey: ['referral-transactions', referralLinkQuery.data?.id],
+    queryKey: ['referral_transactions', referralLinkQuery.data?.id],
     queryFn: async (): Promise<ReferralTransaction[]> => {
       if (!referralLinkQuery.data?.id) return [];
       return referralService.getTransactions(referralLinkQuery.data.id);
@@ -131,12 +131,12 @@ export function useReferral(customerId: string | undefined, options?: UseReferra
   // ========== Helper: Invalidar todas as queries ==========
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ['referral'] });
-    queryClient.invalidateQueries({ queryKey: ['referral-by-tenant'] });
-    queryClient.invalidateQueries({ queryKey: ['referred-users'] });
-    queryClient.invalidateQueries({ queryKey: ['referral-transactions'] });
+    queryClient.invalidateQueries({ queryKey: ['referral-by_tenant'] });
+    queryClient.invalidateQueries({ queryKey: ['referred_users'] });
+    queryClient.invalidateQueries({ queryKey: ['referral_transactions'] });
     // Compatibilidade com queries antigas
-    queryClient.invalidateQueries({ queryKey: ['customer-referral-link'] });
-    queryClient.invalidateQueries({ queryKey: ['cliente-referral-link'] });
+    queryClient.invalidateQueries({ queryKey: ['customer-referral_link'] });
+    queryClient.invalidateQueries({ queryKey: ['cliente-referral_link'] });
   };
 
   // ========== Realtime Subscription ==========
@@ -198,3 +198,4 @@ export function useReferral(customerId: string | undefined, options?: UseReferra
 // Re-export types for convenience
 export type { ReferralLink, ReferredCustomer, ReferralTransaction, ReferralStats } from '@/services/referralService';
 export { MIN_PAYOUT_AMOUNT } from '@/services/referralService';
+

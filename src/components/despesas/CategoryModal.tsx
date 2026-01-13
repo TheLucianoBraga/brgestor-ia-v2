@@ -50,7 +50,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
   home: Home,
   car: Car,
   briefcase: Briefcase,
-  'shopping-cart': ShoppingCart,
+  'shopping_cart': ShoppingCart,
   utensils: Utensils,
   heart: Heart,
   book: Book,
@@ -139,7 +139,7 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                   type="button"
                   onClick={() => setColor(c)}
                   className={`w-8 h-8 rounded-full transition-all ${
-                    color === c ? 'ring-2 ring-offset-2 ring-primary scale-110' : ''
+                    color === c ? 'ring-2 ring-offset-2 ring-primary scale_110' : ''
                   }`}
                   style={{ backgroundColor: c }}
                 />
@@ -159,8 +159,8 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                     onClick={() => setIcon(i)}
                     className={`p-2 rounded-lg border transition-all ${
                       icon === i
-                        ? 'border-primary bg-primary/10 text-primary'
-                        : 'border-border hover:bg-muted'
+                        ? 'border-primary bg-primary/10 text_primary'
+                        : 'border-border hover:bg_muted'
                     }`}
                   >
                     <IconComponent className="w-5 h-5" />

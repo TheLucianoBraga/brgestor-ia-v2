@@ -38,7 +38,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import {
   Table,
   TableBody,
@@ -53,7 +53,7 @@ import { usePlans } from '@/hooks/usePlans';
 import { useTenant } from '@/contexts/TenantContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { ManagePlanModal } from '@/components/gestao/ManagePlanModal';
 import { EditTenantModal } from '@/components/gestao/EditTenantModal';
 import { ChangePasswordModal } from '@/components/gestao/ChangePasswordModal';
@@ -140,7 +140,7 @@ const GestaoRevendas: React.FC = () => {
 
   // Fetch all users from child tenants - Otimizado com Promise.all
   const { data: allUsers = [], isLoading: isLoadingUsers } = useQuery({
-    queryKey: ['all-tenant-users', currentTenant?.id, children.length],
+    queryKey: ['all-tenant_users', currentTenant?.id, children.length],
     queryFn: async () => {
       if (!currentTenant?.id || children.length === 0) return [];
       
@@ -209,7 +209,7 @@ const GestaoRevendas: React.FC = () => {
 
   // Fetch user counts per tenant (excluding owners)
   const { data: tenantUserCounts = {} } = useQuery({
-    queryKey: ['tenant-user-counts', currentTenant?.id],
+    queryKey: ['tenant-user_counts', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return {};
       
@@ -240,7 +240,7 @@ const GestaoRevendas: React.FC = () => {
 
   // Fetch real customer counts per tenant from customers table
   const { data: tenantCustomerCounts = {} } = useQuery({
-    queryKey: ['tenant-customer-counts', currentTenant?.id],
+    queryKey: ['tenant-customer_counts', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return {};
       
@@ -1184,7 +1184,7 @@ const GestaoRevendas: React.FC = () => {
                       <TableCell>
                         <Badge className={plan.active 
                           ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                          : 'bg-muted/50 text-muted-foreground'
+                          : 'bg-muted/50 text-muted_foreground'
                         }>
                           {plan.active ? 'Ativo' : 'Inativo'}
                         </Badge>
@@ -1472,3 +1472,4 @@ const GestaoRevendas: React.FC = () => {
 };
 
 export default GestaoRevendas;
+

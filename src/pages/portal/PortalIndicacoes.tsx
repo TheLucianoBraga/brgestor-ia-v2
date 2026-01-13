@@ -308,8 +308,8 @@ export default function PortalIndicacoes() {
                         <Badge 
                           variant={user.status === 'paid' ? 'default' : 'secondary'}
                           className={user.status === 'paid' 
-                            ? 'bg-green-100 text-green-800 hover:bg-green-100' 
-                            : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
+                            ? 'bg-green-100 text-green-800 hover:bg-green_100' 
+                            : 'bg-yellow-100 text-yellow-800 hover:bg-yellow_100'
                           }
                         >
                           {user.status === 'paid' ? 'Pago' : 'Pendente'}

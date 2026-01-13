@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -32,8 +32,8 @@ export interface TemplateInsert {
 
 export const TEMPLATE_CHANNELS = [
   { value: 'whatsapp', label: 'WhatsApp', icon: 'MessageCircle' },
-  { value: 'email', label: 'E-mail', icon: 'Mail' },
-  { value: 'in_app', label: 'In-App', icon: 'Bell' },
+  { value: 'email', label: 'E_mail', icon: 'Mail' },
+  { value: 'in_app', label: 'In_App', icon: 'Bell' },
 ] as const;
 
 export interface TemplateUpdate extends Partial<TemplateInsert> {
@@ -45,7 +45,7 @@ export const TEMPLATE_TYPES = [
   { value: 'vence_hoje', label: 'Vencimento Hoje' },
   { value: 'apos_vencimento', label: 'Após Vencimento' },
   { value: 'cobranca', label: 'Cobrança' },
-  { value: 'boas_vindas', label: 'Boas-vindas' },
+  { value: 'boas_vindas', label: 'Boas_vindas' },
   { value: 'cadastro_realizado', label: 'Cadastro Realizado' },
   { value: 'cadastro_aprovado', label: 'Cadastro Aprovado' },
   { value: 'acesso_portal', label: 'Acesso ao Portal' },
@@ -75,11 +75,11 @@ export const TEMPLATE_VARIABLE_CATEGORIES: TemplateVariableCategory[] = [
     variables: [
       { key: '{primeiro_nome}', label: 'Primeiro Nome', example: 'João' },
       { key: '{nome}', label: 'Nome Completo', example: 'João Silva' },
-      { key: '{whatsapp}', label: 'WhatsApp', example: '(11) 99999-9999' },
-      { key: '{whatsapp_secundario}', label: 'WhatsApp 2', example: '(11) 88888-8888' },
-      { key: '{email}', label: 'E-mail', example: 'cliente@email.com' },
-      { key: '{cpf_cnpj}', label: 'CPF/CNPJ', example: '123.456.789-00' },
-      { key: '{rg_ie}', label: 'RG/IE', example: '12.345.678-9' },
+      { key: '{whatsapp}', label: 'WhatsApp', example: '(11) 99999_9999' },
+      { key: '{whatsapp_secundario}', label: 'WhatsApp 2', example: '(11) 88888_8888' },
+      { key: '{email}', label: 'E_mail', example: 'cliente@email.com' },
+      { key: '{cpf_cnpj}', label: 'CPF/CNPJ', example: '123.456.789_00' },
+      { key: '{rg_ie}', label: 'RG/IE', example: '12.345.678_9' },
       { key: '{nascimento}', label: 'Nascimento', example: '15/03/1990' },
       { key: '{genero}', label: 'Gênero', example: 'Masculino' },
       { key: '{senha_portal}', label: 'Senha Portal', example: '******' },
@@ -120,7 +120,7 @@ export const TEMPLATE_VARIABLE_CATEGORIES: TemplateVariableCategory[] = [
     name: 'Endereço',
     icon: 'MapPin',
     variables: [
-      { key: '{cep}', label: 'CEP', example: '01310-100' },
+      { key: '{cep}', label: 'CEP', example: '01310_100' },
       { key: '{rua}', label: 'Rua', example: 'Av. Paulista' },
       { key: '{numero}', label: 'Número', example: '1000' },
       { key: '{complemento}', label: 'Complemento', example: 'Sala 101' },
@@ -133,7 +133,7 @@ export const TEMPLATE_VARIABLE_CATEGORIES: TemplateVariableCategory[] = [
     name: 'Veículo',
     icon: 'Car',
     variables: [
-      { key: '{placa}', label: 'Placa', example: 'ABC-1234' },
+      { key: '{placa}', label: 'Placa', example: 'ABC_1234' },
       { key: '{marca}', label: 'Marca', example: 'Toyota' },
       { key: '{modelo}', label: 'Modelo', example: 'Corolla' },
       { key: '{ano}', label: 'Ano', example: '2023' },
@@ -206,7 +206,7 @@ export const useTemplates = () => {
   const { user } = useAuth();
 
   const templatesQuery = useQuery({
-    queryKey: ['message-templates', currentTenant?.id],
+    queryKey: ['message_templates', currentTenant?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('message_templates')
@@ -234,7 +234,7 @@ export const useTemplates = () => {
       return data;
     },
     onSuccess: (newTemplate) => {
-      queryClient.invalidateQueries({ queryKey: ['message-templates'] });
+      queryClient.invalidateQueries({ queryKey: ['message_templates'] });
       toast.success('Template criado com sucesso!');
       if (currentTenant?.id) {
         logActivityDirect(currentTenant.id, user?.id || null, 'create', 'template', {
@@ -261,7 +261,7 @@ export const useTemplates = () => {
       return data;
     },
     onSuccess: (updatedTemplate) => {
-      queryClient.invalidateQueries({ queryKey: ['message-templates'] });
+      queryClient.invalidateQueries({ queryKey: ['message_templates'] });
       toast.success('Template atualizado com sucesso!');
       if (currentTenant?.id) {
         logActivityDirect(currentTenant.id, user?.id || null, 'update', 'template', {
@@ -285,7 +285,7 @@ export const useTemplates = () => {
       if (error) throw error;
     },
     onSuccess: (_, deletedId) => {
-      queryClient.invalidateQueries({ queryKey: ['message-templates'] });
+      queryClient.invalidateQueries({ queryKey: ['message_templates'] });
       toast.success('Template excluído com sucesso!');
       if (currentTenant?.id) {
         logActivityDirect(currentTenant.id, user?.id || null, 'delete', 'template', {
@@ -318,7 +318,7 @@ export const useTemplates = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['message-templates'] });
+      queryClient.invalidateQueries({ queryKey: ['message_templates'] });
       toast.success('Template duplicado com sucesso!');
     },
     onError: (error: Error) => {
@@ -336,7 +336,7 @@ export const useTemplates = () => {
       if (error) throw error;
     },
     onSuccess: (_, { is_active }) => {
-      queryClient.invalidateQueries({ queryKey: ['message-templates'] });
+      queryClient.invalidateQueries({ queryKey: ['message_templates'] });
       toast.success(is_active ? 'Template ativado!' : 'Template desativado!');
     },
     onError: (error: Error) => {
@@ -354,3 +354,4 @@ export const useTemplates = () => {
     toggleActive,
   };
 };
+

@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 import { useTenant } from '@/contexts/TenantContext';
 
@@ -47,7 +47,7 @@ export function GroupScheduleModal({ open, onOpenChange, groupId, groupName, wah
     
     setIsImproving(true);
     try {
-      const { data, error } = await supabase.functions.invoke('ai-generate', {
+      const { data, error } = await supabase.rpc('ai_generate', {
         body: {
           type: 'improve_text',
           text: message,
@@ -90,13 +90,13 @@ export function GroupScheduleModal({ open, onOpenChange, groupId, groupName, wah
         const filePath = `${currentTenant?.id}/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
-          .from('group-schedules')
+          .from('group_schedules')
           .upload(filePath, file);
 
         if (uploadError) throw uploadError;
 
         const { data: { publicUrl } } = supabase.storage
-          .from('group-schedules')
+          .from('group_schedules')
           .getPublicUrl(filePath);
 
         newUrls.push(publicUrl);
@@ -292,7 +292,7 @@ export function GroupScheduleModal({ open, onOpenChange, groupId, groupName, wah
                 />
                 <Label 
                   htmlFor="file-upload" 
-                  className={`flex items-center justify-center gap-2 p-2 border-2 border-dashed rounded-md cursor-pointer hover:bg-muted transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex items-center justify-center gap-2 p-2 border-2 border-dashed rounded-md cursor-pointer hover:bg-muted transition-colors ${isUploading ? 'opacity-50 cursor-not_allowed' : ''}`}
                 >
                   {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                   <span className="text-xs font-medium">Fazer Upload de Imagens</span>
@@ -331,3 +331,4 @@ export function GroupScheduleModal({ open, onOpenChange, groupId, groupName, wah
     </Dialog>
   );
 }
+

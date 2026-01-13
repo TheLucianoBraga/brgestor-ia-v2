@@ -69,7 +69,7 @@ export const useRevendaTrialNotifications = () => {
         duration: 10000,
         action: {
           label: 'Ver Revendas',
-          onClick: () => navigate('/app/gestao-revendas'),
+          onClick: () => navigate('/app/gestao_revendas'),
         },
       });
     } else if (criticalCount > 0) {
@@ -78,7 +78,7 @@ export const useRevendaTrialNotifications = () => {
         duration: 8000,
         action: {
           label: 'Ver Revendas',
-          onClick: () => navigate('/app/gestao-revendas'),
+          onClick: () => navigate('/app/gestao_revendas'),
         },
       });
     } else if (warningCount > 0) {
@@ -87,7 +87,7 @@ export const useRevendaTrialNotifications = () => {
         duration: 6000,
         action: {
           label: 'Ver Revendas',
-          onClick: () => navigate('/app/gestao-revendas'),
+          onClick: () => navigate('/app/gestao_revendas'),
         },
       });
     }

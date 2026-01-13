@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { RefreshCw, Settings, Users, Save, CalendarClock } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -149,14 +149,12 @@ export function GroupsSection({ tenantId }: GroupsSectionProps) {
     
     try {
       // Primeiro, tentamos buscar os grupos via API
-      const { data, error } = await supabase.functions.invoke('waha-api', {
-        body: { 
+      const { data, error } = await supabase.rpc('waha_api', { 
           action: 'syncGroups', 
           tenantId,
           // Adicionando flag para forçar atualização se necessário
           force: true 
-        }
-      });
+        });
       
       if (error) throw error;
       
@@ -293,7 +291,7 @@ export function GroupsSection({ tenantId }: GroupsSectionProps) {
           onClick={syncGroups}
           disabled={isSyncing}
         >
-          <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate_spin' : ''}`} />
           Sincronizar Grupos
         </Button>
       </div>
@@ -533,3 +531,4 @@ export function GroupsSection({ tenantId }: GroupsSectionProps) {
     </div>
   );
 }
+

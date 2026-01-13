@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, Loader2, RefreshCw, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 
 interface AIInsightsCardProps {
@@ -34,7 +34,7 @@ export const AIInsightsCard: React.FC<AIInsightsCardProps> = ({ metrics, revenue
       
       Responda como um consultor financeiro amigável, destacando o ponto mais importante.`;
 
-      const { data, error } = await supabase.functions.invoke('ai-generate', {
+      const { data, error } = await supabase.rpc('ai_generate', {
         body: {
           type: 'chat',
           prompt,
@@ -103,10 +103,11 @@ export const AIInsightsCard: React.FC<AIInsightsCardProps> = ({ metrics, revenue
             disabled={isLoading}
             className="flex-shrink-0"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate_spin' : ''}`} />
           </Button>
         </div>
       </CardContent>
     </Card>
   );
 };
+

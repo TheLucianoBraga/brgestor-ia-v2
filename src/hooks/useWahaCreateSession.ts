@@ -28,13 +28,14 @@ export function useWahaCreateSession() {
       console.log('✅ User ID:', user.id);
 
       // Obter o token JWT atual
-      const { data: { session } } = await supabase.auth.getSession();
+      // Mock session - durante migração
+      const session = { access_token: localStorage.getItem('token') || 'mock-token' };
       const accessToken = session?.access_token;
       
       console.log('🔑 Token obtido:', accessToken ? 'SIM' : 'NÃO');
 
       // Usar whatsapp-test temporariamente
-      const { data, error } = await supabase.functions.invoke("whatsapp-test", {
+      const { data, error } = await supabase.rpc("whatsapp-test", {
         body: { userId: user.id },
         headers: {
           Authorization: `Bearer ${accessToken}`

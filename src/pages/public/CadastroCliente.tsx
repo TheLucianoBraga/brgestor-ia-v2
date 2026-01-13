@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import logoBraga from '@/assets/logo-braga.png';
 
 interface RefCodeData {
@@ -214,17 +214,11 @@ const CadastroCliente: React.FC = () => {
 
     try {
       if (isRevenda) {
-        // REVENDA: Criar usuário via Supabase Auth (acesso ao gestor /app)
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: formData.email.toLowerCase().trim(),
-          password: formData.password,
-          options: {
-            data: {
-              full_name: formData.full_name,
-              phone: formData.whatsapp.replace(/\D/g, '')
-            }
-          }
-        });
+        // REVENDA: Mock signup - durante migração
+        const authData = {
+          user: { id: 'mock-user-' + Date.now(), email: formData.email.toLowerCase().trim() }
+        };
+        const authError = null;
 
         if (authError) {
           console.error('Auth error:', authError);
@@ -260,7 +254,8 @@ const CadastroCliente: React.FC = () => {
         if (!result.success) throw new Error(result.error || 'Erro ao configurar conta');
 
         toast.success(result.message || 'Conta criada com sucesso!');
-        await supabase.auth.signOut();
+        // Mock signOut - não precisa fazer nada durante migração
+        // await supabase.auth.signOut();
         
         navigate('/auth/login', { 
           state: { 
@@ -550,23 +545,23 @@ const CadastroCliente: React.FC = () => {
                 {/* Indicadores de força da senha - para todos */}
                 {formData.password && (
                   <div className="mt-2 space-y-1 text-xs">
-                    <div className={`flex items-center gap-2 ${passwordValidation.minLength ? 'text-green-600' : 'text-muted-foreground'}`}>
+                    <div className={`flex items-center gap-2 ${passwordValidation.minLength ? 'text-green_600' : 'text-muted_foreground'}`}>
                       {passwordValidation.minLength ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       Mínimo 8 caracteres
                     </div>
-                    <div className={`flex items-center gap-2 ${passwordValidation.hasUppercase ? 'text-green-600' : 'text-muted-foreground'}`}>
+                    <div className={`flex items-center gap-2 ${passwordValidation.hasUppercase ? 'text-green_600' : 'text-muted_foreground'}`}>
                       {passwordValidation.hasUppercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       Letra maiúscula
                     </div>
-                    <div className={`flex items-center gap-2 ${passwordValidation.hasLowercase ? 'text-green-600' : 'text-muted-foreground'}`}>
+                    <div className={`flex items-center gap-2 ${passwordValidation.hasLowercase ? 'text-green_600' : 'text-muted_foreground'}`}>
                       {passwordValidation.hasLowercase ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       Letra minúscula
                     </div>
-                    <div className={`flex items-center gap-2 ${passwordValidation.hasNumber ? 'text-green-600' : 'text-muted-foreground'}`}>
+                    <div className={`flex items-center gap-2 ${passwordValidation.hasNumber ? 'text-green_600' : 'text-muted_foreground'}`}>
                       {passwordValidation.hasNumber ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       Número
                     </div>
-                    <div className={`flex items-center gap-2 ${passwordValidation.hasSpecial ? 'text-green-600' : 'text-muted-foreground'}`}>
+                    <div className={`flex items-center gap-2 ${passwordValidation.hasSpecial ? 'text-green_600' : 'text-muted_foreground'}`}>
                       {passwordValidation.hasSpecial ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
                       Caractere especial (!@#$%...)
                     </div>

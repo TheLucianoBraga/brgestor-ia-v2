@@ -57,7 +57,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { useReports, DateRange } from '@/hooks/useReports';
@@ -74,7 +74,7 @@ const STATUS_COLORS: Record<string, string> = {
   paid: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
   pending: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
   overdue: 'bg-destructive/10 text-destructive border-destructive/20',
-  cancelled: 'bg-muted text-muted-foreground border-muted',
+  cancelled: 'bg-muted text-muted-foreground border_muted',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -161,7 +161,7 @@ const Relatorios: React.FC = () => {
 
   const handleExportExcel = () => {
     exportToExcel(sortedTransactions, transactionColumns, {
-      filename: `relatorio-${format(dateRange.from, 'yyyy-MM-dd')}-${format(dateRange.to, 'yyyy-MM-dd')}`,
+      filename: `relatorio-${format(dateRange.from, 'yyyy-MM_dd')}-${format(dateRange.to, 'yyyy-MM_dd')}`,
       title: 'Relatório Financeiro',
       subtitle: `Período: ${format(dateRange.from, 'dd/MM/yyyy')} a ${format(dateRange.to, 'dd/MM/yyyy')}`
     });
@@ -169,7 +169,7 @@ const Relatorios: React.FC = () => {
 
   const handleExportPDF = () => {
     exportToPDF(sortedTransactions, transactionColumns, {
-      filename: `relatorio-${format(dateRange.from, 'yyyy-MM-dd')}-${format(dateRange.to, 'yyyy-MM-dd')}`,
+      filename: `relatorio-${format(dateRange.from, 'yyyy-MM_dd')}-${format(dateRange.to, 'yyyy-MM_dd')}`,
       title: 'Relatório Financeiro',
       subtitle: `Período: ${format(dateRange.from, 'dd/MM/yyyy')} a ${format(dateRange.to, 'dd/MM/yyyy')} | Receita: ${formatCurrency(metrics?.currentRevenue || 0)} | ${sortedTransactions.length} transações`
     });
@@ -357,7 +357,7 @@ const Relatorios: React.FC = () => {
               ) : (
                 <TrendingDown className="h-3 w-3 text-rose-500 mr-1" />
               )}
-              <span className={safeMetrics.revenueChange >= 0 ? 'text-emerald-500' : 'text-rose-500'}>
+              <span className={safeMetrics.revenueChange >= 0 ? 'text-emerald_500' : 'text-rose_500'}>
                 {safeMetrics.revenueChange >= 0 ? '+' : ''}{safeMetrics.revenueChange.toFixed(1)}%
               </span>
               <span className="ml-1">vs anterior</span>

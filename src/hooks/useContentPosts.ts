@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useCustomerAuth } from '@/contexts/CustomerAuthContext';
 import { toast } from 'sonner';
@@ -36,7 +36,7 @@ export function useContentPosts(category?: string) {
   const queryClient = useQueryClient();
 
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['content-posts', currentTenant?.id, category],
+    queryKey: ['content_posts', currentTenant?.id, category],
     queryFn: async () => {
       let query = supabase
         .from('content_posts')
@@ -57,7 +57,7 @@ export function useContentPosts(category?: string) {
   });
 
   const { data: categories = [] } = useQuery({
-    queryKey: ['content-categories', currentTenant?.id],
+    queryKey: ['content_categories', currentTenant?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('content_posts')
@@ -101,8 +101,8 @@ export function useContentPosts(category?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['content-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['content-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['content_posts'] });
+      queryClient.invalidateQueries({ queryKey: ['content_categories'] });
       toast.success('Conteúdo publicado com sucesso!');
     },
     onError: (error: any) => {
@@ -138,8 +138,8 @@ export function useContentPosts(category?: string) {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['content-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['content-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['content_posts'] });
+      queryClient.invalidateQueries({ queryKey: ['content_categories'] });
       toast.success('Conteúdo atualizado!');
     },
     onError: (error: any) => {
@@ -158,7 +158,7 @@ export function useContentPosts(category?: string) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['content-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['content_posts'] });
       toast.success('Conteúdo removido!');
     },
     onError: (error: any) => {
@@ -176,7 +176,7 @@ export function useContentPosts(category?: string) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['content-posts'] });
+      queryClient.invalidateQueries({ queryKey: ['content_posts'] });
       toast.success('Status atualizado!');
     }
   });
@@ -200,7 +200,7 @@ export function usePortalContent(category?: string) {
   
   // Importamos dinamicamente para evitar circular dependency
   const { data: portalInfo } = useQuery({
-    queryKey: ['portal-customer-info-for-content'],
+    queryKey: ['portal-customer-info-for_content'],
     queryFn: async () => {
       // Se temos customer do CustomerAuth, usamos o tenantId dele (do revendedor)
       if (customer?.tenantId) {
@@ -208,7 +208,8 @@ export function usePortalContent(category?: string) {
       }
       
       // Senão, buscamos via Supabase Auth - precisa achar o parent_tenant_id do cliente
-      const { data: { user } } = await supabase.auth.getUser();
+      // Mock user - durante migração
+      const user = { id: 'mock-user-id' };
       if (!user) return null;
       
       // Buscar o tenant do usuário
@@ -238,7 +239,7 @@ export function usePortalContent(category?: string) {
     : portalInfo?.ownerTenantId;
   
   const { data: posts = [], isLoading } = useQuery({
-    queryKey: ['portal-content', effectiveTenantId, category],
+    queryKey: ['portal_content', effectiveTenantId, category],
     queryFn: async () => {
       if (!effectiveTenantId) {
         console.log('No effectiveTenantId for portal content');
@@ -247,14 +248,12 @@ export function usePortalContent(category?: string) {
       
       try {
         // Buscar diretamente com o tenantId correto (do revendedor/owner)
-        const { data, error } = await supabase.functions.invoke('chat-contextual', {
-          body: {
+        const { data, error } = await supabase.rpc('chat_contextual', {
             action: 'get_portal_content',
             tenantId: effectiveTenantId,
             tenantType: 'cliente',
             category: category === 'all' ? undefined : category
-          }
-        });
+          });
 
         if (error) {
           console.error('Edge Function error:', error);
@@ -284,3 +283,4 @@ export function usePortalContent(category?: string) {
 
   return { posts, categories, isLoading };
 }
+

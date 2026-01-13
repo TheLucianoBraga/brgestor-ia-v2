@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Loader2, Copy, Check, QrCode, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 interface PixPaymentStripeProps {
   amount: number;
@@ -44,7 +44,7 @@ export const PixPaymentStripe: React.FC<PixPaymentStripeProps> = ({
     setErrorMessage(null);
     
     try {
-      const { data, error } = await supabase.functions.invoke('stripe-create-pix', {
+      const { data, error } = await supabase.rpc('ai_create_pix', {
         body: {
           tenantId,
           customerId,
@@ -143,8 +143,8 @@ export const PixPaymentStripe: React.FC<PixPaymentStripeProps> = ({
 
   const formatExpiration = (dateStr: string) => {
     return new Date(dateStr).toLocaleTimeString('pt-BR', {
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: '2_digit',
+      minute: '2_digit',
     });
   };
 
@@ -274,3 +274,4 @@ export const PixPaymentStripe: React.FC<PixPaymentStripeProps> = ({
     </div>
   );
 };
+

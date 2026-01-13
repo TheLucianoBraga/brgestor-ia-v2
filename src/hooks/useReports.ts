@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { startOfDay, endOfDay, subDays, format } from 'date-fns';
 
@@ -70,7 +70,7 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
 
   // Metrics query
   const { data: metrics, isLoading: metricsLoading } = useQuery({
-    queryKey: ['report-metrics', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString()],
+    queryKey: ['report_metrics', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString()],
     queryFn: async (): Promise<ReportMetrics> => {
       if (!tenantId) {
         return {
@@ -246,7 +246,7 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
 
   // Daily revenue query - include customer_items revenue as well
   const { data: dailyRevenue = [], isLoading: dailyLoading } = useQuery({
-    queryKey: ['report-daily-revenue', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString()],
+    queryKey: ['report-daily_revenue', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString()],
     queryFn: async (): Promise<DailyRevenue[]> => {
       if (!tenantId) return [];
 
@@ -274,7 +274,7 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
       // Add charges
       (charges || []).forEach(charge => {
         const dateStr = charge.paid_at || charge.created_at;
-        const date = format(new Date(dateStr), 'yyyy-MM-dd');
+        const date = format(new Date(dateStr), 'yyyy-MM_dd');
         if (!grouped[date]) {
           grouped[date] = { revenue: 0, count: 0 };
         }
@@ -284,7 +284,7 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
 
       // Add items
       (items || []).forEach((item: any) => {
-        const date = format(new Date(item.created_at), 'yyyy-MM-dd');
+        const date = format(new Date(item.created_at), 'yyyy-MM_dd');
         if (!grouped[date]) {
           grouped[date] = { revenue: 0, count: 0 };
         }
@@ -305,7 +305,7 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
 
   // Status distribution query - include customer_items
   const { data: statusDistribution = [], isLoading: statusLoading } = useQuery({
-    queryKey: ['report-status-distribution', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString()],
+    queryKey: ['report-status_distribution', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString()],
     queryFn: async (): Promise<StatusDistribution[]> => {
       if (!tenantId) return [];
 
@@ -367,7 +367,7 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
 
   // Top services query - using customer_items and subscriptions
   const { data: topServices = [], isLoading: servicesLoading } = useQuery({
-    queryKey: ['report-top-services', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString()],
+    queryKey: ['report-top_services', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString()],
     queryFn: async (): Promise<TopService[]> => {
       if (!tenantId) return [];
 
@@ -410,7 +410,7 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
 
   // Transactions query - using customer_charges AND customer_items
   const { data: transactions = [], isLoading: transactionsLoading } = useQuery({
-    queryKey: ['report-transactions', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString(), statusFilter],
+    queryKey: ['report_transactions', tenantId, dateRange.from.toISOString(), dateRange.to.toISOString(), statusFilter],
     queryFn: async (): Promise<Transaction[]> => {
       if (!tenantId) return [];
 
@@ -523,3 +523,4 @@ export const useReports = (dateRange: DateRange, statusFilter: string = 'all') =
     isLoading: metricsLoading || dailyLoading || statusLoading || servicesLoading || transactionsLoading,
   };
 };
+

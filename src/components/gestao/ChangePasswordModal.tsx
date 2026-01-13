@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 
 interface ChangePasswordModalProps {
@@ -131,3 +131,4 @@ export const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
     </Dialog>
   );
 };
+

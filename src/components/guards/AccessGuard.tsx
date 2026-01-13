@@ -17,7 +17,7 @@ export const AccessGuard: React.FC<AccessGuardProps> = ({ children }) => {
 
     if (requiresSubscription && !isRouteAllowed(location.pathname)) {
       toast.warning('Assine um serviço para desbloquear esta funcionalidade', {
-        id: 'access-required',
+        id: 'access_required',
       });
       navigate('/app/servicos', { replace: true });
     }

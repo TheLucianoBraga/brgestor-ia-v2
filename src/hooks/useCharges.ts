@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { logActivityDirect } from '@/hooks/useActivityLog';
@@ -78,7 +78,7 @@ export const useCharges = () => {
     },
     onSuccess: (newCharge) => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança criada com sucesso!');
       if (currentTenant?.id) {
         logActivityDirect(currentTenant.id, user?.id || null, 'create', 'charge', {
@@ -103,7 +103,7 @@ export const useCharges = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança atualizada com sucesso!');
     },
     onError: (error: any) => {
@@ -122,7 +122,7 @@ export const useCharges = () => {
     },
     onSuccess: (_, chargeId) => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança marcada como paga!');
       if (currentTenant?.id) {
         logActivityDirect(currentTenant.id, user?.id || null, 'payment', 'charge', {
@@ -147,7 +147,7 @@ export const useCharges = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança cancelada!');
     },
     onError: (error: any) => {
@@ -162,7 +162,7 @@ export const useCharges = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança excluída com sucesso!');
     },
     onError: (error: any) => {
@@ -191,3 +191,4 @@ export const useCharges = () => {
     deleteCharge,
   };
 };
+

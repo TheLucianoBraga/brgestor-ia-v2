@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 
 export interface ContentVersion {
@@ -20,7 +20,7 @@ export function useContentVersions(postId: string | null) {
   const queryClient = useQueryClient();
 
   const { data: versions = [], isLoading } = useQuery({
-    queryKey: ['content-versions', postId],
+    queryKey: ['content_versions', postId],
     queryFn: async () => {
       if (!postId) return [];
       
@@ -53,8 +53,8 @@ export function useContentVersions(postId: string | null) {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['content-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['content-versions'] });
+      queryClient.invalidateQueries({ queryKey: ['content_posts'] });
+      queryClient.invalidateQueries({ queryKey: ['content_versions'] });
       toast.success('Versão restaurada com sucesso!');
     },
     onError: (error: any) => {
@@ -69,3 +69,4 @@ export function useContentVersions(postId: string | null) {
     isRestoring: restoreVersion.isPending
   };
 }
+

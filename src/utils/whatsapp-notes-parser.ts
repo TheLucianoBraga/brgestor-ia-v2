@@ -8,7 +8,7 @@ export interface ParsedNoteCommand {
 // Command prefixes
 const COMMAND_PREFIXES = {
   create: ['/anotação', '/anotacao', '/nota'],
-  list: ['/listar', '/notas', '/minhas-notas'],
+  list: ['/listar', '/notas', '/minhas_notas'],
   reminder: ['/lembrete', '/lembrar', '/alarme'],
 };
 
@@ -31,16 +31,16 @@ const DATE_PATTERNS = {
     return d;
   },
   segunda: () => getNextWeekday(1),
-  'segunda-feira': () => getNextWeekday(1),
+  'segunda_feira': () => getNextWeekday(1),
   terça: () => getNextWeekday(2),
-  'terça-feira': () => getNextWeekday(2),
+  'terça_feira': () => getNextWeekday(2),
   terca: () => getNextWeekday(2),
   quarta: () => getNextWeekday(3),
-  'quarta-feira': () => getNextWeekday(3),
+  'quarta_feira': () => getNextWeekday(3),
   quinta: () => getNextWeekday(4),
-  'quinta-feira': () => getNextWeekday(4),
+  'quinta_feira': () => getNextWeekday(4),
   sexta: () => getNextWeekday(5),
-  'sexta-feira': () => getNextWeekday(5),
+  'sexta_feira': () => getNextWeekday(5),
   sábado: () => getNextWeekday(6),
   sabado: () => getNextWeekday(6),
   domingo: () => getNextWeekday(0),
@@ -210,8 +210,8 @@ export function formatDateForWhatsApp(date: Date): string {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
+    hour: '2_digit',
+    minute: '2_digit',
   };
   
   return date.toLocaleDateString('pt-BR', options);

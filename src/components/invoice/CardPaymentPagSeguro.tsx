@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { CreditCard, Loader2, Lock } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 interface CardPaymentPagSeguroProps {
   amount: number;
@@ -53,7 +53,7 @@ export const CardPaymentPagSeguro = ({
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('pagseguro-process-card', {
+      const { data, error } = await supabase.rpc('ai_process_card', {
         body: {
           tenant_id: tenantId,
           customer_id: customerId,
@@ -187,3 +187,4 @@ export const CardPaymentPagSeguro = ({
     </Card>
   );
 };
+

@@ -8,7 +8,7 @@ import { useTenantSettings } from '@/hooks/useTenantSettings';
 import { Button } from '@/components/ui/button';
 import { ChatWidget } from '@/components/chatbot/ChatWidget';
 import { PageTransition } from '@/components/ui/PageTransition';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { ThemeToggle } from '@/components/ui/theme_toggle';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { 
   LayoutDashboard, 
@@ -32,7 +32,7 @@ import logoBragaDigital from '@/assets/logo-braga-digital.png';
 const navItems = [
   { path: '/portal/dashboard', label: 'Início', icon: LayoutDashboard },
   { path: '/portal/servicos', label: 'Serviços', icon: ShoppingBag },
-  { path: '/portal/meus-servicos', label: 'Meus Serviços', icon: Package },
+  { path: '/portal/meus_servicos', label: 'Meus Serviços', icon: Package },
   { path: '/portal/conteudo', label: 'Conteúdo', icon: Newspaper },
   { path: '/portal/indicacoes', label: 'Indicações', icon: Users },
   { path: '/portal/perfil', label: 'Perfil', icon: User },
@@ -96,7 +96,7 @@ export const PortalLayout: React.FC = () => {
     // Se não tem serviço ativo, só mostra Serviços, Meus Serviços (para faturas) e Perfil
     if (!hasActiveService && 
         item.path !== '/portal/servicos' && 
-        item.path !== '/portal/meus-servicos' && 
+        item.path !== '/portal/meus_servicos' && 
         item.path !== '/portal/perfil') {
       return false;
     }
@@ -147,10 +147,10 @@ export const PortalLayout: React.FC = () => {
           <div className="bg-secondary/50 rounded-2xl p-4 mb-4">
             <div className="flex items-center gap-3 mb-3">
               <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-                {displayName.charAt(0)}
+                {displayName?.charAt(0) ?? 'U'}
               </div>
               <div className="flex flex-col overflow-hidden">
-                <span className="text-sm font-semibold truncate">{displayName}</span>
+                <span className="text-sm font-semibold truncate">{displayName || 'Cliente'}</span>
                 <span className="text-xs text-muted-foreground truncate">Plano Ativo</span>
               </div>
             </div>

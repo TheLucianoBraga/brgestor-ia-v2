@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useQuery } from '@tanstack/react-query';
 import { useCustomerAuth } from '@/contexts/CustomerAuthContext';
@@ -352,7 +352,7 @@ export function useChatbotAdvanced(options: UseChatbotAdvancedOptions = {}) {
   }, [currentTenant?.id, messages, tenantType, customer?.customerId, aiLearning]);
 
   const { data: config, isLoading: configLoading } = useQuery({
-    queryKey: ['chatbot-config', currentTenant?.id],
+    queryKey: ['chatbot_config', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
       
@@ -398,15 +398,13 @@ export function useChatbotAdvanced(options: UseChatbotAdvancedOptions = {}) {
 
     try {
       // Call contextual edge function for initialization
-      const { data, error } = await supabase.functions.invoke('chat-contextual', {
-        body: {
+      const { data, error } = await supabase.rpc('chat_contextual', {
           action: 'init',
           tenantId: currentTenant.id,
           tenantType: tenantType,
           userId: user?.id || null,
           customerId: customer?.customerId || null
-        }
-      });
+        });
 
       if (error) {
         console.error('Init error:', error);
@@ -665,9 +663,7 @@ export function useChatbotAdvanced(options: UseChatbotAdvancedOptions = {}) {
         // Se não tem número configurado, tenta buscar do WAHA conectado
         if (!whatsappNumber && currentTenant?.id) {
           try {
-            const { data: wahaResult } = await supabase.functions.invoke('waha-api', {
-              body: { action: 'get-status', tenantId: currentTenant.id }
-            });
+            const { data: wahaResult } = await supabase.rpc('waha_api', { action: 'get_status', tenantId: currentTenant.id });
             
             if (wahaResult?.success && wahaResult?.data?.status === 'WORKING' && wahaResult?.data?.me?.id) {
               whatsappNumber = wahaResult.data.me.id.split('@')[0] || '';
@@ -887,7 +883,7 @@ export function useChatbotAdvanced(options: UseChatbotAdvancedOptions = {}) {
           content: '📋 Vou te redirecionar para ver seu plano atual...',
           timestamp: new Date().toISOString()
         }]);
-        if (navigate) setTimeout(() => navigate('/app/meu-plano'), 500);
+        if (navigate) setTimeout(() => navigate('/app/meu_plano'), 500);
         break;
       // Navigation actions
       case 'navigate_organizations':
@@ -1053,7 +1049,7 @@ export function useChatbotAdvanced(options: UseChatbotAdvancedOptions = {}) {
           setIsSearchingWeb(true);
         }
         
-        const { data, error } = await supabase.functions.invoke('chat-contextual', {
+        const { data, error } = await supabase.rpc('chat_contextual', {
           body: {
             message: text,
             previousMessages: messages.map(m => ({ role: m.role, content: m.content })),
@@ -1301,3 +1297,4 @@ export function useChatbotAdvanced(options: UseChatbotAdvancedOptions = {}) {
     deleteConversation
   };
 }
+

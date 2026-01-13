@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -123,7 +123,7 @@ export function useAIGenerate() {
         hasPrompt: !!options.prompt 
       });
       
-      const { data, error } = await supabase.functions.invoke('ai-generate', {
+      const { data, error } = await supabase.rpc('ai_generate', {
         body: {
           type: options.type,
           prompt: options.prompt,
@@ -446,3 +446,4 @@ export function useAIGenerate() {
     clearSnapshot,
   };
 }
+

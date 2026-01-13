@@ -32,9 +32,9 @@ export const ComparisonCard: React.FC<ComparisonCardProps> = ({
   };
 
   const getTrendColor = () => {
-    if (change > 5) return 'text-emerald-500';
-    if (change < -5) return 'text-destructive';
-    return 'text-muted-foreground';
+    if (change > 5) return 'text-emerald_500';
+    if (change < -5) return 'text_destructive';
+    return 'text-muted_foreground';
   };
 
   return (

@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Select,
@@ -39,7 +39,7 @@ import { useTenantSettings } from '@/hooks/useTenantSettings';
 import { format, addDays, parseISO, setHours, setMinutes } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useQuery } from '@tanstack/react-query';
 
 interface SendMessageModalProps {
@@ -78,7 +78,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({
 
   // Fetch customer portal password
   const { data: portalAuth } = useQuery({
-    queryKey: ['customer-portal-password', customer.id],
+    queryKey: ['customer-portal_password', customer.id],
     queryFn: async () => {
       const { data } = await supabase
         .from('customer_auth')
@@ -257,11 +257,11 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({
       const cleanNumber = customer.whatsapp.replace(/\D/g, '');
       
       // Call WAHA API to send message (with or without image/audio)
-      let action = 'send-message';
-      if (customAudio) action = 'send-voice';
-      else if (previewImage) action = 'send-image';
+      let action = 'send_message';
+      if (customAudio) action = 'send_voice';
+      else if (previewImage) action = 'send_image';
       
-      const { data, error } = await supabase.functions.invoke('waha-api', {
+      const { data, error } = await supabase.rpc('waha_api', {
         body: {
           action,
           tenantId: currentTenant.id,
@@ -556,7 +556,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({
                         type="date"
                         value={scheduleDate}
                         onChange={(e) => setScheduleDate(e.target.value)}
-                        min={format(new Date(), 'yyyy-MM-dd')}
+                        min={format(new Date(), 'yyyy-MM_dd')}
                       />
                     </div>
                     <div>
@@ -688,3 +688,4 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({
     </Dialog>
   );
 };
+

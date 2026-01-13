@@ -11,7 +11,7 @@ import { useTenantSettings } from '@/hooks/useTenantSettings';
 import { useNotifications } from '@/hooks/useNotifications';
 import { toast } from 'sonner';
 import defaultLogo from '@/assets/logo.png';
-import { ThemeToggleSimple } from '@/components/ui/theme-toggle';
+import { ThemeToggleSimple } from '@/components/ui/theme_toggle';
 import { cn } from '@/lib/utils';
 
 interface MobileHeaderProps {

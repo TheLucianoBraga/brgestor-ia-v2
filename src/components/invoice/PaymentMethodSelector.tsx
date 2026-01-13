@@ -32,11 +32,11 @@ const getMethodIcon = (method: string) => {
 const getMethodColor = (method: string) => {
   switch (method) {
     case 'pix':
-      return 'bg-emerald-500 hover:bg-emerald-600';
+      return 'bg-emerald-500 hover:bg-emerald_600';
     case 'card':
-      return 'bg-blue-500 hover:bg-blue-600';
+      return 'bg-blue-500 hover:bg-blue_600';
     case 'boleto':
-      return 'bg-orange-500 hover:bg-orange-600';
+      return 'bg-orange-500 hover:bg-orange_600';
     default:
       return 'bg-primary hover:bg-primary/90';
   }

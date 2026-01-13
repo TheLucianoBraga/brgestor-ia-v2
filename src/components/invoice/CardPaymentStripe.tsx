@@ -103,7 +103,7 @@ export const CardPaymentStripe = ({
         colorPrimary: '#3b82f6',
         colorBackground: '#ffffff',
         colorText: '#1f2937',
-        fontFamily: 'Inter, system-ui, sans-serif',
+        fontFamily: 'Inter, system-ui, sans_serif',
         borderRadius: '8px',
       },
     },

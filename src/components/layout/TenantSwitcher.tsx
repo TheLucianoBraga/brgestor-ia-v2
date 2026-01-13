@@ -8,7 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { Badge } from '@/components/ui/badge';
 import { useTenant, Tenant } from '@/contexts/TenantContext';
 import { useTenantSettings } from '@/hooks/useTenantSettings';

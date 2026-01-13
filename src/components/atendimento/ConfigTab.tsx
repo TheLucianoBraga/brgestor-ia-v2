@@ -13,7 +13,7 @@ import { KnowledgeBaseTab } from '@/components/config/KnowledgeBaseTab';
 
 // Função para normalizar model ID
 function normalizeGeminiModel(model: string | null | undefined): string {
-  if (!model || typeof model !== 'string') return 'gemini-2.5-flash';
+  if (!model || typeof model !== 'string') return 'gemini-2.5_flash';
   
   // Se vier "google/gemini-xxx" -> pegar apenas "gemini-xxx"
   if (model.includes('/')) {
@@ -30,16 +30,16 @@ function normalizeGeminiModel(model: string | null | undefined): string {
   }
   
   // Fallback
-  return 'gemini-2.5-flash';
+  return 'gemini-2.5_flash';
 }
 
 const GEMINI_MODELS = [
-  { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Multimodal)' },
-  { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (Rápido)' },
-  { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite (Ultra rápido)' },
-  { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (Avançado)' },
-  { value: 'gemini-2.5-pro-preview-06-05', label: 'Gemini 2.5 Pro Preview' },
-  { value: 'gemini-exp-1206', label: 'Gemini Experimental 1206' },
+  { value: 'gemini-2.0_flash', label: 'Gemini 2.0 Flash (Multimodal)' },
+  { value: 'gemini-2.5_flash', label: 'Gemini 2.5 Flash (Rápido)' },
+  { value: 'gemini-2.5-flash_lite', label: 'Gemini 2.5 Flash Lite (Ultra rápido)' },
+  { value: 'gemini-2.5_pro', label: 'Gemini 2.5 Pro (Avançado)' },
+  { value: 'gemini-2.5-pro-preview-06_05', label: 'Gemini 2.5 Pro Preview' },
+  { value: 'gemini-exp_1206', label: 'Gemini Experimental 1206' },
   { value: 'custom', label: '⚙️ Modelo Personalizado' },
 ];
 
@@ -50,7 +50,7 @@ export function ConfigTab() {
 
   const isMaster = currentTenant?.type === 'master';
 
-  const [aiModel, setAiModel] = useState('gemini-2.5-flash');
+  const [aiModel, setAiModel] = useState('gemini-2.5_flash');
   const [customModel, setCustomModel] = useState('');
   const [isCustomModel, setIsCustomModel] = useState(false);
   const [aiWebSearch, setAiWebSearch] = useState(false);
@@ -78,13 +78,13 @@ export function ConfigTab() {
     if (isKnown) {
       setAiModel(normalizedModel);
       setIsCustomModel(false);
-    } else if (normalizedModel && normalizedModel !== 'gemini-2.5-flash') {
+    } else if (normalizedModel && normalizedModel !== 'gemini-2.5_flash') {
       // Modelo desconhecido = personalizado
       setAiModel('custom');
       setCustomModel(normalizedModel);
       setIsCustomModel(true);
     } else {
-      setAiModel('gemini-2.5-flash');
+      setAiModel('gemini-2.5_flash');
       setIsCustomModel(false);
     }
     
@@ -107,7 +107,7 @@ export function ConfigTab() {
     if (isCustomModel && customModel.trim()) {
       return normalizeGeminiModel(customModel.trim());
     }
-    return aiModel === 'custom' ? 'gemini-2.5-flash' : aiModel;
+    return aiModel === 'custom' ? 'gemini-2.5_flash' : aiModel;
   };
 
   // Auto-save AI settings after 2 seconds of inactivity

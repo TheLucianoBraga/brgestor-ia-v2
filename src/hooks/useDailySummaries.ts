@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 
 export interface DailySummary {
@@ -25,7 +25,7 @@ export const useDailySummaries = (limit = 7) => {
   const { currentTenant } = useTenant();
 
   const { data: summaries = [], isLoading } = useQuery({
-    queryKey: ['daily-summaries', currentTenant?.id, limit],
+    queryKey: ['daily_summaries', currentTenant?.id, limit],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
@@ -43,7 +43,7 @@ export const useDailySummaries = (limit = 7) => {
   });
 
   const { data: todaySummary } = useQuery({
-    queryKey: ['daily-summary-today', currentTenant?.id],
+    queryKey: ['daily-summary_today', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
 
@@ -68,3 +68,4 @@ export const useDailySummaries = (limit = 7) => {
     isLoading,
   };
 };
+

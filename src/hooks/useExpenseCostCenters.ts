@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
@@ -15,7 +15,7 @@ export const useExpenseCostCenters = () => {
 
   // Fetch cost centers
   const costCentersQuery = useQuery({
-    queryKey: ['expense-cost-centers', tenantId],
+    queryKey: ['expense-cost_centers', tenantId],
     queryFn: async () => {
       if (!tenantId) return [];
 
@@ -47,7 +47,7 @@ export const useExpenseCostCenters = () => {
       return costCenter;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expense-cost-centers', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['expense-cost_centers', tenantId] });
       toast.success('Centro de custo criado com sucesso');
     },
     onError: (error) => {
@@ -70,7 +70,7 @@ export const useExpenseCostCenters = () => {
       return costCenter;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expense-cost-centers', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['expense-cost_centers', tenantId] });
       toast.success('Centro de custo atualizado com sucesso');
     },
     onError: (error) => {
@@ -90,7 +90,7 @@ export const useExpenseCostCenters = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expense-cost-centers', tenantId] });
+      queryClient.invalidateQueries({ queryKey: ['expense-cost_centers', tenantId] });
       toast.success('Centro de custo removido com sucesso');
     },
     onError: (error) => {
@@ -108,3 +108,4 @@ export const useExpenseCostCenters = () => {
     deleteCostCenter,
   };
 };
+

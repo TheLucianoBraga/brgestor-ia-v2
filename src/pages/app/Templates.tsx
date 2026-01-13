@@ -13,7 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import {
   Select,
   SelectContent,
@@ -274,7 +274,7 @@ export default function Templates() {
                 <Card
                   key={template.id}
                   className={`relative group hover:shadow-md transition-shadow border-sidebar-border/50 ${
-                    !template.is_active ? 'opacity-60' : ''
+                    !template.is_active ? 'opacity_60' : ''
                   }`}
                 >
                   <CardHeader className="p-3 sm:p-4 pb-2 sm:pb-2">

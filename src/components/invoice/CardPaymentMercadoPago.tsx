@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CreditCard, Loader2, AlertCircle, Lock } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 interface CardPaymentMercadoPagoProps {
   publicKey: string;
@@ -127,7 +127,7 @@ export const CardPaymentMercadoPago = ({
       }
 
       // Send token to backend
-      const { data, error: fnError } = await supabase.functions.invoke('mp-process-card', {
+      const { data, error: fnError } = await supabase.rpc('ai_process_card', {
         body: {
           tenantId,
           chargeId,
@@ -326,3 +326,4 @@ declare global {
     MercadoPago: any;
   }
 }
+

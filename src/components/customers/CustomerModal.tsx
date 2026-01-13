@@ -32,7 +32,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { CustomerWithRelations, FullCustomerInsert } from '@/hooks/useCustomers';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { CurrencyInput } from '@/components/ui/currency-input';
@@ -40,7 +40,7 @@ import { useTenantPlans } from '@/hooks/useTenantPlans';
 import { useTenantProducts } from '@/hooks/useTenantProducts';
 import { useTenantDiscounts } from '@/hooks/useTenantDiscounts';
 import { useServices } from '@/hooks/useServices';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useQuery } from '@tanstack/react-query';
 
 
@@ -125,7 +125,7 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
   
   // Check if customer has portal access
   const { data: portalAccess, refetch: refetchPortalAccess } = useQuery({
-    queryKey: ['customer-portal-access', customer?.id],
+    queryKey: ['customer-portal_access', customer?.id],
     queryFn: async () => {
       if (!customer?.id) return null;
       const { data, error } = await supabase
@@ -1533,3 +1533,4 @@ export const CustomerModal: React.FC<CustomerModalProps> = ({
     </Dialog>
   );
 };
+

@@ -25,16 +25,16 @@ interface NotificationItemProps {
 const getNotificationIcon = (type: string) => {
   switch (type as NotificationType) {
     case 'novo_cliente':
-      return { icon: UserPlus, color: 'text-green-500', bg: 'bg-green-500/10' };
+      return { icon: UserPlus, color: 'text-green_500', bg: 'bg-green-500/10' };
     case 'pagamento_recebido':
-      return { icon: CreditCard, color: 'text-blue-500', bg: 'bg-blue-500/10' };
+      return { icon: CreditCard, color: 'text-blue_500', bg: 'bg-blue-500/10' };
     case 'cliente_vencido':
-      return { icon: AlertTriangle, color: 'text-amber-500', bg: 'bg-amber-500/10' };
+      return { icon: AlertTriangle, color: 'text-amber_500', bg: 'bg-amber-500/10' };
     case 'novo_usuario':
-      return { icon: Users, color: 'text-purple-500', bg: 'bg-purple-500/10' };
+      return { icon: Users, color: 'text-purple_500', bg: 'bg-purple-500/10' };
     case 'sistema':
     default:
-      return { icon: Info, color: 'text-muted-foreground', bg: 'bg-muted' };
+      return { icon: Info, color: 'text-muted_foreground', bg: 'bg_muted' };
   }
 };
 
@@ -71,13 +71,13 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
   return (
     <div
       className={cn(
-        'flex items-start gap-3 p-3 rounded-lg transition-colors',
+        'flex items-start gap-3 p-3 rounded-lg transition_colors',
         !isRead && 'bg-primary/5',
         compact ? 'hover:bg-muted/50' : 'hover:bg-muted/30'
       )}
     >
-      <div className={cn('p-2 rounded-full shrink-0', bg)}>
-        <Icon className={cn('h-4 w-4', color)} />
+      <div className={cn('p-2 rounded-full shrink_0', bg)}>
+        <Icon className={cn('h-4 w_4', color)} />
       </div>
       
       <div className="flex-1 min-w-0">
@@ -85,15 +85,15 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
           <div className="min-w-0">
             <p className={cn(
               'text-sm font-medium truncate',
-              !isRead && 'text-foreground',
-              isRead && 'text-muted-foreground'
+              !isRead && 'text_foreground',
+              isRead && 'text-muted_foreground'
             )}>
               {notification.title}
             </p>
             <p className={cn(
               'text-xs mt-0.5',
-              compact ? 'line-clamp-2' : 'line-clamp-3',
-              'text-muted-foreground'
+              compact ? 'line-clamp_2' : 'line-clamp_3',
+              'text-muted_foreground'
             )}>
               {notification.message}
             </p>

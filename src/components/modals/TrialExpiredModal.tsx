@@ -20,7 +20,7 @@ export const TrialExpiredModal: React.FC<TrialExpiredModalProps> = ({ open, onOp
 
   const handleUpgrade = () => {
     onOpenChange(false);
-    navigate('/app/meu-plano');
+    navigate('/app/meu_plano');
   };
 
   return (

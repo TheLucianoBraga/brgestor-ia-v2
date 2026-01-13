@@ -94,7 +94,7 @@ const Login: React.FC = () => {
           navigate(getRedirectPath('app', fromPath), { replace: true });
         }
       } else {
-        navigate('/app/select-tenant', { replace: true });
+        navigate('/app/select_tenant', { replace: true });
       }
     }
   }, [isAuthenticated, authLoading, tenantLoading, profile, currentTenant, loginMode, fromPath, navigate]);

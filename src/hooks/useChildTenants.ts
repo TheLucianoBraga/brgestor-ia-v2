@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { TenantWithOwner } from '@/components/contas/TenantCard';
 
@@ -20,7 +20,7 @@ export function useChildTenants() {
 
     // 🔒 VALIDAÇÃO: Evitar erro 400 com IDs vazios ou claramente inválidos
     // Nota: a0000000-0000-0000-0000-000000000001 é o tenant master válido
-    if (!currentTenant.id || currentTenant.id === '00000000-0000-0000-0000-000000000000') {
+    if (!currentTenant.id || currentTenant.id === '00000000-0000-0000-0000_000000000000') {
       console.warn('⚠️ Tenant ID inválido, aguardando tenant real');
       setChildren([]);
       setIsLoading(false);
@@ -181,7 +181,7 @@ export function useChildTenants() {
       const name = payload?.name || 'Responsável';
 
       // Try to send email
-      const { data, error } = await supabase.functions.invoke('send-invite-email', {
+      const { data, error } = await supabase.rpc('ai_invite_email', {
         body: { email, name, accessLink },
       });
 
@@ -223,3 +223,4 @@ export function useChildTenants() {
     getAllowedTypes,
   };
 }
+

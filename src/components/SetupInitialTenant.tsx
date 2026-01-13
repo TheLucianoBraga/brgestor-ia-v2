@@ -9,7 +9,7 @@ export function SetupInitialTenant() {
   async function handleSetup() {
     setLoading(true);
 
-    const { error } = await supabase.functions.invoke(
+    const { error } = await supabase.rpc(
       "setup-initial-admin"
     );
 

@@ -76,7 +76,7 @@ const Trial: React.FC = () => {
                   {isExpired ? (
                     <AlertTriangle className="w-8 h-8 text-destructive" />
                   ) : (
-                    <Clock className={`w-8 h-8 ${isLastDay ? 'text-amber-500' : 'text-primary'}`} />
+                    <Clock className={`w-8 h-8 ${isLastDay ? 'text-amber_500' : 'text_primary'}`} />
                   )}
                 </div>
                 <div>
@@ -132,7 +132,7 @@ const Trial: React.FC = () => {
               {relevantPlans.map((plan, index) => (
                 <Card 
                   key={plan.id} 
-                  className={`relative overflow-hidden transition-all hover:shadow-lg ${index === 1 ? 'border-primary md:scale-105' : ''}`}
+                  className={`relative overflow-hidden transition-all hover:shadow-lg ${index === 1 ? 'border-primary md:scale_105' : ''}`}
                 >
                   {index === 1 && (
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-bl-lg">
@@ -177,7 +177,7 @@ const Trial: React.FC = () => {
                     </ul>
 
                     <Button 
-                      className={`w-full ${index === 1 ? 'btn-gradient-primary' : ''}`}
+                      className={`w-full ${index === 1 ? 'btn-gradient_primary' : ''}`}
                       variant={index === 1 ? 'default' : 'outline'}
                       onClick={() => handleUpgrade(plan.id)}
                     >

@@ -42,7 +42,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { useCustomers, CustomerWithRelations, FullCustomerInsert } from '@/hooks/useCustomers';
 import { useCustomerCharges } from '@/hooks/useCustomerCharges';
 import { useChargeSchedules } from '@/hooks/useChargeSchedules';
@@ -221,10 +221,10 @@ const Clientes: React.FC = () => {
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { label: string; className: string }> = {
       active: { label: 'Ativo', className: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' },
-      inactive: { label: 'Inativo', className: 'bg-muted text-muted-foreground border-transparent' },
+      inactive: { label: 'Inativo', className: 'bg-muted text-muted-foreground border_transparent' },
       pending: { label: 'Pendente', className: 'bg-amber-500/10 text-amber-500 border-amber-500/20' },
       expired: { label: 'Vencido', className: 'bg-red-500/10 text-red-500 border-red-500/20' },
-      today: { label: 'Vence Hoje', className: 'bg-amber-500/10 text-amber-500 border-amber-500/20 animate-pulse' },
+      today: { label: 'Vence Hoje', className: 'bg-amber-500/10 text-amber-500 border-amber-500/20 animate_pulse' },
       upcoming: { label: 'Próximo', className: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
     };
     const config = variants[status] || variants.inactive;

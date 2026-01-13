@@ -17,7 +17,7 @@ import { differenceInDays } from 'date-fns';
 import logo from '@/assets/logo.png';
 import { TrialExpiredModal } from '@/components/modals/TrialExpiredModal';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 
 interface SidebarProps {
   collapsed: boolean;
@@ -81,15 +81,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
       return { text: 'PRO', className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' };
     }
     if (trialDays !== null && trialDays < 0) {
-      return { text: 'EXPIRADO', className: 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse' };
+      return { text: 'EXPIRADO', className: 'bg-red-500/20 text-red-400 border-red-500/40 animate_pulse' };
     }
     if (trialDays !== null && trialDays <= 3) {
-      return { text: `TRIAL ${trialDays}d`, className: 'bg-red-500/20 text-red-400 border-red-500/40 animate-pulse' };
+      return { text: `TRIAL ${trialDays}d`, className: 'bg-red-500/20 text-red-400 border-red-500/40 animate_pulse' };
     }
     if (trialDays !== null) {
       return { text: `TRIAL ${trialDays}d`, className: 'bg-amber-500/20 text-amber-400 border-amber-500/40' };
     }
-    return { text: 'SEM PLANO', className: 'bg-muted text-muted-foreground border-muted' };
+    return { text: 'SEM PLANO', className: 'bg-muted text-muted-foreground border_muted' };
   };
 
   const badgeConfig = getBadgeConfig();
@@ -98,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const renderNavItem = (item: typeof mainNav[0]['items'][0]) => {
     const active = isActive(item.href);
     const isPlanoPro = item.title === 'Plano PRO' || item.title === 'Meu Plano';
-    const isRevendas = item.href === '/app/gestao-revendas';
+    const isRevendas = item.href === '/app/gestao_revendas';
     const showRevendasBadge = isRevendas && activeRevendasCount > 0;
     
     return (
@@ -111,13 +111,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           active 
             ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' 
             : 'text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-white/5',
-          collapsed && !isMobile && 'justify-center px-2'
+          collapsed && !isMobile && 'justify-center px_2'
         )}
         title={collapsed && !isMobile ? item.title : undefined}
       >
         <item.icon className={cn(
-          'w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:scale-110',
-          active ? 'text-white' : 'text-sidebar-foreground/40 group-hover:text-sidebar-foreground'
+          'w-5 h-5 flex-shrink-0 transition-transform duration-300 group-hover:scale_110',
+          active ? 'text_white' : 'text-sidebar-foreground/40 group-hover:text-sidebar_foreground'
         )} />
         
         {(!collapsed || isMobile) && (
@@ -211,10 +211,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <CollapsibleTrigger asChild>
                   <button
                     className={cn(
-                      'flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300',
-                      'hover:bg-white/5 text-sidebar-foreground/60 hover:text-sidebar-foreground',
+                      'flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-all duration_300',
+                      'hover:bg-white/5 text-sidebar-foreground/60 hover:text-sidebar_foreground',
                       'border border-dashed border-white/10',
-                      collapsed && !isMobile && 'justify-center px-2'
+                      collapsed && !isMobile && 'justify-center px_2'
                     )}
                   >
                     <Wrench className="w-5 h-5 flex-shrink-0" />
@@ -222,8 +222,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       <>
                         <span className="flex-1 text-left">Administração</span>
                         <ChevronDown className={cn(
-                          'w-4 h-4 transition-transform duration-300',
-                          adminOpen && 'rotate-180'
+                          'w-4 h-4 transition-transform duration_300',
+                          adminOpen && 'rotate_180'
                         )} />
                       </>
                     )}

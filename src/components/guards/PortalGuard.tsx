@@ -71,7 +71,7 @@ export const PortalGuard: React.FC<PortalGuardProps> = ({
 
   // Se não tem serviço ativo, restringe o acesso apenas à página de serviços e faturas
   const isPublicPortalPath = location.pathname === '/portal/servicos' || 
-                            location.pathname === '/portal/meus-servicos' ||
+                            location.pathname === '/portal/meus_servicos' ||
                             location.pathname === '/portal/perfil';
 
   if (!hasActiveService && !isClienteTenantUser && !isPublicPortalPath) {

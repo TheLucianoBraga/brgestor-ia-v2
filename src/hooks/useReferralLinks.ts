@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -54,7 +54,7 @@ export const useReferralLinks = () => {
 
   // Buscar ref_codes do tenant
   const { data: refCodes = [], isLoading: isLoadingCodes } = useQuery({
-    queryKey: ['ref-codes', currentTenant?.id],
+    queryKey: ['ref_codes', currentTenant?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('ref_codes')
@@ -70,7 +70,7 @@ export const useReferralLinks = () => {
 
   // Buscar referral_links do tenant com ref_codes
   const { data: referralLinks = [], isLoading: isLoadingLinks } = useQuery({
-    queryKey: ['referral-links', currentTenant?.id],
+    queryKey: ['referral_links', currentTenant?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('referral_links')
@@ -86,7 +86,7 @@ export const useReferralLinks = () => {
 
   // Buscar histórico de indicações
   const { data: referralHistory = [], isLoading: isLoadingHistory } = useQuery({
-    queryKey: ['referral-history', currentTenant?.id],
+    queryKey: ['referral_history', currentTenant?.id],
     queryFn: async () => {
       if (!referralLinks.length) return [];
 
@@ -166,8 +166,8 @@ export const useReferralLinks = () => {
       return refCode;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ref-codes'] });
-      queryClient.invalidateQueries({ queryKey: ['referral-links'] });
+      queryClient.invalidateQueries({ queryKey: ['ref_codes'] });
+      queryClient.invalidateQueries({ queryKey: ['referral_links'] });
       toast.success('Link criado com sucesso!');
     },
     onError: (error: Error) => {
@@ -186,7 +186,7 @@ export const useReferralLinks = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ref-codes'] });
+      queryClient.invalidateQueries({ queryKey: ['ref_codes'] });
       toast.success('Link atualizado!');
     },
     onError: (error: Error) => {
@@ -220,7 +220,7 @@ export const useReferralLinks = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['referral-links'] });
+      queryClient.invalidateQueries({ queryKey: ['referral_links'] });
       toast.success('Configuração atualizada!');
     },
     onError: (error: Error) => {
@@ -239,8 +239,8 @@ export const useReferralLinks = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ref-codes'] });
-      queryClient.invalidateQueries({ queryKey: ['referral-links'] });
+      queryClient.invalidateQueries({ queryKey: ['ref_codes'] });
+      queryClient.invalidateQueries({ queryKey: ['referral_links'] });
       toast.success('Link excluído!');
     },
     onError: (error: Error) => {
@@ -276,3 +276,4 @@ export const useReferralLinks = () => {
     deleteRefCode,
   };
 };
+

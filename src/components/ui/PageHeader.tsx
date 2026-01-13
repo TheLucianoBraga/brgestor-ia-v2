@@ -32,9 +32,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   return (
     <div 
       className={cn(
-        'mb-8 animate-fade-in py-4 transition-all duration-300',
-        sticky && 'sticky top-24 lg:top-20 z-20 bg-background/80 backdrop-blur-md',
-        sticky && isScrolled && 'py-2 border-b border-border/50 shadow-sm',
+        'mb-8 animate-fade-in py-4 transition-all duration_300',
+        sticky && 'sticky top-24 lg:top-20 z-20 bg-background/80 backdrop-blur_md',
+        sticky && isScrolled && 'py-2 border-b border-border/50 shadow_sm',
         className
       )}
     >
@@ -52,8 +52,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
                   <React.Fragment key={index}>
                     {index > 0 && <ChevronRight className="w-3 h-3 flex-shrink-0 opacity-50" />}
                     <span className={cn(
-                      'whitespace-nowrap',
-                      index === breadcrumbs.length - 1 ? 'text-primary' : ''
+                      'whitespace_nowrap',
+                      index === breadcrumbs.length - 1 ? 'text_primary' : ''
                     )}>
                       {crumb.label}
                     </span>

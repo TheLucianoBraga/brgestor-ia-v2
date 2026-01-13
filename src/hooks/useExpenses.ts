@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 import { Database } from '@/integrations/supabase/types';
@@ -36,7 +36,7 @@ export const useExpenses = (filters?: ExpenseFilters) => {
     if (!tenantId) return;
 
     const channel = supabase
-      .channel('expenses-realtime')
+      .channel('expenses_realtime')
       .on(
         'postgres_changes',
         {
@@ -375,3 +375,4 @@ export const useExpenses = (filters?: ExpenseFilters) => {
     refetch: expensesQuery.refetch,
   };
 };
+

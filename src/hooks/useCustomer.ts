@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { customerService, CustomerData, CustomerAddress, CustomerUpdate } from '@/services/customerService';
 import { toast } from 'sonner';
 
@@ -22,7 +22,7 @@ export function useCustomer(customerId: string | undefined, options?: UseCustome
 
   // Query key baseado no tipo de busca
   const queryKey = byTenantId 
-    ? ['customer-by-tenant', customerId] 
+    ? ['customer-by_tenant', customerId] 
     : ['customer', customerId];
 
   // ========== Query: Buscar Customer ==========
@@ -41,7 +41,7 @@ export function useCustomer(customerId: string | undefined, options?: UseCustome
 
   // ========== Query: Buscar Endereço ==========
   const addressQuery = useQuery({
-    queryKey: ['customer-address', customerQuery.data?.id],
+    queryKey: ['customer_address', customerQuery.data?.id],
     queryFn: async () => {
       if (!customerQuery.data?.id) return null;
       return customerService.getAddress(customerQuery.data.id);
@@ -58,9 +58,9 @@ export function useCustomer(customerId: string | undefined, options?: UseCustome
     onSuccess: (updatedData) => {
       // Invalidar todas as queries relacionadas ao customer
       queryClient.invalidateQueries({ queryKey: ['customer', updatedData.id] });
-      queryClient.invalidateQueries({ queryKey: ['customer-by-tenant', updatedData.customer_tenant_id] });
+      queryClient.invalidateQueries({ queryKey: ['customer-by_tenant', updatedData.customer_tenant_id] });
       queryClient.invalidateQueries({ queryKey: ['customers'] }); // Lista do App
-      queryClient.invalidateQueries({ queryKey: ['cliente-perfil'] }); // Compatibilidade
+      queryClient.invalidateQueries({ queryKey: ['cliente_perfil'] }); // Compatibilidade
       toast.success('Dados atualizados com sucesso!');
     },
     onError: (error: any) => {
@@ -75,7 +75,7 @@ export function useCustomer(customerId: string | undefined, options?: UseCustome
       return customerService.upsertAddress(customerQuery.data.id, address);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer-address', customerQuery.data?.id] });
+      queryClient.invalidateQueries({ queryKey: ['customer_address', customerQuery.data?.id] });
       toast.success('Endereço atualizado com sucesso!');
     },
     onError: (error: any) => {
@@ -121,7 +121,7 @@ export function useCustomer(customerId: string | undefined, options?: UseCustome
           const newData = payload.new as CustomerData;
           queryClient.setQueryData(['customer', actualCustomerId], newData);
           if (newData.customer_tenant_id) {
-            queryClient.setQueryData(['customer-by-tenant', newData.customer_tenant_id], newData);
+            queryClient.setQueryData(['customer-by_tenant', newData.customer_tenant_id], newData);
           }
           // Também invalida a lista de customers
           queryClient.invalidateQueries({ queryKey: ['customers'] });
@@ -171,3 +171,4 @@ export function useCustomer(customerId: string | undefined, options?: UseCustome
 
 // Re-export types for convenience
 export type { CustomerData, CustomerAddress, CustomerUpdate } from '@/services/customerService';
+

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Copy, Check, Loader2, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 interface PixPaymentProps {
   qrCode?: string;
@@ -39,7 +39,7 @@ export const PixPayment = ({
 
     const checkStatus = async () => {
       try {
-        const { data } = await supabase.functions.invoke('mp-check-status', {
+        const { data } = await supabase.rpc('ai_check_status', {
           body: { tenantId, paymentId },
         });
         if (data?.paid) {
@@ -134,3 +134,4 @@ export const PixPayment = ({
     </Card>
   );
 };
+

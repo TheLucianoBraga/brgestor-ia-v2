@@ -6,7 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { MoreVertical, Edit, Trash2, Power, Percent, DollarSign, Calendar } from 'lucide-react';
 import { Discount } from '@/hooks/useTenantDiscounts';
 import { TenantPlan } from '@/hooks/useTenantPlans';
@@ -48,7 +48,7 @@ export function DiscountCard({
   const isNotStarted = discount.valid_from && new Date(discount.valid_from) > new Date();
 
   return (
-    <Card className={!discount.is_active || isExpired ? 'opacity-60' : ''}>
+    <Card className={!discount.is_active || isExpired ? 'opacity_60' : ''}>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">

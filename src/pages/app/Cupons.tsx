@@ -128,8 +128,8 @@ const Cupons: React.FC = () => {
             <Card
               key={coupon.id}
               className={cn(
-                'transition-all hover:shadow-md',
-                !coupon.active && 'opacity-60'
+                'transition-all hover:shadow_md',
+                !coupon.active && 'opacity_60'
               )}
             >
               <CardHeader className="pb-3">

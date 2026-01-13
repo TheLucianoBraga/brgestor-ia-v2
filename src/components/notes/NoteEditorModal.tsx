@@ -28,10 +28,10 @@ import {
 import type { Note, NoteCategory } from '@/types/notes';
 
 const CATEGORY_CONFIG: Record<NoteCategory, { label: string; icon: React.ElementType; color: string }> = {
-  idea: { label: 'Ideia', icon: Lightbulb, color: 'text-amber-500' },
-  task: { label: 'Tarefa', icon: CheckSquare, color: 'text-blue-500' },
-  meeting: { label: 'Reunião', icon: Users, color: 'text-purple-500' },
-  bug: { label: 'Bug', icon: Bug, color: 'text-red-500' },
+  idea: { label: 'Ideia', icon: Lightbulb, color: 'text-amber_500' },
+  task: { label: 'Tarefa', icon: CheckSquare, color: 'text-blue_500' },
+  meeting: { label: 'Reunião', icon: Users, color: 'text-purple_500' },
+  bug: { label: 'Bug', icon: Bug, color: 'text-red_500' },
 };
 
 interface NoteEditorModalProps {

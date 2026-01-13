@@ -105,7 +105,7 @@ export default function PortalDashboard() {
             value: activeItems.length, 
             subtitle: activeItems.length === 1 ? 'serviço' : 'serviços',
             icon: Package,
-            color: 'bg-blue-500',
+            color: 'bg-blue_500',
             delay: 0.1
           },
           { 
@@ -113,7 +113,7 @@ export default function PortalDashboard() {
             value: pendingPayments.length, 
             subtitle: pendingPayments.length === 0 ? 'Tudo em dia!' : 'aguardando',
             icon: CreditCard,
-            color: 'bg-amber-500',
+            color: 'bg-amber_500',
             delay: 0.2
           },
           { 
@@ -121,7 +121,7 @@ export default function PortalDashboard() {
             value: nextDueDate ? format(new Date(nextDueDate), 'dd/MM', { locale: ptBR }) : '-', 
             subtitle: nextDueDate ? (daysUntilDue === 0 ? 'vence hoje' : `em ${daysUntilDue} dias`) : 'Sem vencimentos',
             icon: Calendar,
-            color: 'bg-emerald-500',
+            color: 'bg-emerald_500',
             delay: 0.3
           }
         ].map((card, i) => (

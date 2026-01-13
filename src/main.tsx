@@ -4,6 +4,10 @@ import { HelmetProvider } from "react-helmet-async";
 import App from "./App.tsx";
 import "./index.css";
 import { CACHE_BUST } from "./cache-bust";
+
+// 🛡️ PROTEÇÃO CRÍTICA: Carrega antes de tudo para evitar language tag inválidos
+import "./lib/locale-guard";
+
 console.log("Build version:", CACHE_BUST);
 
 // Register service worker com auto-update

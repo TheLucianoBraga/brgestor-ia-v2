@@ -1,0 +1,28 @@
+# PostgreSQL como Serviço Independente
+# Este arquivo vai em /root ou diretório de infra, NÃO no projeto
+
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: brgestor-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: brgestor
+      POSTGRES_USER: brgestor_user
+      POSTGRES_PASSWORD: Manu07062022
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - brgestor-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  brgestor-network:
+    driver: bridge

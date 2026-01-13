@@ -36,7 +36,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import {
   Sheet,
   SheetContent,
@@ -45,7 +45,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from '@/components/ui/sheet';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 
 interface ContentPostModalProps {
   open: boolean;
@@ -319,7 +319,7 @@ export function ContentPostModal({
       if (post.scheduled_at && !post.is_active) {
         setPublishMode('schedule');
         const scheduledDate = new Date(post.scheduled_at);
-        setScheduledDate(format(scheduledDate, 'yyyy-MM-dd'));
+        setScheduledDate(format(scheduledDate, 'yyyy-MM_dd'));
         setScheduledTime(format(scheduledDate, 'HH:mm'));
       } else if (!post.is_active) {
         setPublishMode('draft');
@@ -866,7 +866,7 @@ export function ContentPostModal({
                     type="date"
                     value={scheduledDate}
                     onChange={(e) => setScheduledDate(e.target.value)}
-                    min={format(new Date(), 'yyyy-MM-dd')}
+                    min={format(new Date(), 'yyyy-MM_dd')}
                   />
                 </div>
                 <div className="flex-1">

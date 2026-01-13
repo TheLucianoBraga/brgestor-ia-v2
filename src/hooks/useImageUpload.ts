@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { compressImage, formatFileSize, getCompressionRatio } from '@/lib/imageCompression';
 import { toast } from 'sonner';
@@ -35,7 +35,7 @@ export const useImageUpload = () => {
     }
 
     const {
-      bucket = 'tenant-assets',
+      bucket = 'tenant_assets',
       folder = 'logos',
       maxWidth = 800,
       maxHeight = 800,
@@ -128,7 +128,7 @@ export const useImageUpload = () => {
     }
   };
 
-  const deleteImage = async (url: string, bucket = 'tenant-assets'): Promise<boolean> => {
+  const deleteImage = async (url: string, bucket = 'tenant_assets'): Promise<boolean> => {
     try {
       // Extract path from URL
       const urlObj = new URL(url);
@@ -162,3 +162,4 @@ export const useImageUpload = () => {
     progress,
   };
 };
+

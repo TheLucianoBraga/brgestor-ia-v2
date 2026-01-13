@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 
 interface CreateTenantModalProps {
@@ -113,7 +113,7 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
     setIsLoading(true);
     
     try {
-      const { data, error } = await supabase.functions.invoke('create-tenant-with-owner', {
+      const { data, error } = await supabase.rpc('ai_tenant-with_owner', {
         body: {
           tenantName: tenantName.trim(),
           tenantType,
@@ -385,3 +385,4 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
     </Dialog>
   );
 };
+

@@ -451,12 +451,12 @@ const AIDemoChat = ({ shouldOpen, signupLink }: { shouldOpen: boolean; signupLin
                     key={i} 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${msg.role === 'user' ? 'justify_end' : 'justify_start'}`}
                   >
                     <div className={`max-w-[85%] p-3 rounded-2xl text-sm whitespace-pre-line ${
                       msg.role === 'user' 
-                        ? 'bg-primary text-primary-foreground rounded-br-sm' 
-                        : 'bg-muted rounded-bl-sm'
+                        ? 'bg-primary text-primary-foreground rounded-br_sm' 
+                        : 'bg-muted rounded-bl_sm'
                     }`}>
                       {msg.role === 'assistant' ? renderMessage(msg.content) : msg.content}
                     </div>
@@ -664,7 +664,7 @@ const FeatureCategoryCard = ({
             navigate('/app/dashboard', { replace: true });
           }
         } else {
-          navigate('/app/select-tenant', { replace: true });
+          navigate('/app/select_tenant', { replace: true });
         }
       }
     }
@@ -1773,7 +1773,7 @@ const FeatureCategoryCard = ({
                         <Card className={`relative h-full border-2 transition-all duration-500 ${
                           isPopular 
                             ? 'border-primary shadow-2xl md:scale-105 bg-gradient-to-b from-primary/10 via-background to-accent/10' 
-                            : 'border-muted/30 hover:border-primary/50 hover:shadow-xl'
+                            : 'border-muted/30 hover:border-primary/50 hover:shadow_xl'
                         }`}>
                           {isPopular && (
                             <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-20">
@@ -1830,7 +1830,7 @@ const FeatureCategoryCard = ({
                                 ].map((feature, i) => (
                                   <li key={i} className="flex items-center gap-3">
                                     <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                                      feature.highlight ? 'bg-gradient-to-r from-primary to-accent' : 'bg-primary/20'
+                                      feature.highlight ? 'bg-gradient-to-r from-primary to_accent' : 'bg-primary/20'
                                     }`}>
                                       {feature.highlight ? (
                                         <Crown className="w-3 h-3 text-white" />
@@ -1838,7 +1838,7 @@ const FeatureCategoryCard = ({
                                         <Check className="w-3 h-3 text-primary" />
                                       )}
                                     </div>
-                                    <span className={feature.highlight ? 'font-semibold text-primary' : ''}>
+                                    <span className={feature.highlight ? 'font-semibold text_primary' : ''}>
                                       {feature.text}
                                     </span>
                                     {feature.highlight && (
@@ -1855,8 +1855,8 @@ const FeatureCategoryCard = ({
                               <Button 
                                 className={`w-full text-lg py-6 ${
                                   isPopular 
-                                    ? 'bg-gradient-to-r from-primary via-accent to-primary shadow-xl animate-pulse' 
-                                    : 'bg-gradient-to-r from-primary to-accent'
+                                    ? 'bg-gradient-to-r from-primary via-accent to-primary shadow-xl animate_pulse' 
+                                    : 'bg-gradient-to-r from-primary to_accent'
                                 }`}
                                 size="lg"
                                 asChild
@@ -2032,10 +2032,10 @@ const FeatureCategoryCard = ({
               </p>
               <div className="flex flex-wrap justify-center gap-6 text-sm">
                 {[
-                  { icon: Check, text: '7 dias grátis', color: 'text-green-500' },
-                  { icon: CreditCard, text: 'Sem cartão', color: 'text-blue-500' },
-                  { icon: Heart, text: '100% garantido', color: 'text-red-500' },
-                  { icon: X, text: 'Cancele quando quiser', color: 'text-orange-500' }
+                  { icon: Check, text: '7 dias grátis', color: 'text-green_500' },
+                  { icon: CreditCard, text: 'Sem cartão', color: 'text-blue_500' },
+                  { icon: Heart, text: '100% garantido', color: 'text-red_500' },
+                  { icon: X, text: 'Cancele quando quiser', color: 'text-orange_500' }
                 ].map((item, i) => (
                   <motion.span 
                     key={i}

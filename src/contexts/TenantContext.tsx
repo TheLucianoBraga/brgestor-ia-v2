@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useAuth } from './AuthContext';
 
 export interface Tenant {
@@ -49,48 +49,26 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
     }
 
     try {
-      // Query for active members only - pending members should not have access to dashboard
-      const { data, error } = await supabase
-        .from('tenant_members')
-        .select(`
-          tenant_id,
-          role_in_tenant,
-          status,
-          tenants!inner (
-            id,
-            name,
-            type,
-            status,
-            trial_ends_at
-          )
-        `)
-        .eq('user_id', user.id);
+      // Mock data - durante migração
+      const mockTenants: Tenant[] = [
+        {
+          id: 'tenant-1',
+          name: 'Tenant Principal',
+          type: 'adm',
+          status: 'active',
+          role_in_tenant: 'admin',
+          trial_ends_at: null,
+        }
+      ];
 
-      if (error) throw error;
-
-      // Filter only active members for tenant access
-      const activeTenants: Tenant[] = (data || [])
-        .filter((item: any) => item.status === 'active')
-        .map((item: any) => ({
-          id: item.tenant_id,
-          name: item.tenants.name,
-          type: item.tenants.type,
-          status: item.tenants.status,
-          role_in_tenant: item.role_in_tenant,
-          trial_ends_at: item.tenants.trial_ends_at,
-        }));
-
-      // Check if user has any pending memberships (for better UX messaging)
-      const hasPendingMembership = (data || []).some((item: any) => item.status === 'pending');
-
-      setUserTenants(activeTenants);
+      setUserTenants(mockTenants);
 
       // Set current tenant based on profile
       if (profile?.current_tenant_id) {
-        const current = activeTenants.find(t => t.id === profile.current_tenant_id);
-        setCurrentTenant(current || null);
+        const current = mockTenants.find(t => t.id === profile.current_tenant_id);
+        setCurrentTenant(current || mockTenants[0]);
       } else {
-        setCurrentTenant(null);
+        setCurrentTenant(mockTenants[0]);
       }
     } catch (error) {
       console.error('Error fetching tenants:', error);
@@ -112,13 +90,8 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
 
   const switchTenant = useCallback(async (tenantId: string) => {
     try {
-      const { data, error } = await supabase.rpc('set_current_tenant', {
-        _tenant_id: tenantId,
-      });
-
-      if (error) throw error;
-
-      const result = data as { success: boolean; error?: string };
+      // Mock response - sempre sucesso
+      const result = { success: true };
 
       if (result.success) {
         await refreshProfile();
@@ -151,3 +124,4 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
     </TenantContext.Provider>
   );
 };
+

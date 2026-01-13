@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
 import { useTenant } from '@/contexts/TenantContext';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -116,10 +116,10 @@ export const IntegrationsTab: React.FC = () => {
   const [aiEnabled, setAiEnabled] = useState(false);
   const [selectedAiProvider, setSelectedAiProvider] = useState<'openai' | 'gemini'>('gemini');
 
-  const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/mp-webhook`;
-  const asaasWebhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/asaas-webhook`;
-  const stripeWebhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/stripe-webhook`;
-  const pagseguroWebhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/pagseguro-webhook`;
+  const webhookUrl = `http://72.60.14.172:3001/api/webhooks/mercadopago`;
+  const asaasWebhookUrl = `http://72.60.14.172:3001/api/webhooks/asaas`;
+  const stripeWebhookUrl = `http://72.60.14.172:3001/api/webhooks/stripe`;
+  const pagseguroWebhookUrl = `http://72.60.14.172:3001/api/webhooks/pagseguro`;
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
@@ -370,7 +370,7 @@ export const IntegrationsTab: React.FC = () => {
 
     setIsTesting(true);
     try {
-      const { data, error } = await supabase.functions.invoke('mp-test-connection', {
+      const { data, error } = await supabase.rpc('ai_test_connection', {
         body: { tenant_id: currentTenant?.id },
       });
 
@@ -489,7 +489,7 @@ export const IntegrationsTab: React.FC = () => {
         method: 'POST',
         headers: { 
           'Authorization': `Bearer ${pagseguroToken}`,
-          'Content-Type': 'application/json'
+          'Content_Type': 'application/json'
         },
         body: JSON.stringify({ type: 'card' })
       });
@@ -1592,7 +1592,7 @@ export const IntegrationsTab: React.FC = () => {
 
       {/* AI Configuration - Only for Master */}
       {isMaster && (
-        <Collapsible open={expandedSections['ai-config']} onOpenChange={() => toggleSection('ai-config')}>
+        <Collapsible open={expandedSections['ai_config']} onOpenChange={() => toggleSection('ai_config')}>
           <Card>
             <IntegrationHeader
               id="ai-config"
@@ -1600,7 +1600,7 @@ export const IntegrationsTab: React.FC = () => {
               iconColor="text-gradient-to-r from-purple-500 to-pink-500"
               title="Configuração de IA"
               badge={<Badge variant="outline" className="text-xs">Apenas Master</Badge>}
-              isOpen={expandedSections['ai-config']}
+              isOpen={expandedSections['ai_config']}
               configured={aiEnabled}
             />
             <CollapsibleContent>
@@ -1670,3 +1670,4 @@ export const IntegrationsTab: React.FC = () => {
     </div>
   );
 };
+

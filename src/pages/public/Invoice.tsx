@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { Loader2, AlertCircle, CreditCard, QrCode, Banknote } from 'lucide-react';
 
 // Components
@@ -356,7 +356,7 @@ const Invoice = () => {
     try {
       if (method === 'card') {
         if (gateway === 'stripe') {
-          const { data, error } = await supabase.functions.invoke('stripe-create-payment-intent', {
+          const { data, error } = await supabase.rpc('ai_create-payment_intent', {
             body: {
               tenantId: resolvedTenantId,
               amount: invoice.amount,
@@ -372,7 +372,7 @@ const Invoice = () => {
         // MercadoPago card is handled inline with SDK, no need to initialize here
       } else if (method === 'pix') {
         if (gateway === 'stripe') {
-          const { data, error } = await supabase.functions.invoke('stripe-create-payment-intent', {
+          const { data, error } = await supabase.rpc('ai_create-payment_intent', {
             body: {
               tenantId: resolvedTenantId,
               amount: invoice.amount,
@@ -386,7 +386,7 @@ const Invoice = () => {
           setClientSecret(data.clientSecret);
           setPublishableKey(data.publishableKey);
         } else if (gateway === 'mercadopago') {
-          const { data, error } = await supabase.functions.invoke('mp-create-pix', {
+          const { data, error } = await supabase.rpc('ai_create_pix', {
             body: {
               tenantId: resolvedTenantId,
               amount: invoice.amount,
@@ -402,7 +402,7 @@ const Invoice = () => {
             paymentId: data.paymentId,
           });
         } else if (gateway === 'asaas') {
-          const { data, error } = await supabase.functions.invoke('asaas-create-charge', {
+          const { data, error } = await supabase.rpc('ai_create_charge', {
             body: {
               tenantId: resolvedTenantId,
               customerName: invoice.customer_name,
@@ -424,7 +424,7 @@ const Invoice = () => {
             paymentId: data.paymentId,
           });
         } else if (gateway === 'pagseguro') {
-          const { data, error } = await supabase.functions.invoke('pagseguro-create-charge', {
+          const { data, error } = await supabase.rpc('ai_create_charge', {
             body: {
               tenant_id: resolvedTenantId,
               customer_id: invoice.customer_id,
@@ -443,7 +443,7 @@ const Invoice = () => {
       } else if (method === 'boleto') {
         if (gateway === 'mercadopago') {
           // MercadoPago doesn't have inline boleto, redirect to preference
-          const { data, error } = await supabase.functions.invoke('mp-create-preference', {
+          const { data, error } = await supabase.rpc('ai_create_preference', {
             body: {
               tenantId: resolvedTenantId,
               amount: invoice.amount,
@@ -457,7 +457,7 @@ const Invoice = () => {
             window.location.href = data.initPoint;
           }
         } else if (gateway === 'asaas') {
-          const { data, error } = await supabase.functions.invoke('asaas-create-charge', {
+          const { data, error } = await supabase.rpc('ai_create_charge', {
             body: {
               tenantId: resolvedTenantId,
               customerName: invoice.customer_name,
@@ -478,7 +478,7 @@ const Invoice = () => {
             invoiceUrl: data.invoiceUrl,
           });
         } else if (gateway === 'pagseguro') {
-          const { data, error } = await supabase.functions.invoke('pagseguro-create-charge', {
+          const { data, error } = await supabase.rpc('ai_create_charge', {
             body: {
               tenant_id: resolvedTenantId,
               customer_id: invoice.customer_id,
@@ -769,3 +769,4 @@ const Invoice = () => {
 };
 
 export default Invoice;
+

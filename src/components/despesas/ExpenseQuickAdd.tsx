@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Zap, Calendar, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 
 interface ExpenseCategory {
@@ -203,3 +203,4 @@ export const ExpenseQuickAdd: React.FC<ExpenseQuickAddProps> = ({ open, onOpenCh
     </Dialog>
   );
 };
+

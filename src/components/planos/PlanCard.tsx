@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { PlanWithPrice } from '@/hooks/usePlans';
 
 interface PlanCardProps {
@@ -35,7 +35,7 @@ export const PlanCard: React.FC<PlanCardProps> = ({
   onToggleActive,
 }) => {
   return (
-    <Card className={`hover:shadow-md transition-shadow ${!plan.active ? 'opacity-60' : ''}`}>
+    <Card className={`hover:shadow-md transition-shadow ${!plan.active ? 'opacity_60' : ''}`}>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">

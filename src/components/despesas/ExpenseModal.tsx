@@ -378,7 +378,7 @@ export const ExpenseModal: React.FC<ExpenseModalProps> = ({
               ))}
 
               {allocations.length > 0 && (
-                <div className={`text-sm ${totalAllocation === 100 ? 'text-green-600' : 'text-amber-600'}`}>
+                <div className={`text-sm ${totalAllocation === 100 ? 'text-green_600' : 'text-amber_600'}`}>
                   Total: {totalAllocation}%
                   {totalAllocation !== 100 && ' (deve ser 100%)'}
                 </div>

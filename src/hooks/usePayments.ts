@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -54,7 +54,7 @@ export const usePayments = () => {
     mutationFn: async (params: CreatePixPaymentParams): Promise<PixPaymentResponse> => {
       if (!currentTenant?.id) throw new Error('Tenant não selecionado');
 
-      const { data, error } = await supabase.functions.invoke('mp-create-pix', {
+      const { data, error } = await supabase.rpc('ai_create_pix', {
         body: {
           tenantId: currentTenant.id,
           ...params,
@@ -74,7 +74,7 @@ export const usePayments = () => {
     mutationFn: async (params: CreateCardPaymentParams): Promise<CardPaymentResponse> => {
       if (!currentTenant?.id) throw new Error('Tenant não selecionado');
 
-      const { data, error } = await supabase.functions.invoke('mp-create-preference', {
+      const { data, error } = await supabase.rpc('ai_create_preference', {
         body: {
           tenantId: currentTenant.id,
           ...params,
@@ -93,7 +93,7 @@ export const usePayments = () => {
   const checkPaymentStatus = async (paymentId: string): Promise<PaymentStatusResponse> => {
     if (!currentTenant?.id) throw new Error('Tenant não selecionado');
 
-    const { data, error } = await supabase.functions.invoke('mp-check-status', {
+    const { data, error } = await supabase.rpc('ai_check_status', {
       body: {
         tenantId: currentTenant.id,
         paymentId,
@@ -110,3 +110,4 @@ export const usePayments = () => {
     checkPaymentStatus,
   };
 };
+

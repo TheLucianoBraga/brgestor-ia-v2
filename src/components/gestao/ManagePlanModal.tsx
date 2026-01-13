@@ -20,7 +20,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { usePlans } from '@/hooks/usePlans';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 
 interface ManagePlanModalProps {
@@ -69,11 +69,11 @@ export const ManagePlanModal: React.FC<ManagePlanModalProps> = ({
 
       // Set validity date from subscription or trial
       if (data?.ends_at) {
-        setValidityDate(format(new Date(data.ends_at), 'yyyy-MM-dd'));
+        setValidityDate(format(new Date(data.ends_at), 'yyyy-MM_dd'));
       } else if (tenant.trial_ends_at) {
-        setValidityDate(format(new Date(tenant.trial_ends_at), 'yyyy-MM-dd'));
+        setValidityDate(format(new Date(tenant.trial_ends_at), 'yyyy-MM_dd'));
       } else {
-        setValidityDate(format(addMonths(new Date(), 1), 'yyyy-MM-dd'));
+        setValidityDate(format(addMonths(new Date(), 1), 'yyyy-MM_dd'));
       }
     };
 
@@ -84,7 +84,7 @@ export const ManagePlanModal: React.FC<ManagePlanModalProps> = ({
 
   const handleAddMonths = (months: number) => {
     const currentDate = validityDate ? new Date(validityDate) : new Date();
-    setValidityDate(format(addMonths(currentDate, months), 'yyyy-MM-dd'));
+    setValidityDate(format(addMonths(currentDate, months), 'yyyy-MM_dd'));
   };
 
   const handleSave = async () => {
@@ -304,3 +304,4 @@ export const ManagePlanModal: React.FC<ManagePlanModalProps> = ({
     </Dialog>
   );
 };
+

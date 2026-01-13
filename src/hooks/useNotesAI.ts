@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
@@ -44,14 +44,12 @@ export const useNotesAI = () => {
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      const { data, error } = await supabase.functions.invoke('notes-ai', {
-        body: {
+      const { data, error } = await supabase.rpc('ai_ai', {
           message,
           userId: user.id,
           tenantId: currentTenant?.id,
           previousMessages: messages.slice(-10) // Last 10 messages for context
-        }
-      });
+        });
 
       if (error) throw error;
 
@@ -98,13 +96,11 @@ export const useNotesAI = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('notes-ai', {
-        body: {
+      const { data, error } = await supabase.rpc('ai_ai', {
           userId: user.id,
           action: 'execute',
           actionData: pendingAction
-        }
-      });
+        });
 
       if (error) throw error;
 
@@ -153,3 +149,4 @@ export const useNotesAI = () => {
     clearMessages,
   };
 };
+

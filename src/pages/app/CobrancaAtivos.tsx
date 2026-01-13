@@ -31,7 +31,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import {
   Table,
   TableBody,
@@ -45,7 +45,7 @@ import { useTenant } from '@/contexts/TenantContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Navigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 const CobrancaAtivos: React.FC = () => {
   const { currentTenant, isLoading: isLoadingTenant } = useTenant();
@@ -59,7 +59,7 @@ const CobrancaAtivos: React.FC = () => {
 
   // Fetch subscriptions and payments
   const { data: subscriptions = [], isLoading: isLoadingSubs } = useQuery({
-    queryKey: ['active-subscriptions', currentTenant?.id],
+    queryKey: ['active_subscriptions', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
       
@@ -83,7 +83,7 @@ const CobrancaAtivos: React.FC = () => {
   });
 
   const { data: payments = [], isLoading: isLoadingPayments } = useQuery({
-    queryKey: ['tenant-payments', currentTenant?.id],
+    queryKey: ['tenant_payments', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
       
@@ -346,3 +346,4 @@ const CobrancaAtivos: React.FC = () => {
 };
 
 export default CobrancaAtivos;
+

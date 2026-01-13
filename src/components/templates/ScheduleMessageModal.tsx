@@ -23,7 +23,7 @@ import { useCustomers } from '@/hooks/useCustomers';
 import { ScheduledMessageInsert } from '@/hooks/useScheduledMessages';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 
 interface ScheduleMessageModalProps {
   open: boolean;
@@ -128,7 +128,7 @@ export function ScheduleMessageModal({
                   type="date"
                   value={scheduledDate}
                   onChange={(e) => setScheduledDate(e.target.value)}
-                  min={format(new Date(), 'yyyy-MM-dd')}
+                  min={format(new Date(), 'yyyy-MM_dd')}
                   required
                 />
               </div>

@@ -16,21 +16,21 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import type { Note, NoteCategory } from '@/types/notes';
 
 const CATEGORY_CONFIG: Record<NoteCategory, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-  idea: { label: 'Ideia', icon: Lightbulb, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-950/30' },
-  task: { label: 'Tarefa', icon: CheckSquare, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-950/30' },
-  meeting: { label: 'Reunião', icon: Users, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-950/30' },
-  bug: { label: 'Bug', icon: Bug, color: 'text-red-600', bg: 'bg-red-50 dark:bg-red-950/30' },
+  idea: { label: 'Ideia', icon: Lightbulb, color: 'text-amber_600', bg: 'bg-amber-50 dark:bg-amber-950/30' },
+  task: { label: 'Tarefa', icon: CheckSquare, color: 'text-blue_600', bg: 'bg-blue-50 dark:bg-blue-950/30' },
+  meeting: { label: 'Reunião', icon: Users, color: 'text-purple_600', bg: 'bg-purple-50 dark:bg-purple-950/30' },
+  bug: { label: 'Bug', icon: Bug, color: 'text-red_600', bg: 'bg-red-50 dark:bg-red-950/30' },
 };
 
 const CATEGORY_COLORS: Record<NoteCategory, string> = {
-  idea: 'border-l-amber-500',
-  task: 'border-l-blue-500',
-  meeting: 'border-l-purple-500',
-  bug: 'border-l-red-500',
+  idea: 'border-l-amber_500',
+  task: 'border-l-blue_500',
+  meeting: 'border-l-purple_500',
+  bug: 'border-l-red_500',
 };
 
 export default function Notes() {

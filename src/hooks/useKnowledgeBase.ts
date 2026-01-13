@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
@@ -26,7 +26,7 @@ export function useKnowledgeBase() {
   const { toast } = useToast();
 
   const { data: items, isLoading } = useQuery({
-    queryKey: ['knowledge-base', currentTenant?.id],
+    queryKey: ['knowledge_base', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
       
@@ -44,7 +44,7 @@ export function useKnowledgeBase() {
   });
 
   const { data: categories } = useQuery({
-    queryKey: ['knowledge-base-categories', currentTenant?.id],
+    queryKey: ['knowledge-base_categories', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
       
@@ -87,7 +87,7 @@ export function useKnowledgeBase() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-base'] });
+      queryClient.invalidateQueries({ queryKey: ['knowledge_base'] });
       toast({ title: 'Item criado com sucesso!' });
     },
     onError: () => {
@@ -111,7 +111,7 @@ export function useKnowledgeBase() {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-base'] });
+      queryClient.invalidateQueries({ queryKey: ['knowledge_base'] });
       toast({ title: 'Item atualizado!' });
     },
     onError: () => {
@@ -129,7 +129,7 @@ export function useKnowledgeBase() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['knowledge-base'] });
+      queryClient.invalidateQueries({ queryKey: ['knowledge_base'] });
       toast({ title: 'Item removido!' });
     },
     onError: () => {
@@ -146,3 +146,4 @@ export function useKnowledgeBase() {
     deleteItem
   };
 }
+

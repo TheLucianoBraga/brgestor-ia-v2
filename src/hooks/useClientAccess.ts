@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 
 interface AccessStatus {
@@ -11,10 +11,11 @@ export const useClientAccess = () => {
   const { currentTenant } = useTenant();
 
   const { data: accessStatus, isLoading } = useQuery({
-    queryKey: ['client-access', currentTenant?.id],
+    queryKey: ['client_access', currentTenant?.id],
     queryFn: async () => {
+      // Usa o mock para manter compatibilidade
       const { data, error } = await supabase.rpc('get_current_tenant_access');
-
+      
       if (error) throw error;
       return data as unknown as AccessStatus;
     },

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 
 export interface PendingCustomer {
@@ -21,7 +21,7 @@ export function usePendingCustomers() {
     if (!currentTenant?.id) return;
 
     const channel = supabase
-      .channel('pending-customers-realtime')
+      .channel('pending-customers_realtime')
       .on(
         'postgres_changes',
         {
@@ -32,7 +32,7 @@ export function usePendingCustomers() {
         },
         (payload) => {
           console.log('🔄 Pending customers realtime update:', payload.eventType);
-          queryClient.invalidateQueries({ queryKey: ['pending-customers', currentTenant.id] });
+          queryClient.invalidateQueries({ queryKey: ['pending_customers', currentTenant.id] });
         }
       )
       .subscribe();
@@ -43,7 +43,7 @@ export function usePendingCustomers() {
   }, [currentTenant?.id, queryClient]);
 
   const { data: pendingCustomers = [], isLoading, refetch } = useQuery({
-    queryKey: ['pending-customers', currentTenant?.id],
+    queryKey: ['pending_customers', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
@@ -68,3 +68,4 @@ export function usePendingCustomers() {
     refetch,
   };
 }
+

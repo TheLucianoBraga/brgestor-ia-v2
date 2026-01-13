@@ -6,7 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { MoreVertical, Edit, Trash2, Power, Calendar, RefreshCcw, DollarSign } from 'lucide-react';
 import { TenantPlan } from '@/hooks/useTenantPlans';
 
@@ -26,7 +26,7 @@ const formatCurrency = (value: number) => {
 
 export function PlanCard({ plan, onEdit, onDelete, onToggleActive }: PlanCardProps) {
   return (
-    <Card className={!plan.is_active ? 'opacity-60' : ''}>
+    <Card className={!plan.is_active ? 'opacity_60' : ''}>
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
         <div className="space-y-1">
           <div className="flex items-center gap-2">

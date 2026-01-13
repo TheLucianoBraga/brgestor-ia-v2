@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
@@ -62,7 +62,7 @@ export const useNotifications = (limit?: number) => {
   });
 
   const { data: unreadCount = 0 } = useQuery({
-    queryKey: ['notifications-unread-count', currentTenant?.id],
+    queryKey: ['notifications-unread_count', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return 0;
       
@@ -83,7 +83,7 @@ export const useNotifications = (limit?: number) => {
     if (!currentTenant?.id) return;
 
     const channel = supabase
-      .channel('notifications-changes')
+      .channel('notifications_changes')
       .on(
         'postgres_changes',
         {
@@ -95,7 +95,7 @@ export const useNotifications = (limit?: number) => {
         (payload) => {
           console.log('Notification change:', payload);
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
-          queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
+          queryClient.invalidateQueries({ queryKey: ['notifications-unread_count'] });
           
           if (payload.eventType === 'INSERT') {
             const newNotification = payload.new as Notification;
@@ -123,7 +123,7 @@ export const useNotifications = (limit?: number) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications-unread_count'] });
     },
   });
 
@@ -141,7 +141,7 @@ export const useNotifications = (limit?: number) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications-unread_count'] });
       toast.success('Todas notificações marcadas como lidas');
     },
   });
@@ -157,7 +157,7 @@ export const useNotifications = (limit?: number) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      queryClient.invalidateQueries({ queryKey: ['notifications-unread-count'] });
+      queryClient.invalidateQueries({ queryKey: ['notifications-unread_count'] });
       toast.success('Notificação excluída');
     },
   });
@@ -171,3 +171,4 @@ export const useNotifications = (limit?: number) => {
     deleteNotification,
   };
 };
+

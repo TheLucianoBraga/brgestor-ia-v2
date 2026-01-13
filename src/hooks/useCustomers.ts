@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
@@ -443,7 +443,7 @@ export const useCustomers = () => {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
-      queryClient.invalidateQueries({ queryKey: ['customer-portal-access', variables.id] });
+      queryClient.invalidateQueries({ queryKey: ['customer-portal_access', variables.id] });
       toast.success('Cliente atualizado com sucesso!');
       // Log activity
       if (currentTenant?.id) {
@@ -496,3 +496,4 @@ export const useCustomers = () => {
     deleteCustomer,
   };
 };
+

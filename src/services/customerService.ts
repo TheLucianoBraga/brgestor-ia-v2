@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 // ========== Types ==========
 export interface CustomerData {
@@ -212,3 +212,4 @@ export const customerService = {
     return true;
   },
 };
+

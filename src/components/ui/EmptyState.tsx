@@ -75,7 +75,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center py-16 px-4 text-center animate-fade-in',
+        'flex flex-col items-center justify-center py-16 px-4 text-center animate-fade_in',
         className
       )}
     >

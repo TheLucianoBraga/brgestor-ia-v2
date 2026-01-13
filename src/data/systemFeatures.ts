@@ -37,7 +37,7 @@ export const SYSTEM_FEATURES: Category[] = [
     name: 'Dashboard & Relatórios',
     description: 'Visão geral e análises do seu negócio',
     icon: LayoutDashboard,
-    color: 'text-blue-500',
+    color: 'text-blue_500',
     href: '/app/dashboard',
     subCategories: [
       {
@@ -67,7 +67,7 @@ export const SYSTEM_FEATURES: Category[] = [
     name: 'Gestão de Clientes',
     description: 'Cadastro e gerenciamento de clientes',
     icon: UserCheck,
-    color: 'text-green-500',
+    color: 'text-green_500',
     href: '/app/clientes',
     subCategories: [
       {
@@ -85,13 +85,13 @@ export const SYSTEM_FEATURES: Category[] = [
         description: 'Contato com clientes',
         features: [
           { name: 'Envio de WhatsApp', description: 'Mensagens diretas', status: 'active', icon: MessageSquare },
-          { name: 'Envio de e-mail', description: 'Notificações por email', status: 'active', icon: Mail },
+          { name: 'Envio de e_mail', description: 'Notificações por email', status: 'active', icon: Mail },
           { name: 'Histórico de mensagens', description: 'Registro de comunicações', status: 'active', icon: FileText },
         ],
       },
       {
         name: 'Portal do Cliente',
-        description: 'Acesso self-service',
+        description: 'Acesso self_service',
         features: [
           { name: 'Login do cliente', description: 'Acesso ao portal', status: 'active', icon: Lock },
           { name: 'Visualização de serviços', description: 'Serviços contratados', status: 'active', icon: Package },
@@ -106,7 +106,7 @@ export const SYSTEM_FEATURES: Category[] = [
     name: 'Financeiro',
     description: 'Cobranças, pagamentos e despesas',
     icon: Wallet,
-    color: 'text-emerald-500',
+    color: 'text-emerald_500',
     href: '/app/cobrancas',
     subCategories: [
       {
@@ -114,7 +114,7 @@ export const SYSTEM_FEATURES: Category[] = [
         description: 'Geração e gestão de cobranças',
         features: [
           { name: 'Criação de cobranças', description: 'Manual ou automática', status: 'active', icon: Receipt },
-          { name: 'PIX integrado', description: 'QR Code e copia-cola', status: 'active', icon: QrCode },
+          { name: 'PIX integrado', description: 'QR Code e copia_cola', status: 'active', icon: QrCode },
           { name: 'Cartão de crédito', description: 'Pagamento online', status: 'active', icon: CreditCard },
           { name: 'Boleto bancário', description: 'Geração automática', status: 'active', icon: Banknote },
           { name: 'Cobrança recorrente', description: 'Assinaturas automáticas', status: 'active', icon: RefreshCcw },
@@ -148,7 +148,7 @@ export const SYSTEM_FEATURES: Category[] = [
     name: 'Produtos & Serviços',
     description: 'Catálogo de ofertas',
     icon: ShoppingBag,
-    color: 'text-purple-500',
+    color: 'text-purple_500',
     href: '/app/produtos',
     subCategories: [
       {
@@ -186,7 +186,7 @@ export const SYSTEM_FEATURES: Category[] = [
     name: 'Comunicação',
     description: 'WhatsApp, templates e conteúdo',
     icon: MessageSquare,
-    color: 'text-green-600',
+    color: 'text-green_600',
     href: '/app/whatsapp',
     subCategories: [
       {
@@ -226,8 +226,8 @@ export const SYSTEM_FEATURES: Category[] = [
     name: 'Automação & IA',
     description: 'Chatbot e atendimento inteligente',
     icon: Bot,
-    color: 'text-amber-500',
-    href: '/app/atendimento-ia',
+    color: 'text-amber_500',
+    href: '/app/atendimento_ia',
     subCategories: [
       {
         name: 'Chatbot IA',
@@ -264,10 +264,10 @@ export const SYSTEM_FEATURES: Category[] = [
   },
   {
     id: 'gestao',
-    name: 'Gestão Multi-tenant',
+    name: 'Gestão Multi_tenant',
     description: 'Organizações e revendas',
     icon: Building2,
-    color: 'text-indigo-500',
+    color: 'text-indigo_500',
     href: '/app/contas',
     subCategories: [
       {
@@ -307,14 +307,14 @@ export const SYSTEM_FEATURES: Category[] = [
     name: 'Sistema & Configurações',
     description: 'Usuários, logs e preferências',
     icon: Settings,
-    color: 'text-gray-500',
+    color: 'text-gray_500',
     href: '/app/config',
     subCategories: [
       {
         name: 'Usuários',
         description: 'Gerenciamento de acesso',
         features: [
-          { name: 'Convite de usuários', description: 'Por e-mail', status: 'active', icon: UserPlus },
+          { name: 'Convite de usuários', description: 'Por e_mail', status: 'active', icon: UserPlus },
           { name: 'Papéis', description: 'Admin, operador, etc', status: 'active', icon: Shield },
           { name: 'Permissões', description: 'Controle granular', status: 'active', icon: Lock },
           { name: 'Histórico de login', description: 'Acessos recentes', status: 'active', icon: Activity },
@@ -346,7 +346,7 @@ export const SYSTEM_FEATURES: Category[] = [
     name: 'Produtividade',
     description: 'Ferramentas para o dia a dia',
     icon: StickyNote,
-    color: 'text-pink-500',
+    color: 'text-pink_500',
     href: '/app/notes',
     subCategories: [
       {

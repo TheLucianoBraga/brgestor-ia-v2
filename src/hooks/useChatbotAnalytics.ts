@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useQuery } from '@tanstack/react-query';
 
@@ -22,7 +22,7 @@ export function useChatbotAnalytics(startDate?: Date, endDate?: Date) {
   const { currentTenant } = useTenant();
 
   const { data: analytics, isLoading } = useQuery({
-    queryKey: ['chatbot-analytics', currentTenant?.id, startDate, endDate],
+    queryKey: ['chatbot_analytics', currentTenant?.id, startDate, endDate],
     queryFn: async (): Promise<ChatbotAnalytics> => {
       if (!currentTenant?.id) {
         return getEmptyAnalytics();
@@ -183,3 +183,4 @@ function getEmptyAnalytics(): ChatbotAnalytics {
     whatsappMessages: 0
   };
 }
+

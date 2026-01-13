@@ -25,14 +25,14 @@ export const getStatusDisplayConfig = (status: string | null | undefined) => {
   
   switch (normalized) {
     case 'active':
-      return { label: 'Ativo', variant: 'default' as const, color: 'text-green-500' };
+      return { label: 'Ativo', variant: 'default' as const, color: 'text-green_500' };
     case 'expired':
-      return { label: 'Expirado', variant: 'destructive' as const, color: 'text-red-500' };
+      return { label: 'Expirado', variant: 'destructive' as const, color: 'text-red_500' };
     case 'cancelled':
-      return { label: 'Cancelado', variant: 'secondary' as const, color: 'text-gray-500' };
+      return { label: 'Cancelado', variant: 'secondary' as const, color: 'text-gray_500' };
     case 'pending':
-      return { label: 'Pendente', variant: 'outline' as const, color: 'text-yellow-500' };
+      return { label: 'Pendente', variant: 'outline' as const, color: 'text-yellow_500' };
     default:
-      return { label: status || 'Pendente', variant: 'outline' as const, color: 'text-gray-500' };
+      return { label: status || 'Pendente', variant: 'outline' as const, color: 'text-gray_500' };
   }
 };

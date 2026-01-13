@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 import { useCustomerAuth } from '@/contexts/CustomerAuthContext';
 import { useReferral } from '@/hooks/useReferral';
@@ -340,3 +340,4 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     </Dialog>
   );
 };
+

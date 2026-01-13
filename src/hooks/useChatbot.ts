@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { Json } from '@/integrations/supabase/types';
@@ -49,7 +49,7 @@ export function useChatbot() {
   const [isThinking, setIsThinking] = useState(false);
 
   const { data: config, isLoading: configLoading } = useQuery({
-    queryKey: ['chatbot-config', currentTenant?.id],
+    queryKey: ['chatbot_config', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
       
@@ -220,7 +220,7 @@ export function useChatbot() {
 
       if (aiEnabled) {
         // Call the chatbot-response edge function
-        const { data, error } = await supabase.functions.invoke('chatbot-response', {
+        const { data, error } = await supabase.rpc('chatbot_response', {
           body: {
             message: text,
             previousMessages: messages.map(m => ({
@@ -322,7 +322,7 @@ export function useChatbotConfig() {
   const queryClient = useQueryClient();
 
   const { data: config, isLoading } = useQuery({
-    queryKey: ['chatbot-config-admin', currentTenant?.id],
+    queryKey: ['chatbot-config_admin', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return null;
       
@@ -345,7 +345,7 @@ export function useChatbotConfig() {
   });
 
   const { data: sessions } = useQuery({
-    queryKey: ['chatbot-sessions', currentTenant?.id],
+    queryKey: ['chatbot_sessions', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
       
@@ -406,8 +406,8 @@ export function useChatbotConfig() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['chatbot-config-admin'] });
-      queryClient.invalidateQueries({ queryKey: ['chatbot-config'] });
+      queryClient.invalidateQueries({ queryKey: ['chatbot-config_admin'] });
+      queryClient.invalidateQueries({ queryKey: ['chatbot_config'] });
     }
   });
 
@@ -418,3 +418,4 @@ export function useChatbotConfig() {
     saveConfig
   };
 }
+

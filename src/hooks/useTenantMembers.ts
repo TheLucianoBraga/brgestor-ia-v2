@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -28,7 +28,7 @@ export const useTenantMembers = () => {
 
   // Fetch current tenant members
   const membersQuery = useQuery({
-    queryKey: ['tenant-members', currentTenant?.id],
+    queryKey: ['tenant_members', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
@@ -60,7 +60,7 @@ export const useTenantMembers = () => {
 
   // Fetch seat info for ADM/REVENDA tenants
   const seatInfoQuery = useQuery({
-    queryKey: ['seat-info', currentTenant?.id],
+    queryKey: ['seat_info', currentTenant?.id],
     queryFn: async (): Promise<SeatInfo> => {
       if (!currentTenant?.id) {
         return { current: 0, max: null, available: null, hasLimit: false };
@@ -156,8 +156,8 @@ export const useTenantMembers = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-members'] });
-      queryClient.invalidateQueries({ queryKey: ['seat-info'] });
+      queryClient.invalidateQueries({ queryKey: ['tenant_members'] });
+      queryClient.invalidateQueries({ queryKey: ['seat_info'] });
       toast.success('Usuário desativado com sucesso!');
     },
     onError: () => {
@@ -185,8 +185,8 @@ export const useTenantMembers = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-members'] });
-      queryClient.invalidateQueries({ queryKey: ['seat-info'] });
+      queryClient.invalidateQueries({ queryKey: ['tenant_members'] });
+      queryClient.invalidateQueries({ queryKey: ['seat_info'] });
       toast.success('Usuário reativado com sucesso!');
     },
     onError: (error: Error) => {
@@ -208,8 +208,8 @@ export const useTenantMembers = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['tenant-members'] });
-      queryClient.invalidateQueries({ queryKey: ['seat-info'] });
+      queryClient.invalidateQueries({ queryKey: ['tenant_members'] });
+      queryClient.invalidateQueries({ queryKey: ['seat_info'] });
       toast.success('Usuário removido com sucesso!');
     },
     onError: () => {
@@ -228,3 +228,4 @@ export const useTenantMembers = () => {
     removeMember,
   };
 };
+

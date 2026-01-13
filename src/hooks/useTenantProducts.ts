@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 
 export interface PriceTier {
@@ -222,3 +222,4 @@ export function useTenantProducts() {
     toggleActive,
   };
 }
+

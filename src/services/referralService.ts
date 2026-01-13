@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 
 // ==================== TYPES ====================
 export interface ReferralLink {
@@ -139,7 +139,7 @@ export const referralService = {
     // Enriquecer com nomes dos clientes
     const enriched: ReferredCustomer[] = await Promise.all(
       (data || []).map(async (item) => {
-        let referred_name = 'Cliente #' + item.referred_customer_id.slice(0, 6);
+        let referred_name = 'Cliente #' + (item.referred_customer_id?.slice(0, 6) || 'XXXXXX');
         
         if (item.referred_customer_id) {
           const { data: customerData } = await supabase
@@ -279,3 +279,4 @@ export const referralService = {
     return `${origin}/r/${refCode}`;
   }
 };
+

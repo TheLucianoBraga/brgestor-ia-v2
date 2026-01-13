@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -39,7 +39,7 @@ export const useCustomerCharges = (customerId?: string) => {
     if (!currentTenant?.id) return;
 
     const channel = supabase
-      .channel('customer-charges-realtime')
+      .channel('customer-charges_realtime')
       .on(
         'postgres_changes',
         {
@@ -50,7 +50,7 @@ export const useCustomerCharges = (customerId?: string) => {
         },
         (payload) => {
           console.log('🔄 Customer charges realtime update:', payload.eventType);
-          queryClient.invalidateQueries({ queryKey: ['customer-charges', currentTenant.id] });
+          queryClient.invalidateQueries({ queryKey: ['customer_charges', currentTenant.id] });
         }
       )
       .subscribe();
@@ -61,7 +61,7 @@ export const useCustomerCharges = (customerId?: string) => {
   }, [currentTenant?.id, queryClient]);
 
   const chargesQuery = useQuery({
-    queryKey: ['customer-charges', currentTenant?.id, customerId],
+    queryKey: ['customer_charges', currentTenant?.id, customerId],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
@@ -116,7 +116,7 @@ export const useCustomerCharges = (customerId?: string) => {
       return newCharge as CustomerCharge;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança criada com sucesso!');
     },
     onError: (error: any) => {
@@ -138,7 +138,7 @@ export const useCustomerCharges = (customerId?: string) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança marcada como paga!');
     },
     onError: (error: any) => {
@@ -160,7 +160,7 @@ export const useCustomerCharges = (customerId?: string) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança cancelada!');
     },
     onError: (error: any) => {
@@ -182,7 +182,7 @@ export const useCustomerCharges = (customerId?: string) => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+      queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
       toast.success('Cobrança excluída com sucesso!');
     },
     onError: (error: any) => {
@@ -191,7 +191,7 @@ export const useCustomerCharges = (customerId?: string) => {
   });
 
   const refetch = () => {
-    queryClient.invalidateQueries({ queryKey: ['customer-charges'] });
+    queryClient.invalidateQueries({ queryKey: ['customer_charges'] });
   };
 
   return {
@@ -204,3 +204,4 @@ export const useCustomerCharges = (customerId?: string) => {
     refetch,
   };
 };
+

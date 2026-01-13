@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { toast } from 'sonner';
 
 export interface TenantWithOwner {
@@ -49,10 +49,10 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 const TYPE_COLORS: Record<string, string> = {
-  master: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
-  adm: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
-  revenda: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
-  cliente: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+  master: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple_300',
+  adm: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue_300',
+  revenda: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green_300',
+  cliente: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange_300',
 };
 
 export const TenantCard: React.FC<TenantCardProps> = ({
@@ -133,7 +133,7 @@ export const TenantCard: React.FC<TenantCardProps> = ({
       <CardContent className="space-y-3">
         {/* Badges */}
         <div className="flex items-center gap-2 flex-wrap">
-          <Badge className={TYPE_COLORS[tenant.type] || 'bg-muted'}>
+          <Badge className={TYPE_COLORS[tenant.type] || 'bg_muted'}>
             {TYPE_LABELS[tenant.type] || tenant.type}
           </Badge>
           <Badge variant={isActive ? 'default' : 'destructive'}>

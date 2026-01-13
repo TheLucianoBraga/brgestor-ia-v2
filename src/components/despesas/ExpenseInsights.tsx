@@ -117,26 +117,26 @@ export const ExpenseInsights: React.FC<ExpenseInsightsProps> = ({ metrics, expen
   const getTypeStyles = (type: 'success' | 'warning' | 'danger' | 'info') => {
     switch (type) {
       case 'success':
-        return 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950 dark:border-emerald-800';
+        return 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950 dark:border-emerald_800';
       case 'warning':
-        return 'bg-amber-50 border-amber-200 dark:bg-amber-950 dark:border-amber-800';
+        return 'bg-amber-50 border-amber-200 dark:bg-amber-950 dark:border-amber_800';
       case 'danger':
-        return 'bg-rose-50 border-rose-200 dark:bg-rose-950 dark:border-rose-800';
+        return 'bg-rose-50 border-rose-200 dark:bg-rose-950 dark:border-rose_800';
       case 'info':
-        return 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800';
+        return 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue_800';
     }
   };
 
   const getIconColor = (type: 'success' | 'warning' | 'danger' | 'info') => {
     switch (type) {
       case 'success':
-        return 'text-emerald-600 dark:text-emerald-400';
+        return 'text-emerald-600 dark:text-emerald_400';
       case 'warning':
-        return 'text-amber-600 dark:text-amber-400';
+        return 'text-amber-600 dark:text-amber_400';
       case 'danger':
-        return 'text-rose-600 dark:text-rose-400';
+        return 'text-rose-600 dark:text-rose_400';
       case 'info':
-        return 'text-blue-600 dark:text-blue-400';
+        return 'text-blue-600 dark:text-blue_400';
     }
   };
 

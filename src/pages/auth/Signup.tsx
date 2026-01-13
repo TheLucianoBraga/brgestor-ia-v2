@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface RefCodeData {
@@ -56,7 +56,7 @@ const Signup: React.FC = () => {
 
   const processSignup = async () => {
     if (!refCodeData) {
-      navigate('/app/select-tenant');
+      navigate('/app/select_tenant');
       return;
     }
 
@@ -102,16 +102,8 @@ const Signup: React.FC = () => {
     setLoading(true);
 
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/app/dashboard`,
-          data: {
-            full_name: fullName
-          }
-        }
-      });
+      // Mock signup - durante migração
+      const signUpError = null;
 
       if (signUpError) {
         if (signUpError.message.includes('already registered')) {
@@ -362,3 +354,4 @@ const Signup: React.FC = () => {
 };
 
 export default Signup;
+

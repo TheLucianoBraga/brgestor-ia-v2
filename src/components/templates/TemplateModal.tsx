@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { 
@@ -48,11 +48,11 @@ interface TemplateModalProps {
 const MOCK_DATA: Record<string, string> = {
   '{primeiro_nome}': 'João',
   '{nome}': 'João Silva',
-  '{whatsapp}': '(11) 99999-9999',
-  '{whatsapp_secundario}': '(11) 88888-8888',
+  '{whatsapp}': '(11) 99999_9999',
+  '{whatsapp_secundario}': '(11) 88888_8888',
   '{email}': 'joao.silva@email.com',
-  '{cpf_cnpj}': '123.456.789-00',
-  '{rg_ie}': '12.345.678-9',
+  '{cpf_cnpj}': '123.456.789_00',
+  '{rg_ie}': '12.345.678_9',
   '{nascimento}': '15/03/1990',
   '{genero}': 'Masculino',
   '{senha_portal}': 'abc123',
@@ -69,14 +69,14 @@ const MOCK_DATA: Record<string, string> = {
   '{pix}': '00020126580014br.gov.bcb.pix0136abc123',
   '{link_pagamento}': 'https://pay.brgestor.com/abc123',
   '{data_cadastro}': '01/01/2026',
-  '{cep}': '01310-100',
+  '{cep}': '01310_100',
   '{rua}': 'Av. Paulista',
   '{numero}': '1000',
   '{complemento}': 'Sala 101',
   '{bairro}': 'Bela Vista',
   '{cidade}': 'São Paulo',
   '{estado}': 'SP',
-  '{placa}': 'ABC-1234',
+  '{placa}': 'ABC_1234',
   '{marca}': 'Toyota',
   '{modelo}': 'Corolla',
   '{ano}': '2023',
@@ -118,7 +118,7 @@ export function TemplateModal({
     }
     
     try {
-      const prompt = `Crie uma mensagem ${type === 'cobranca' ? 'de cobrança amigável' : type === 'lembrete' ? 'de lembrete' : type === 'boas_vindas' ? 'de boas-vindas' : type === 'confirmacao' ? 'de confirmação' : 'profissional'} para ${channel === 'whatsapp' ? 'WhatsApp' : channel === 'email' ? 'e-mail' : 'notificação'}.
+      const prompt = `Crie uma mensagem ${type === 'cobranca' ? 'de cobrança amigável' : type === 'lembrete' ? 'de lembrete' : type === 'boas_vindas' ? 'de boas_vindas' : type === 'confirmacao' ? 'de confirmação' : 'profissional'} para ${channel === 'whatsapp' ? 'WhatsApp' : channel === 'email' ? 'e_mail' : 'notificação'}.
 ${name ? `Contexto: ${name}` : ''}
 Use as variáveis disponíveis: {nome}, {valor}, {vencimento}, {produto}, {link_pagamento}, {periodo_dia}.
 A mensagem deve ser curta, objetiva e profissional. Use emojis ocasionalmente para WhatsApp.`;

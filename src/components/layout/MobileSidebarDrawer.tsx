@@ -15,9 +15,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown_menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll_area';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import defaultLogo from '@/assets/logo.png';
@@ -206,10 +206,10 @@ export const MobileSidebarDrawer: React.FC<MobileSidebarDrawerProps> = ({ open, 
                         to={item.href}
                         onClick={onClose}
                         className={cn(
-                          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
-                          'hover:bg-sidebar-accent',
-                          active && 'bg-sidebar-primary text-sidebar-primary-foreground',
-                          !active && !isPlanoPro && 'text-sidebar-foreground/70 hover:text-sidebar-foreground',
+                          'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition_all',
+                          'hover:bg-sidebar_accent',
+                          active && 'bg-sidebar-primary text-sidebar-primary_foreground',
+                          !active && !isPlanoPro && 'text-sidebar-foreground/70 hover:text-sidebar_foreground',
                           isPlanoPro && 'text-amber-400 bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-500/30'
                         )}
                       >
@@ -234,16 +234,16 @@ export const MobileSidebarDrawer: React.FC<MobileSidebarDrawerProps> = ({ open, 
                 <CollapsibleTrigger asChild>
                   <button
                     className={cn(
-                      'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
-                      'hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-sidebar-foreground',
-                      'border border-dashed border-sidebar-border'
+                      'flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium transition_all',
+                      'hover:bg-sidebar-accent text-sidebar-foreground/70 hover:text-sidebar_foreground',
+                      'border border-dashed border-sidebar_border'
                     )}
                   >
                     <Wrench className="w-5 h-5 flex-shrink-0" />
                     <span className="flex-1 text-left">Administração</span>
                     <ChevronDown className={cn(
-                      'w-4 h-4 transition-transform',
-                      adminOpen && 'rotate-180'
+                      'w-4 h-4 transition_transform',
+                      adminOpen && 'rotate_180'
                     )} />
                   </button>
                 </CollapsibleTrigger>
@@ -262,10 +262,10 @@ export const MobileSidebarDrawer: React.FC<MobileSidebarDrawerProps> = ({ open, 
                               to={item.href}
                               onClick={onClose}
                               className={cn(
-                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
-                                'hover:bg-sidebar-accent',
-                                active && 'bg-sidebar-primary text-sidebar-primary-foreground',
-                                !active && 'text-sidebar-foreground/70 hover:text-sidebar-foreground'
+                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition_all',
+                                'hover:bg-sidebar_accent',
+                                active && 'bg-sidebar-primary text-sidebar-primary_foreground',
+                                !active && 'text-sidebar-foreground/70 hover:text-sidebar_foreground'
                               )}
                             >
                               <item.icon className="w-5 h-5 flex-shrink-0" />

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase-postgres';
 import { toast } from 'sonner';
 import { useTenant } from '@/contexts/TenantContext';
 
@@ -40,7 +40,7 @@ export const useScheduledMessages = () => {
   const { currentTenant } = useTenant();
 
   const scheduledMessagesQuery = useQuery({
-    queryKey: ['scheduled-messages', currentTenant?.id],
+    queryKey: ['scheduled_messages', currentTenant?.id],
     queryFn: async () => {
       if (!currentTenant?.id) return [];
       
@@ -75,7 +75,7 @@ export const useScheduledMessages = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scheduled-messages'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled_messages'] });
       toast.success('Mensagem agendada com sucesso!');
     },
     onError: (error: Error) => {
@@ -93,7 +93,7 @@ export const useScheduledMessages = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scheduled-messages'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled_messages'] });
       toast.success('Agendamento cancelado!');
     },
     onError: (error: Error) => {
@@ -111,7 +111,7 @@ export const useScheduledMessages = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scheduled-messages'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled_messages'] });
       toast.success('Mensagem excluída!');
     },
     onError: (error: Error) => {
@@ -133,7 +133,7 @@ export const useScheduledMessages = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scheduled-messages'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduled_messages'] });
       toast.success('Mensagem reagendada para reenvio!');
     },
     onError: (error: Error) => {
@@ -157,3 +157,4 @@ export const useScheduledMessages = () => {
     retryScheduledMessage,
   };
 };
+

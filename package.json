@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:mock": "vite --mode mock",    // Frontend com mock backend local
+    "dev:dev": "vite --mode dev",     // Frontend com backend dev VPS
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "build:prod": "vite build --mode prod",    // Build para produção
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { supabase } from '@/lib/supabase-postgres';
+import api from '@/services/api';
 import { useTenant } from '@/contexts/TenantContext';
 
 export interface Plan {
@@ -66,30 +66,20 @@ export function usePlans() {
     setError(null);
 
     try {
-      // Fetch plans (only active ones for non-master)
-      let plansQuery = supabase.from('plans').select('*');
-      if (!isMaster) {
-        plansQuery = plansQuery.eq('active', true);
-      }
-      const { data: plansData, error: plansError } = await plansQuery.order('created_at', { ascending: false });
+      // Fetch plans
+      const { data: plansData, error: plansError } = await api.getPlans();
 
-      if (plansError) throw plansError;
+      if (plansError) throw new Error(plansError);
 
-      // Fetch prices (only active ones)
-      const { data: pricesData, error: pricesError } = await supabase
-        .from('plan_prices')
-        .select('*')
-        .eq('active', true);
+      // Fetch prices
+      const { data: pricesData, error: pricesError } = await api.getAllPrices();
 
-      if (pricesError) throw pricesError;
+      if (pricesError) throw new Error(pricesError);
 
-      // Fetch features (only enabled ones)
-      const { data: featuresData, error: featuresError } = await supabase
-        .from('plan_features')
-        .select('*')
-        .eq('is_enabled', true);
+      // Fetch features
+      const { data: featuresData, error: featuresError } = await api.getAllFeatures();
 
-      if (featuresError) throw featuresError;
+      if (featuresError) throw new Error(featuresError);
 
       // Map plans with their prices and features
       const plansWithPrices: PlanWithPrice[] = (plansData || []).map((plan: any) => {
@@ -143,45 +133,35 @@ export function usePlans() {
     }
 
     try {
-      const { data: newPlan, error: insertError } = await supabase
-        .from('plans')
-        .insert({
-          ...data,
-          created_by_tenant_id: currentTenant.id,
-          per_active_revenda_price: data.per_active_revenda_price || 0,
-        })
-        .select()
-        .single();
+      const { data: newPlan, error: insertError } = await api.createPlan({
+        ...data,
+        per_active_revenda_price: data.per_active_revenda_price || 0,
+      });
 
-      if (insertError) throw insertError;
+      if (insertError) throw new Error(insertError);
+      const planRecord = newPlan;
 
       // Create master price
       if (data.base_price > 0) {
-        await supabase
-          .from('plan_prices')
-          .insert({
-            plan_id: newPlan.id,
-            seller_tenant_id: currentTenant.id,
-            price_monthly: data.base_price,
-            active: true,
-          });
+        await api.createPlanPrice(planRecord.id, {
+          price: data.base_price,
+          billing_cycle: 'monthly',
+        });
       }
 
       // Create features
       if (features.length > 0) {
         const featureRecords = features.map((f) => ({
-          plan_id: newPlan.id,
-          feature_category: f.category,
-          feature_subcategory: f.subcategory,
-          feature_name: f.feature,
+          feature_key: `${f.category}.${f.subcategory}.${f.feature}`,
+          feature_value: 'true',
           is_enabled: true,
         }));
 
-        await supabase.from('plan_features').insert(featureRecords);
+        await api.createPlanFeatures(planRecord.id, featureRecords);
       }
 
       await fetchPlans();
-      return { success: true, plan: newPlan };
+      return { success: true, plan: planRecord };
     } catch (err: any) {
       console.error('Error creating plan:', err);
       return { success: false, error: err.message };
@@ -198,29 +178,24 @@ export function usePlans() {
     }
 
     try {
-      const { error: updateError } = await supabase
-        .from('plans')
-        .update(data)
-        .eq('id', planId);
+      const { error: updateError } = await api.updatePlan(planId, data);
 
-      if (updateError) throw updateError;
+      if (updateError) throw new Error(updateError);
 
       // Update features if provided
       if (features !== undefined) {
         // Delete existing features
-        await supabase.from('plan_features').delete().eq('plan_id', planId);
+        await api.deletePlanFeatures(planId);
 
         // Insert new features
         if (features.length > 0) {
           const featureRecords = features.map((f) => ({
-            plan_id: planId,
-            feature_category: f.category,
-            feature_subcategory: f.subcategory,
-            feature_name: f.feature,
+            feature_key: `${f.category}.${f.subcategory}.${f.feature}`,
+            feature_value: 'true',
             is_enabled: true,
           }));
 
-          await supabase.from('plan_features').insert(featureRecords);
+          await api.createPlanFeatures(planId, featureRecords);
         }
       }
 
@@ -238,12 +213,9 @@ export function usePlans() {
     }
 
     try {
-      const { error: deleteError } = await supabase
-        .from('plans')
-        .delete()
-        .eq('id', planId);
+      const { error: deleteError } = await api.deletePlan(planId);
 
-      if (deleteError) throw deleteError;
+      if (deleteError) throw new Error(deleteError);
 
       await fetchPlans();
       return { success: true };
@@ -259,18 +231,11 @@ export function usePlans() {
     }
 
     try {
-      const { error: upsertError } = await supabase
-        .from('plan_prices')
-        .upsert({
-          plan_id: planId,
-          seller_tenant_id: currentTenant.id,
-          price_monthly: priceMonthly,
-          active: true,
-        }, {
-          onConflict: 'plan_id,seller_tenant_id'
-        });
-
-      if (upsertError) throw upsertError;
+      // Try to create price (backend handles upsert logic)
+      await api.createPlanPrice(planId, {
+        price: priceMonthly,
+        billing_cycle: 'monthly',
+      });
 
       await fetchPlans();
       return { success: true };

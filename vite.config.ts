@@ -10,8 +10,9 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
     proxy: {
+      // Proxy para API REST (PostgREST style)
       '/rest': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:4000', // Mock backend local
         changeOrigin: true,
         secure: false,
         configure: (proxy, options) => {
@@ -20,13 +21,15 @@ export default defineConfig(({ mode }) => ({
           });
         },
       },
+      // Proxy para autenticação
       '/auth': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:4000', // Mock backend local
         changeOrigin: true,
         secure: false,
       },
+      // Proxy para chamadas RPC (procedures)
       '/rpc': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:4000', // Mock backend local
         changeOrigin: true,
         secure: false,
       }

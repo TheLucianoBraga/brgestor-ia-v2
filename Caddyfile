@@ -1,7 +1,13 @@
 # Caddyfile - Configuração com SSL automático
 # Caddy gerencia certificados Let's Encrypt automaticamente
-brgestor.com, www.brgestor.com {
-    # Proxy reverso para o container
+brgestor.com www.brgestor.com {
+    # Proxy para API backend
+    reverse_proxy /rest/v1/* 72.60.14.172:3333
+    reverse_proxy /auth/* 72.60.14.172:3333
+    reverse_proxy /api/* 72.60.14.172:3333
+    reverse_proxy /health 72.60.14.172:3333
+    
+    # Frontend estático
     reverse_proxy brgestor:80
     
     # Compressão Gzip
@@ -36,7 +42,7 @@ brgestor.com, www.brgestor.com {
 # Proxy HTTPS para WAHA API
 waha.brgestor.com {
     reverse_proxy 72.60.14.172:3000
-    
+
     # Logs
     log {
         output file /var/log/caddy/waha-access.log

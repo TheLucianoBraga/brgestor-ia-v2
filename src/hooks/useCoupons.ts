@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase-postgres';
+import api from '@/services/api';
 import { useTenant } from '@/contexts/TenantContext';
 import { toast } from 'sonner';
 
@@ -34,38 +34,14 @@ export const useCoupons = () => {
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
-      const { data, error } = await supabase
-        .from('coupons')
-        .select('*')
-        .eq('issuer_tenant_id', currentTenant.id)
-        .order('created_at', { ascending: false });
+      const { data, error } = await api.getCoupons();
 
-      if (error) throw error;
+      if (error) throw new Error(error);
 
-      // Get redemption counts
-      const couponIds = data.map(c => c.id);
-      if (couponIds.length > 0) {
-        const { data: redemptions } = await supabase
-          .from('coupon_redemptions')
-          .select('coupon_id')
-          .in('coupon_id', couponIds);
-
-        const countMap = (redemptions || []).reduce((acc, r) => {
-          acc[r.coupon_id] = (acc[r.coupon_id] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
-
-        return data.map(c => ({
-          ...c,
-          discount_type: c.discount_type as 'percent' | 'fixed',
-          redemption_count: countMap[c.id] || 0,
-        })) as Coupon[];
-      }
-
-      return data.map(c => ({
+      // Backend já retorna redemption_count
+      return (data || []).map(c => ({
         ...c,
         discount_type: c.discount_type as 'percent' | 'fixed',
-        redemption_count: 0,
       })) as Coupon[];
     },
     enabled: !!currentTenant?.id,
@@ -75,16 +51,9 @@ export const useCoupons = () => {
     mutationFn: async (data: CouponInsert) => {
       if (!currentTenant?.id) throw new Error('No tenant selected');
 
-      const { data: result, error } = await supabase
-        .from('coupons')
-        .insert({
-          ...data,
-          issuer_tenant_id: currentTenant.id,
-        })
-        .select()
-        .single();
+      const { data: result, error } = await api.createCoupon(data);
 
-      if (error) throw error;
+      if (error) throw new Error(error);
       return result;
     },
     onSuccess: () => {
@@ -102,14 +71,9 @@ export const useCoupons = () => {
 
   const updateCoupon = useMutation({
     mutationFn: async ({ id, ...data }: { id: string } & Partial<CouponInsert>) => {
-      const { data: result, error } = await supabase
-        .from('coupons')
-        .update(data)
-        .eq('id', id)
-        .select()
-        .single();
+      const { data: result, error } = await api.updateCoupon(id, data);
 
-      if (error) throw error;
+      if (error) throw new Error(error);
       return result;
     },
     onSuccess: () => {
@@ -123,12 +87,9 @@ export const useCoupons = () => {
 
   const toggleCouponStatus = useMutation({
     mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
-      const { error } = await supabase
-        .from('coupons')
-        .update({ active })
-        .eq('id', id);
+      const { error } = await api.updateCoupon(id, { active });
 
-      if (error) throw error;
+      if (error) throw new Error(error);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['coupons'] });
@@ -141,8 +102,8 @@ export const useCoupons = () => {
 
   const deleteCoupon = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('coupons').delete().eq('id', id);
-      if (error) throw error;
+      const { error } = await api.deleteCoupon(id);
+      if (error) throw new Error(error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['coupons'] });

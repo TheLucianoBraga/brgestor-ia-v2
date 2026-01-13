@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase-postgres';
+import api from '@/services/api';
 
 // ========== Types ==========
 export interface CustomerData {

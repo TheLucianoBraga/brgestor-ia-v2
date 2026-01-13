@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase-postgres';
+import api from '@/services/api';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { logActivityDirect } from '@/hooks/useActivityLog';
@@ -14,7 +14,7 @@ interface TenantSetting {
   updated_at: string;
 }
 
-export const useTenantSettings = () => {
+export function useTenantSettings() {
   const { currentTenant } = useTenant();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -25,24 +25,23 @@ export const useTenantSettings = () => {
       if (!currentTenant?.id) return {};
       
       try {
-        const { data, error } = await supabase
-          .from('tenant_settings')
-          .select('*')
-          .eq('tenant_id', currentTenant.id);
+        const { data, error } = await api.getTenantSettings();
 
         // Return empty object on any error - don't break the app
         if (error) {
-          console.warn('tenant_settings query error:', error.message);
+          console.warn('tenant_settings query error:', error);
           return {};
         }
 
         // Convert to key-value object
         const settingsMap: Record<string, string> = {};
-        (data as TenantSetting[] | null)?.forEach((setting) => {
-          if (setting.value) {
-            settingsMap[setting.key] = setting.value;
-          }
-        });
+        
+        if (Array.isArray(data)) {
+          data.forEach((setting: TenantSetting) => {
+            settingsMap[setting.key] = setting.value || '';
+          });
+        }
+
         return settingsMap;
       } catch (err) {
         console.warn('tenant_settings fetch failed:', err);
@@ -50,20 +49,14 @@ export const useTenantSettings = () => {
       }
     },
     enabled: !!currentTenant?.id,
-    retry: false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const updateSetting = useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
       if (!currentTenant?.id) throw new Error('Tenant não selecionado');
 
-      const { error } = await supabase
-        .from('tenant_settings')
-        .upsert(
-          { tenant_id: currentTenant.id, key, value },
-          { onConflict: 'tenant_id,key' }
-        );
+      const { error } = await api.saveTenantSetting(key, value);
 
       if (error) throw error;
     },
@@ -81,14 +74,11 @@ export const useTenantSettings = () => {
       if (!currentTenant?.id) throw new Error('Tenant não selecionado');
 
       const upsertData = Object.entries(settingsToUpdate).map(([key, value]) => ({
-        tenant_id: currentTenant.id,
         key,
         value,
       }));
 
-      const { error } = await supabase
-        .from('tenant_settings')
-        .upsert(upsertData, { onConflict: 'tenant_id,key' });
+      const { error } = await api.saveTenantSettingsBatch(upsertData);
 
       if (error) throw error;
     },
@@ -102,20 +92,16 @@ export const useTenantSettings = () => {
     },
   });
 
-  // Version that shows toast - for manual saves
-  const updateMultipleSettingsWithToast = useMutation({
+  const saveBatchSettings = useMutation({
     mutationFn: async (settingsToUpdate: Record<string, string>) => {
       if (!currentTenant?.id) throw new Error('Tenant não selecionado');
 
       const upsertData = Object.entries(settingsToUpdate).map(([key, value]) => ({
-        tenant_id: currentTenant.id,
         key,
         value,
       }));
 
-      const { error } = await supabase
-        .from('tenant_settings')
-        .upsert(upsertData, { onConflict: 'tenant_id,key' });
+      const { error } = await api.saveTenantSettingsBatch(upsertData);
 
       if (error) throw error;
     },
@@ -129,22 +115,31 @@ export const useTenantSettings = () => {
       }
     },
     onError: (error) => {
-      console.error('Error updating settings:', error);
+      console.error('Error saving batch settings:', error);
       toast.error('Erro ao salvar configurações');
     },
   });
 
-  const getSetting = (key: string): string => {
-    return settings?.[key] || '';
-  };
-
   return {
-    settings,
+    settings: settings || {},
     isLoading,
-    getSetting,
-    updateSetting,
-    updateMultipleSettings,
-    updateMultipleSettingsWithToast,
+    updateSetting: updateSetting.mutate,
+    updateMultipleSettings: updateMultipleSettings.mutate,
+    saveBatchSettings: saveBatchSettings.mutate,
+    isUpdating: updateSetting.isPending || updateMultipleSettings.isPending || saveBatchSettings.isPending,
   };
-};
+}
+
+// Helper function to get a specific setting
+export function useTenantSetting(key: string, defaultValue: string = '') {
+  const { settings } = useTenantSettings();
+  return settings[key] ?? defaultValue;
+}
+
+// Helper function to check if a setting exists and has a truthy value
+export function useTenantSettingEnabled(key: string) {
+  const { settings } = useTenantSettings();
+  const value = settings[key];
+  return value === 'true' || value === '1' || value === 'enabled';
+}
 

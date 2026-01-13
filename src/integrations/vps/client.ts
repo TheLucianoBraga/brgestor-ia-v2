@@ -52,8 +52,10 @@ class QueryBuilder {
       // Usar /rest/v1/:table (compatível com PostgREST/Supabase)
       const url = `${this.baseURL}/rest/v1/${this.tableName}?${this.queryParams.toString()}`;
       
+      console.log('🔍 VPS Query:', { method: this.method, url, body: this.bodyData });
+      
       const headers: Record<string, string> = {
-        'Content_Type': 'application/json',
+        'Content-Type': 'application/json',
         'Prefer': 'return=representation',
       };
 
@@ -224,7 +226,7 @@ class BRGestorAPIClient {
   private authListeners: Array<(event: string, session: Session | null) => void> = [];
 
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://72.60.14.172:3333';
+    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'https://brgestor.com';
     this.token = localStorage.getItem('brgestor_token');
     
     // Recuperar usuário do localStorage

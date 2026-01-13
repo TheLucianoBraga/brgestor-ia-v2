@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase-postgres';
+import api from '@/services/api';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTenantSettings } from '@/hooks/useTenantSettings';
@@ -376,7 +376,7 @@ export const useCustomers = () => {
       // Handle address - upsert
       if (data.address) {
         // Delete existing and insert new
-        await supabase.from('customer_addresses').delete().eq('customer_id', id);
+        await api.deleteCustomerAddresses(id);
         
         if (Object.values(data.address).some(v => v)) {
           const { error: addressError } = await supabase
@@ -388,7 +388,7 @@ export const useCustomers = () => {
 
       // Handle vehicles - replace all
       if (data.vehicles !== undefined) {
-        await supabase.from('customer_vehicles').delete().eq('customer_id', id);
+        await api.deleteCustomerVehicles(id);
         
         const validVehicles = data.vehicles.filter(v => v.plate || v.model);
         if (validVehicles.length > 0) {
@@ -402,7 +402,7 @@ export const useCustomers = () => {
       // Handle items - replace all and regenerate charge schedules
       if (data.items !== undefined) {
         // Delete old items
-        await supabase.from('customer_items').delete().eq('customer_id', id);
+        await api.deleteCustomerItems(id);
         
         // Delete pending charge schedules for this customer
         await supabase
@@ -459,8 +459,8 @@ export const useCustomers = () => {
 
   const deleteCustomer = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('customers').delete().eq('id', id);
-      if (error) throw error;
+      const { error } = await api.deleteCustomer(id);
+      if (error) throw new Error(error);
       return id;
     },
     onSuccess: (deletedId) => {

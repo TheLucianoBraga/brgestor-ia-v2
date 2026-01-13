@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase-postgres';
+import api from '@/services/api';
 
 // ==================== TYPES ====================
 export interface ReferralLink {
@@ -49,137 +49,95 @@ export const referralService = {
    * Se não existir e createIfMissing=true, cria automaticamente
    */
   async getByCustomerId(customerId: string, tenantId?: string, createIfMissing = true): Promise<ReferralLink | null> {
-    let query = supabase
-      .from('customer_referral_links')
-      .select('*')
-      .eq('customer_id', customerId)
-      .eq('is_active', true);
-    
-    if (tenantId) {
-      query = query.eq('tenant_id', tenantId);
-    }
-    
-    const { data, error } = await query.maybeSingle();
-    
-    if (error) {
+    try {
+      const response = await api.getReferralLinks({ customer_id: customerId, is_active: true });
+      const data = response.data?.[0] || null;
+      
+      // Se não existe e temos tenantId, criar automaticamente (idempotente)
+      if (!data && tenantId && createIfMissing) {
+        const created = await this.createLink(customerId, tenantId);
+        return created;
+      }
+      
+      return data as ReferralLink | null;
+    } catch (error) {
       console.error('Error fetching referral link:', error);
       return null;
     }
-    
-    // Se não existe e temos tenantId, criar automaticamente (idempotente)
-    if (!data && tenantId && createIfMissing) {
-      const created = await this.createLink(customerId, tenantId);
-      return created;
-    }
-    
-    return data as ReferralLink | null;
   },
 
   /**
    * Cria um novo link de indicação para o cliente
    */
   async createLink(customerId: string, tenantId: string): Promise<ReferralLink | null> {
-    const { data, error } = await supabase
-      .from('customer_referral_links')
-      .insert({
+    try {
+      const response = await api.createReferralLink({
         customer_id: customerId,
-        tenant_id: tenantId,
-        is_active: true,
-        total_referrals: 0,
-        total_earned: 0,
-        available_balance: 0
-      })
-      .select()
-      .single();
-    
-    if (error) {
+        commission_rate: 10,
+      });
+      
+      return response.data as ReferralLink;
+    } catch (error: any) {
       // Se erro de duplicidade, buscar o existente
-      if (error.code === '23505') {
+      if (error.response?.status === 409 || error.message?.includes('duplicate')) {
         return this.getByCustomerId(customerId, tenantId, false);
       }
       console.error('Error creating referral link:', error);
       return null;
     }
-    
-    return data as ReferralLink;
   },
 
   /**
    * Busca link de indicação pelo customer_tenant_id (para área Cliente/App)
    */
   async getByCustomerTenantId(customerTenantId: string): Promise<ReferralLink | null> {
-    // Primeiro busca o customer_id pelo customer_tenant_id
-    const { data: customers } = await supabase
-      .from('customers')
-      .select('id')
-      .eq('customer_tenant_id', customerTenantId)
-      .limit(1);
+    try {
+      // Primeiro busca o customer_id pelo customer_tenant_id
+      const response = await api.getCustomers({ customer_tenant_id: customerTenantId, limit: 1 });
+      const customerId = response.data?.[0]?.id;
+      
+      if (!customerId) return null;
 
-    const customerId = customers?.[0]?.id;
-    if (!customerId) return null;
-
-    return this.getByCustomerId(customerId);
+      return this.getByCustomerId(customerId);
+    } catch (error) {
+      console.error('Error fetching customer by tenant ID:', error);
+      return null;
+    }
   },
 
   /**
    * Busca clientes indicados por um referral_link_id
    */
   async getReferredUsers(referralLinkId: string): Promise<ReferredCustomer[]> {
-    const { data, error } = await supabase
-      .from('customer_referrals')
-      .select('id, referred_customer_id, status, commission_amount, created_at')
-      .eq('referral_link_id', referralLinkId)
-      .order('created_at', { ascending: false });
+    try {
+      const response = await api.getReferrals(referralLinkId);
+      const data = response.data || [];
 
-    if (error) {
+      // Backend já retorna referred_customer_name enriquecido
+      const enriched: ReferredCustomer[] = data.map((item: any) => ({
+        ...item,
+        referred_name: item.referred_customer_name || 'Cliente #' + (item.referred_customer_id?.slice(0, 6) || 'XXXXXX'),
+        status: (item.status || 'pending') as 'pending' | 'paid'
+      }));
+
+      return enriched;
+    } catch (error) {
       console.error('Error fetching referred users:', error);
       return [];
     }
-
-    // Enriquecer com nomes dos clientes
-    const enriched: ReferredCustomer[] = await Promise.all(
-      (data || []).map(async (item) => {
-        let referred_name = 'Cliente #' + (item.referred_customer_id?.slice(0, 6) || 'XXXXXX');
-        
-        if (item.referred_customer_id) {
-          const { data: customerData } = await supabase
-            .from('customers')
-            .select('full_name')
-            .eq('id', item.referred_customer_id)
-            .maybeSingle();
-          
-          if (customerData) {
-            referred_name = customerData.full_name;
-          }
-        }
-
-        return {
-          ...item,
-          referred_name,
-          status: (item.status || 'pending') as 'pending' | 'paid'
-        };
-      })
-    );
-
-    return enriched;
   },
 
   /**
    * Busca transações de um referral link
    */
   async getTransactions(referralLinkId: string): Promise<ReferralTransaction[]> {
-    const { data, error } = await supabase
-      .from('referral_transactions')
-      .select('*')
-      .eq('customer_referral_link_id', referralLinkId)
-      .order('created_at', { ascending: false });
-
-    if (error) {
+    try {
+      const response = await api.getReferralTransactions(referralLinkId);
+      return (response.data || []) as ReferralTransaction[];
+    } catch (error) {
       console.error('Error fetching transactions:', error);
       return [];
     }
-
-    return (data || []) as ReferralTransaction[];
   },
 
   /**
@@ -196,27 +154,23 @@ export const referralService = {
       throw new Error(`Saldo mínimo para saque: R$ ${MIN_PAYOUT_AMOUNT},00`);
     }
 
-    // Criar transação de saque
-    const { error } = await supabase
-      .from('referral_transactions')
-      .insert({
+    try {
+      // Criar transação de saque
+      await api.createReferralTransaction({
         customer_referral_link_id: params.referralLinkId,
-        customer_id: params.customerId,
-        tenant_id: params.tenantId,
-        type: 'payout',
         amount: params.amount,
-        status: 'pending',
-        pix_key: params.pixKey,
-        notes: `Saque de R$ ${params.amount.toFixed(2)} solicitado via PIX`
+        type: 'payout',
+        description: `Saque de R$ ${params.amount.toFixed(2)} solicitado via PIX`,
       });
 
-    if (error) throw error;
-
-    // Zerar saldo disponível
-    await supabase
-      .from('customer_referral_links')
-      .update({ available_balance: 0 })
-      .eq('id', params.referralLinkId);
+      // Zerar saldo disponível
+      await api.updateReferralLink(params.referralLinkId, {
+        available_balance: 0
+      });
+    } catch (error) {
+      console.error('Error requesting payout:', error);
+      throw error;
+    }
   },
 
   /**
@@ -232,28 +186,25 @@ export const referralService = {
       throw new Error('Saldo insuficiente');
     }
 
-    // Criar transação de crédito usado
-    const { error } = await supabase
-      .from('referral_transactions')
-      .insert({
+    try {
+      // Criar transação de crédito usado
+      await api.createReferralTransaction({
         customer_referral_link_id: params.referralLinkId,
-        customer_id: params.customerId,
-        tenant_id: params.tenantId,
-        type: 'credit_used',
         amount: params.amount,
-        status: 'completed',
-        notes: `Crédito de R$ ${params.amount.toFixed(2)} reservado para desconto`
+        type: 'credit_used',
+        description: `Crédito de R$ ${params.amount.toFixed(2)} reservado para desconto`,
       });
 
-    if (error) throw error;
+      // Zerar saldo
+      await api.updateReferralLink(params.referralLinkId, {
+        available_balance: 0
+      });
 
-    // Zerar saldo
-    await supabase
-      .from('customer_referral_links')
-      .update({ available_balance: 0 })
-      .eq('id', params.referralLinkId);
-
-    return { success: true, amount: params.amount };
+      return { success: true, amount: params.amount };
+    } catch (error) {
+      console.error('Error using credit:', error);
+      throw error;
+    }
   },
 
   /**

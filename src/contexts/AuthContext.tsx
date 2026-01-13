@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import api from '@/services/api';
+
 // Interfaces locais para compatibilidade (anteriormente do @supabase/supabase-js)
 interface User {
   id: string;
@@ -10,7 +12,7 @@ interface Session {
   user: User;
   access_token?: string;
 }
-import { supabase } from '@/lib/supabase-postgres';
+// Removido import supabase - usando API direta
 
 interface Profile {
   user_id: string;
@@ -57,11 +59,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Fetch user profile
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('user_id, full_name, current_tenant_id, created_at')
-      .eq('user_id', userId)
-      .maybeSingle();
+    const { data, error } = await api.get(`/rest/v1/profiles?user_id=eq.${userId}&select=user_id,full_name,current_tenant_id,created_at&single=true`);
 
     if (!error && data) {
       setProfile({

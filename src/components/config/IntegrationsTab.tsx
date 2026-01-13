@@ -116,10 +116,10 @@ export const IntegrationsTab: React.FC = () => {
   const [aiEnabled, setAiEnabled] = useState(false);
   const [selectedAiProvider, setSelectedAiProvider] = useState<'openai' | 'gemini'>('gemini');
 
-  const webhookUrl = `http://72.60.14.172:3001/api/webhooks/mercadopago`;
-  const asaasWebhookUrl = `http://72.60.14.172:3001/api/webhooks/asaas`;
-  const stripeWebhookUrl = `http://72.60.14.172:3001/api/webhooks/stripe`;
-  const pagseguroWebhookUrl = `http://72.60.14.172:3001/api/webhooks/pagseguro`;
+  const webhookUrl = `https://brgestor.com/api/webhooks/mercadopago`;
+  const asaasWebhookUrl = `https://brgestor.com/api/webhooks/asaas`;
+  const stripeWebhookUrl = `https://brgestor.com/api/webhooks/stripe`;
+  const pagseguroWebhookUrl = `https://brgestor.com/api/webhooks/pagseguro`;
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));

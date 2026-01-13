@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase-postgres';
+import api from '@/services/api';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { logActivityDirect } from '@/hooks/useActivityLog';
@@ -37,13 +37,9 @@ export const useCharges = () => {
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
-      const { data, error } = await supabase
-        .from('customer_charges')
-        .select('*, customer:customers(*)')
-        .eq('tenant_id', currentTenant.id)
-        .order('due_date', { ascending: false });
+      const { data, error } = await api.getCharges();
 
-      if (error) throw error;
+      if (error) throw new Error(error);
       return data as Charge[];
     },
     enabled: !!currentTenant?.id,
@@ -64,16 +60,9 @@ export const useCharges = () => {
         throw new Error('Valor inválido');
       }
 
-      const { data: newCharge, error } = await supabase
-        .from('customer_charges')
-        .insert({
-          ...data,
-          tenant_id: currentTenant.id,
-        })
-        .select()
-        .single();
+      const { data: newCharge, error } = await api.createCharge(data);
 
-      if (error) throw error;
+      if (error) throw new Error(error);
       return newCharge;
     },
     onSuccess: (newCharge) => {
@@ -94,12 +83,9 @@ export const useCharges = () => {
 
   const updateCharge = useMutation({
     mutationFn: async ({ id, ...data }: Partial<ChargeInsert> & { id: string }) => {
-      const { error } = await supabase
-        .from('customer_charges')
-        .update(data)
-        .eq('id', id);
+      const { error } = await api.updateCharge(id, data);
 
-      if (error) throw error;
+      if (error) throw new Error(error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });
@@ -113,12 +99,9 @@ export const useCharges = () => {
 
   const markAsPaid = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('customer_charges')
-        .update({ status: 'paid', paid_at: new Date().toISOString() })
-        .eq('id', id);
+      const { error } = await api.updateCharge(id, { status: 'paid', paid_at: new Date().toISOString() });
 
-      if (error) throw error;
+      if (error) throw new Error(error);
     },
     onSuccess: (_, chargeId) => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });
@@ -138,12 +121,9 @@ export const useCharges = () => {
 
   const cancelCharge = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('customer_charges')
-        .update({ status: 'cancelled' })
-        .eq('id', id);
+      const { error } = await api.updateCharge(id, { status: 'cancelled' });
 
-      if (error) throw error;
+      if (error) throw new Error(error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });
@@ -157,8 +137,8 @@ export const useCharges = () => {
 
   const deleteCharge = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('customer_charges').delete().eq('id', id);
-      if (error) throw error;
+      const { error } = await api.deleteCharge(id);
+      if (error) throw new Error(error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['charges'] });

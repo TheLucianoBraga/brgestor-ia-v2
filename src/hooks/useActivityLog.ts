@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase-postgres';
+import api from '@/services/api';
 import { useTenant } from '@/contexts/TenantContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Json } from '@/integrations/supabase/types';
@@ -34,37 +34,18 @@ export const useActivityLog = (filters?: ActivityLogFilters, page = 1, pageSize 
     queryFn: async () => {
       if (!currentTenant?.id) return { logs: [], total: 0 };
 
-      let query = supabase
-        .from('activity_logs')
-        .select('*', { count: 'exact' })
-        .order('created_at', { ascending: false });
+      const { data, error } = await api.getActivityLogs({
+        limit: pageSize,
+        offset: (page - 1) * pageSize,
+        action: filters?.action,
+        resource: filters?.resource,
+        start_date: filters?.startDate,
+        end_date: filters?.endDate ? `${filters.endDate}T23:59:59.999Z` : undefined,
+      });
 
-      // Apply filters
-      if (filters?.startDate) {
-        query = query.gte('created_at', filters.startDate);
-      }
-      if (filters?.endDate) {
-        query = query.lte('created_at', filters.endDate + 'T23:59:59.999Z');
-      }
-      if (filters?.userId) {
-        query = query.eq('user_id', filters.userId);
-      }
-      if (filters?.action) {
-        query = query.eq('action', filters.action);
-      }
-      if (filters?.resource) {
-        query = query.eq('resource', filters.resource);
-      }
-
-      // Pagination
-      const from = (page - 1) * pageSize;
-      const to = from + pageSize - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-
-      if (error) throw error;
-      return { logs: data as ActivityLog[], total: count || 0 };
+      if (error) throw new Error(error);
+      
+      return data as { logs: ActivityLog[], total: number };
     },
     enabled: !!currentTenant?.id,
   });
@@ -81,16 +62,13 @@ export const useActivityLog = (filters?: ActivityLogFilters, page = 1, pageSize 
     }) => {
       if (!currentTenant?.id) throw new Error('Tenant não selecionado');
 
-      const { error } = await supabase.from('activity_logs').insert([{
-        tenant_id: currentTenant.id,
-        user_id: user?.id || null,
+      const { error } = await api.createActivityLog({
         action,
         resource,
         details,
-        ip_address: null, // IP is captured server-side if needed
-      }]);
+      });
 
-      if (error) throw error;
+      if (error) throw new Error(error);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activity_logs'] });
@@ -103,16 +81,10 @@ export const useActivityLog = (filters?: ActivityLogFilters, page = 1, pageSize 
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
-      const { data, error } = await supabase
-        .from('activity_logs')
-        .select('action')
-        .order('action');
+      const { data, error } = await api.getActivityLogActions();
 
-      if (error) throw error;
-      
-      // Get unique actions
-      const uniqueActions = [...new Set(data.map((d) => d.action))];
-      return uniqueActions;
+      if (error) throw new Error(error);
+      return data || [];
     },
     enabled: !!currentTenant?.id,
   });
@@ -123,16 +95,10 @@ export const useActivityLog = (filters?: ActivityLogFilters, page = 1, pageSize 
     queryFn: async () => {
       if (!currentTenant?.id) return [];
 
-      const { data, error } = await supabase
-        .from('activity_logs')
-        .select('resource')
-        .order('resource');
+      const { data, error } = await api.getActivityLogResources();
 
-      if (error) throw error;
-      
-      // Get unique resources
-      const uniqueResources = [...new Set(data.map((d) => d.resource))];
-      return uniqueResources;
+      if (error) throw new Error(error);
+      return data || [];
     },
     enabled: !!currentTenant?.id,
   });
@@ -157,14 +123,12 @@ export const logActivityDirect = async (
   details: Json = {}
 ) => {
   try {
-    await supabase.from('activity_logs').insert([{
-      tenant_id: tenantId,
-      user_id: userId,
+    await api.createActivityLog({
       action,
       resource,
+      resource_id: undefined,
       details,
-      ip_address: null,
-    }]);
+    });
   } catch (error) {
     console.error('Failed to log activity:', error);
   }

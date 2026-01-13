@@ -295,7 +295,7 @@ export default function WhatsApp() {
   const generateQRCodeApi1 = async (sessionName: string) => {
     const apiUrl = getSetting('waha_api_url')!;
     const apiKey = getSetting('waha_api_key')!;
-    const webhookUrl = `http://72.60.14.172:3001/api/webhooks/whatsapp`;
+    const webhookUrl = `https://brgestor.com/api/webhooks/whatsapp`;
     
     console.log('🔵 [API 1] Gerando QR Code...', sessionName);
     
@@ -380,7 +380,7 @@ export default function WhatsApp() {
   const generateQRCodeApi2 = async (instanceName: string) => {
     const apiUrl = getSetting('api2_url')!;
     const apiKey = getSetting('api2_api_key')!;
-    const webhookUrl = `http://72.60.14.172:3001/api/webhooks/evolution`;
+    const webhookUrl = `https://brgestor.com/api/webhooks/evolution`;
     
     console.log('🔵 [API 2] Gerando QR Code...', instanceName);
     
@@ -588,7 +588,7 @@ export default function WhatsApp() {
             
             // Configurar webhook após conectar via QR
             console.log('✅ Conectado! Configurando webhook...');
-            const webhookUrl = `http://72.60.14.172:3001/api/webhooks/whatsapp`;
+            const webhookUrl = `https://brgestor.com/api/webhooks/whatsapp`;
             try {
               await fetch(`${wahaUrl}/api/sessions/${sessionName}`, {
                 method: 'PUT',
